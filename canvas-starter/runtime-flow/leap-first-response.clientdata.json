@@ -141,7 +141,7 @@
                   "operationId": "StartAndWaitForAnApproval"
                 },
                 "parameters": {
-                  "approvalType": "ApproveRejectFirstToRespond",
+                  "approvalType": "Basic",
                   "WebhookApprovalCreationInput/title": "IRS LEAP request @{triggerOutputs()?['body/leap_requestid']}",
                   "WebhookApprovalCreationInput/assignedTo": "@join(body('Select_approver_Entra_GUIDs'),';')",
                   "WebhookApprovalCreationInput/details": "Review the request in the secured IRS LEAP app. Request ID: @{triggerOutputs()?['body/leap_requestid']}",
