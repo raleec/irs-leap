@@ -35,14 +35,14 @@ Screens:
             FocusedBorderThickness: =2
             Height: =32
             TabIndex: =0
-            Text: =If(IsBlank(varMe.User), "Account unavailable. Contact your environment administrator.", "Signed in as " & varMe.'Full Name')
+            Text: =If(IsBlank(varMe), "Account unavailable. Contact your environment administrator.", "Signed in as " & varMe.'Full Name')
             Width: =850
             X: =24
             Y: =100
       - btnNew:
           Control: Classic/Button
           Properties:
-            DisplayMode: =If(IsBlank(varMe.User), DisplayMode.Disabled, DisplayMode.Edit)
+            DisplayMode: =If(IsBlank(varMe), DisplayMode.Disabled, DisplayMode.Edit)
             Height: =44
             OnSelect: =Set(varNewRequest, true); Navigate(scrNew)
             Text: ="New request"
@@ -135,7 +135,7 @@ Screens:
       - btnMyTotals:
           Control: Classic/Button
           Properties:
-            DisplayMode: =If(IsBlank(varMe.User), DisplayMode.Disabled, DisplayMode.Edit)
+            DisplayMode: =If(IsBlank(varMe), DisplayMode.Disabled, DisplayMode.Edit)
             Height: =44
             OnSelect: =Set(varTotalsRequester, varMe); Set(varAnnualTotal, Blank()); Set(varTotalError, ""); Set(varReloadTotals, true); Navigate(scrTotals)
             Text: ="My annual totals"
@@ -169,7 +169,48 @@ Screens:
           Properties:
             AccessibleLabel: ="Authorized requests on the selected calendar date"
             Height: =470
-            Items: =Switch(ddRequestView.Selected.Value, "My requests", Sort(Filter('LEAP Requests', 'Leave Date' = varSelectedDate, Requester.User = varMe.User), 'Start Minute', SortOrder.Ascending), "My approvals", Sort(Filter('LEAP Requests', 'Leave Date' = varSelectedDate, 'Approver 1'.User = varMe.User || 'Approver 2'.User = varMe.User || 'Approver 3'.User = varMe.User), 'Start Minute', SortOrder.Ascending), Sort(Filter('LEAP Requests', 'Leave Date' = varSelectedDate), 'Start Minute', SortOrder.Ascending))
+            Items: |-
+              =With(
+                {dayStart: DateValue(varSelectedDate), dayEnd: DateAdd(DateValue(varSelectedDate), 1, TimeUnit.Days)},
+                Switch(
+                  ddRequestView.Selected.Value,
+                  "My requests",
+                  Sort(
+                    Filter(
+                      'LEAP Requests',
+                      DateAdd('Leave Date', 'End Minute', TimeUnit.Minutes) > dayStart &&
+                      DateAdd('Leave Date', 'Start Minute', TimeUnit.Minutes) < dayEnd &&
+                      Requester.'Azure AD Object ID' = varMe.'Azure AD Object ID'
+                    ),
+                    DateAdd('Leave Date', 'Start Minute', TimeUnit.Minutes),
+                    SortOrder.Ascending
+                  ),
+                  "My approvals",
+                  Sort(
+                    Filter(
+                      'LEAP Requests',
+                      DateAdd('Leave Date', 'End Minute', TimeUnit.Minutes) > dayStart &&
+                      DateAdd('Leave Date', 'Start Minute', TimeUnit.Minutes) < dayEnd &&
+                      (
+                        'Approver 1'.'Azure AD Object ID' = varMe.'Azure AD Object ID' ||
+                        'Approver 2'.'Azure AD Object ID' = varMe.'Azure AD Object ID' ||
+                        'Approver 3'.'Azure AD Object ID' = varMe.'Azure AD Object ID'
+                      )
+                    ),
+                    DateAdd('Leave Date', 'Start Minute', TimeUnit.Minutes),
+                    SortOrder.Ascending
+                  ),
+                  Sort(
+                    Filter(
+                      'LEAP Requests',
+                      DateAdd('Leave Date', 'End Minute', TimeUnit.Minutes) > dayStart &&
+                      DateAdd('Leave Date', 'Start Minute', TimeUnit.Minutes) < dayEnd
+                    ),
+                    DateAdd('Leave Date', 'Start Minute', TimeUnit.Minutes),
+                    SortOrder.Ascending
+                  )
+                )
+              )
             OnSelect: =Set(varSelectedRequest, ThisItem); Navigate(scrDetails)
             TabIndex: =0
             TemplatePadding: =6
@@ -189,9 +230,14 @@ Screens:
                   Size: =14
                   TabIndex: =0
                   Text: |-
-                    =ThisItem.Title & " | " & Text(ThisItem.'Request Status') & Char(10) &
-                    ThisItem.Requester.'Full Name' & " | " &
-                    Text(Int(ThisItem.'Start Minute' / 60), "00") & ":" & Text(Mod(ThisItem.'Start Minute', 60), "00") &
-                    " - " & Text(Int(ThisItem.'End Minute' / 60), "00") & ":" & Text(Mod(ThisItem.'End Minute', 60), "00") &
-                    " | " & If(IsBlank(ThisItem.'Leave Hours'), "Hours not entered", Text(ThisItem.'Leave Hours') & " hours")
+                    =With(
+                      {
+                        startAt: DateAdd(ThisItem.'Leave Date', ThisItem.'Start Minute', TimeUnit.Minutes),
+                        endAt: DateAdd(ThisItem.'Leave Date', ThisItem.'End Minute', TimeUnit.Minutes)
+                      },
+                      ThisItem.Title & " | " & Text(ThisItem.'Request Status') & Char(10) &
+                      ThisItem.Requester.'Full Name' & " | " &
+                      Text(startAt, "[$-en-US]mmm d, yyyy HH:mm") & " - " & Text(endAt, "[$-en-US]mmm d, yyyy HH:mm") &
+                      " | " & If(IsBlank(ThisItem.'Leave Hours'), "Hours not entered", Text(Value(ThisItem.'Leave Hours') / 4, "0.##") & " hours")
+                    )
                   Width: =650

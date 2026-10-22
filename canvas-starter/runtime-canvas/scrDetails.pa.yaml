@@ -23,20 +23,25 @@ Screens:
             Size: =16
             TabIndex: =0
             Text: |-
-              ="Title: " & varSelectedRequest.Title & Char(10) &
-              "Requester: " & varSelectedRequest.Requester.'Full Name' & Char(10) &
-              "Date: " & Text(varSelectedRequest.'Leave Date', "dddd, mmmm d, yyyy") & Char(10) &
-              "Time: " & Text(Int(varSelectedRequest.'Start Minute' / 60), "00") & ":" & Text(Mod(varSelectedRequest.'Start Minute', 60), "00") &
-              " - " & Text(Int(varSelectedRequest.'End Minute' / 60), "00") & ":" & Text(Mod(varSelectedRequest.'End Minute', 60), "00") & Char(10) &
-              "Category: " & Text(varSelectedRequest.'Leave Category') & Char(10) &
-              "Hours: " & If(IsBlank(varSelectedRequest.'Leave Hours'), "Not entered", Text(varSelectedRequest.'Leave Hours')) & Char(10) &
-              "Status: " & Text(varSelectedRequest.'Request Status') & Char(10) &
-              "Approver 1: " & varSelectedRequest.'Approver 1'.'Full Name' & Char(10) &
-              "Approver 2: " & Coalesce(varSelectedRequest.'Approver 2'.'Full Name', "Not selected") & Char(10) &
-              "Approver 3: " & Coalesce(varSelectedRequest.'Approver 3'.'Full Name', "Not selected") & Char(10) &
-              "Decision by: " & Coalesce(varSelectedRequest.'Decided By'.'Full Name', "Awaiting decision") & Char(10) &
-              "Decision on: " & If(IsBlank(varSelectedRequest.'Decided On'), "Not decided", Text(varSelectedRequest.'Decided On')) & Char(10) &
-              "Request ID: " & Text(varSelectedRequest.'LEAP Request')
+              =With(
+                {
+                  startAt: DateAdd(varSelectedRequest.'Leave Date', varSelectedRequest.'Start Minute', TimeUnit.Minutes),
+                  endAt: DateAdd(varSelectedRequest.'Leave Date', varSelectedRequest.'End Minute', TimeUnit.Minutes)
+                },
+                "Title: " & varSelectedRequest.Title & Char(10) &
+                "Requester: " & varSelectedRequest.Requester.'Full Name' & Char(10) &
+                "Start: " & Text(startAt, "[$-en-US]dddd, mmmm d, yyyy HH:mm") & Char(10) &
+                "End: " & Text(endAt, "[$-en-US]dddd, mmmm d, yyyy HH:mm") & Char(10) &
+                "Category: " & Text(varSelectedRequest.'Leave Category') & Char(10) &
+                "Requested hours: " & If(IsBlank(varSelectedRequest.'Leave Hours'), "Not entered", Text(Value(varSelectedRequest.'Leave Hours') / 4, "0.##")) & Char(10) &
+                "Status: " & Text(varSelectedRequest.'Request Status') & Char(10) &
+                "Approver 1: " & varSelectedRequest.'Approver 1'.'Full Name' & Char(10) &
+                "Approver 2: " & Coalesce(varSelectedRequest.'Approver 2'.'Full Name', "Not selected") & Char(10) &
+                "Approver 3: " & Coalesce(varSelectedRequest.'Approver 3'.'Full Name', "Not selected") & Char(10) &
+                "Decision by: " & Coalesce(varSelectedRequest.'Decided By'.'Full Name', "Awaiting decision") & Char(10) &
+                "Decision on: " & If(IsBlank(varSelectedRequest.'Decided On'), "Not decided", Text(varSelectedRequest.'Decided On')) & Char(10) &
+                "Request ID: " & Text(varSelectedRequest.'LEAP Request')
+              )
             Width: =1280
             X: =24
             Y: =84

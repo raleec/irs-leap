@@ -89,14 +89,22 @@ namespace IrsLeap.Plugins
             row[Schema.LeaveDate] = DateTime.SpecifyKind(date.Date, DateTimeKind.Unspecified);
             var start = Required<int>(row, Schema.StartMinute);
             var end = Required<int>(row, Schema.EndMinute);
-            Require(start >= 0 && start <= 1439 && end >= 1 && end <= 1440 && end > start,
-                "Minutes must describe a positive interval within one local date (start 0..1439, end 1..1440).");
+            Require(start >= 0 && start <= 1439 && end > start,
+                "Minutes must describe a positive interval with a same-day start (start 0..1439, end > start).");
+            Require(start % 15 == 0 && end % 15 == 0,
+                "Start and end date-times must use 15-minute increments.");
+            var durationMinutes = end - start;
+            Require(durationMinutes % 15 == 0,
+                "The selected interval must be a whole number of 15-minute units.");
             var category = Required<OptionSetValue>(row, Schema.Category).Value;
             Require(category >= 100000000 && category <= 100000012, "Select one of the 13 LEAP categories.");
             object hours;
-            if (row.Attributes.TryGetValue(Schema.Hours, out hours) && hours != null)
-                Require(hours is int && (int)hours >= 0 && (int)hours <= 24,
-                    "Hours must be blank or a whole number from 0 to 24.");
+            Require(row.Attributes.TryGetValue(Schema.Hours, out hours) && hours is int,
+                "Leave hours are required as 15-minute units.");
+            var quarterUnits = (int)hours;
+            Require(quarterUnits >= 0, "Leave hours cannot be negative.");
+            Require(quarterUnits == durationMinutes / 15,
+                "Leave hours must equal the selected start/end date-time duration in 15-minute units.");
         }
 
         internal static bool TrustedWorkflowCaller(IOrganizationService service, Guid caller)

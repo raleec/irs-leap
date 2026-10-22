@@ -10,7 +10,7 @@
         <LocalizedCollectionName description="LEAP Requests" languagecode="1033" />
       </LocalizedCollectionNames>
       <Descriptions>
-        <Description description="One date and one leave category per request." languagecode="1033" />
+        <Description description="One leave category per request with start/end date-time and 15-minute units." languagecode="1033" />
       </Descriptions>
       <attributes>
         <attribute PhysicalName="CreatedBy">
@@ -598,7 +598,7 @@
           <IsLocalizable>0</IsLocalizable>
           <Format>none</Format>
           <MinValue>1</MinValue>
-          <MaxValue>1440</MaxValue>
+          <MaxValue>2147483647</MaxValue>
           <displaynames>
             <displayname description="End Minute" languagecode="1033" />
           </displaynames>
@@ -635,7 +635,7 @@
           <IsLocalizable>0</IsLocalizable>
           <Format>none</Format>
           <MinValue>0</MinValue>
-          <MaxValue>24</MaxValue>
+          <MaxValue>2147483647</MaxValue>
           <displaynames>
             <displayname description="Leave Hours" languagecode="1033" />
           </displaynames>

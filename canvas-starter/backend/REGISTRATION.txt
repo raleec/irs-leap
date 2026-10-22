@@ -92,9 +92,9 @@ contacts, Entra display names, email text, teams, or unconstrained GUID text.
   leap_name             primary text, maximum 120
   leap_description      optional multiline text, maximum 1000
   leap_leavedate         required DateOnly behavior, date-only format
-  leap_startminute       required whole number, 0..1439
-  leap_endminute         required whole number, 1..1440 and greater than start
-  leap_hours             optional whole number, 0..24; NULL is not zero
+  leap_startminute       required whole number, 0..1439 (start offset on leave date)
+  leap_endminute         required whole number, > start; supports cross-day ranges
+  leap_hours             required whole number, 0..2147483647 quarter-hour units
   leap_category          required choice: all 13 values 100000000..100000012
   leap_status            required choice:
                            100000000 Pending
@@ -115,9 +115,9 @@ contacts, Entra display names, email text, teams, or unconstrained GUID text.
 
 The source validates category numeric values, not their display labels.
 Provision the intended 13 business labels against these exact values.
-Do not use a decimal-hours column or substitute a duration-derived value.
 DateOnly is a local wall-calendar date: the guard strips the time and sets
 DateTimeKind.Unspecified without UTC/local timezone conversion.
+leap_hours must equal (leap_endminute - leap_startminute) / 15 exactly.
 
 Security and immutable workflow contract
 ----------------------------------------
@@ -131,12 +131,12 @@ forces Pending, derives the year, and clears workflow-managed fields. Supplying
 non-null workflow-managed fields on Create is rejected. Submitted requester
 and owner values are not trusted; they are overwritten.
 
-Content, date, hours, approvers, ownership, requester, and derived year are
-immutable after save, including while Pending. Even same-value attribute
-writes are rejected. Assign is blocked. Finalized requests (Approved, Denied,
-Expired) are immutable in their entirety: no approval ID, processing-note,
-comment, or status changes are accepted afterward. Correct data before
-submission; this source does not implement amendments or reopening.
+Content, date, quarter-hour units, approvers, ownership, requester, and
+derived year are immutable after save, including while Pending. Even same-value
+attribute writes are rejected. Assign is blocked. Finalized requests
+(Approved, Denied, Expired) are immutable in their entirety: no approval ID,
+processing-note, comment, or status changes are accepted afterward. Correct
+data before submission; this source does not implement amendments or reopening.
 
 Pending workflow updates require the initiating caller to have a direct or
 team-inherited role named exactly IRS LEAP Automation or System Administrator.
@@ -176,10 +176,9 @@ scope is unacceptable, change the design and retest before deployment.
 
 The elevated aggregate includes only Approved rows for the requested requester
 and derived calendar year, across rows the caller may not otherwise read.
-It counts approved requests, sums explicitly recorded leap_hours, and counts
-non-null hours. MissingHours = ApprovedRequests - non-null-hours count.
-An explicit zero is recorded; blank is missing. No approved hours are inferred
-from interval duration, and overlapping requests are allowed.
+It counts approved requests, sums recorded leap_hours quarter-hour units, and
+counts non-null hours. MissingHours = ApprovedRequests - non-null-hours count
+(legacy rows can still be null). Approved request overlaps are allowed.
 Dataverse aggregate errors/record-limit faults fail the operation rather than
 returning a partial sum or paging ordinary records. The normal aggregate query
 record limit is 50,000 matching rows and is an environment/service constraint.

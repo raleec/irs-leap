@@ -4,7 +4,7 @@ Screens:
       Fill: =RGBA(247, 249, 252, 1)
       OnVisible: |-
         =If(varNewRequest,
-          Reset(txtTitle); Reset(txtDescription); Reset(dpLeave); Reset(txtHours);
+          Reset(txtTitle); Reset(txtDescription); Reset(dpLeave); Reset(dpEndDate);
           Reset(ddCategory); Reset(cbApprover1); Reset(cbApprover2); Reset(cbApprover3);
           Reset(ddStartHour); Reset(ddStartMinute); Reset(ddEndHour); Reset(ddEndMinute);
           Set(varRequestError, ""); Set(varSubmitting, false); Set(varNewRequest, false))
@@ -27,7 +27,7 @@ Screens:
             FocusedBorderThickness: =2
             Height: =38
             TabIndex: =0
-            Text: ="One date and one category per request. Overlaps are allowed. Do not include diagnoses or unnecessary personal details."
+            Text: ="Set start and end date-time in 15-minute increments. Overlaps are allowed. Do not include diagnoses or unnecessary personal details."
             Width: =1300
             X: =24
             Y: =66
@@ -80,14 +80,14 @@ Screens:
             FocusedBorderThickness: =2
             Height: =30
             TabIndex: =0
-            Text: ="Leave date *"
+            Text: ="Start date *"
             Width: =300
             X: =24
             Y: =350
       - dpLeave:
           Control: Classic/DatePicker
           Properties:
-            AccessibleLabel: ="Required calendar date of leave"
+            AccessibleLabel: ="Required start date of leave"
             DisplayMode: =If(varSubmitting, DisplayMode.Disabled, DisplayMode.Edit)
             EndYear: =2100
             Height: =42
@@ -95,25 +95,24 @@ Screens:
             Width: =300
             X: =24
             Y: =386
-      - lblHours:
+      - lblEndDate:
           Control: Label
           Properties:
             FocusedBorderThickness: =2
             Height: =30
             TabIndex: =0
-            Text: ="Leave hours (optional integer, 0-24)"
+            Text: ="End date *"
             Width: =300
             X: =344
             Y: =350
-      - txtHours:
-          Control: Classic/TextInput
+      - dpEndDate:
+          Control: Classic/DatePicker
           Properties:
-            AccessibleLabel: ="Optional whole-number leave hours from zero through twenty-four"
-            Default: =""
+            AccessibleLabel: ="Required end date of leave"
             DisplayMode: =If(varSubmitting, DisplayMode.Disabled, DisplayMode.Edit)
-            Format: =TextFormat.Number
+            EndYear: =2100
             Height: =42
-            HintText: ="Blank means not entered; 0 means zero"
+            StartYear: =1900
             Width: =300
             X: =344
             Y: =386
@@ -146,7 +145,7 @@ Screens:
             Default: ="0"
             DisplayMode: =If(varSubmitting, DisplayMode.Disabled, DisplayMode.Edit)
             Height: =42
-            Items: =Sequence(60, 0, 1)
+            Items: =[0, 15, 30, 45]
             Items.Value: =Value
             Width: =130
             X: =172
@@ -157,18 +156,18 @@ Screens:
             FocusedBorderThickness: =2
             Height: =30
             TabIndex: =0
-            Text: ="End time * (24:00 = end of day)"
+            Text: ="End time * (24-hour local time)"
             Width: =300
             X: =344
             Y: =444
       - ddEndHour:
           Control: Classic/DropDown
           Properties:
-            AccessibleLabel: ="End hour, zero through twenty-four"
+            AccessibleLabel: ="End hour, zero through twenty-three"
             Default: ="10"
             DisplayMode: =If(varSubmitting, DisplayMode.Disabled, DisplayMode.Edit)
             Height: =42
-            Items: =Sequence(25, 0, 1)
+            Items: =Sequence(24, 0, 1)
             Items.Value: =Value
             Width: =130
             X: =344
@@ -176,15 +175,36 @@ Screens:
       - ddEndMinute:
           Control: Classic/DropDown
           Properties:
-            AccessibleLabel: ="End minute; only zero is allowed at hour twenty-four"
+            AccessibleLabel: ="End minute"
             Default: ="0"
             DisplayMode: =If(varSubmitting, DisplayMode.Disabled, DisplayMode.Edit)
             Height: =42
-            Items: =Sequence(If(ddEndHour.Selected.Value = 24, 1, 60), 0, 1)
+            Items: =[0, 15, 30, 45]
             Items.Value: =Value
             Width: =130
             X: =492
             Y: =480
+      - lblRequestedHours:
+          Control: Label
+          Properties:
+            FocusedBorderThickness: =2
+            Height: =52
+            TabIndex: =0
+            Text: |-
+              =With(
+                {
+                  startAt: DateAdd(DateValue(dpLeave.SelectedDate), ddStartHour.Selected.Value * 60 + ddStartMinute.Selected.Value, TimeUnit.Minutes),
+                  endAt: DateAdd(DateValue(dpEndDate.SelectedDate), ddEndHour.Selected.Value * 60 + ddEndMinute.Selected.Value, TimeUnit.Minutes)
+                },
+                If(
+                  IsBlank(dpLeave.SelectedDate) || IsBlank(dpEndDate.SelectedDate) || DateDiff(startAt, endAt, TimeUnit.Minutes) <= 0,
+                  "Requested leave hours: --",
+                  "Requested leave hours: " & Text(DateDiff(startAt, endAt, TimeUnit.Minutes) / 60, "0.##")
+                )
+              )
+            Width: =620
+            X: =24
+            Y: =536
       - lblCategory:
           Control: Label
           Properties:
@@ -295,7 +315,7 @@ Screens:
             Text: ="Search your organization's directory. Each selected person must also be an enabled, provisioned Dataverse user. Up to three distinct approvers; first response decides. Submitted requests cannot be edited."
             Width: =620
             X: =700
-            Y: =490
+            Y: =536
       - lblSubmissionError:
           Control: Label
           Properties:
@@ -306,24 +326,29 @@ Screens:
             Text: =varRequestError
             Width: =1296
             X: =24
-            Y: =576
+            Y: =624
       - btnSubmit:
           Control: Classic/Button
           Properties:
-            DisplayMode: =If(varSubmitting || IsBlank(varMe.User), DisplayMode.Disabled, DisplayMode.Edit)
+            DisplayMode: =If(varSubmitting || IsBlank(varMe), DisplayMode.Disabled, DisplayMode.Edit)
             Height: =46
             OnSelect: |-
               =Set(varRequestError, "");
               With(
-                {h: Trim(txtHours.Text), s: ddStartHour.Selected.Value * 60 + ddStartMinute.Selected.Value, e: If(ddEndHour.Selected.Value = 24, 1440, ddEndHour.Selected.Value * 60 + ddEndMinute.Selected.Value)},
+                {
+                  startAt: DateAdd(DateValue(dpLeave.SelectedDate), ddStartHour.Selected.Value * 60 + ddStartMinute.Selected.Value, TimeUnit.Minutes),
+                  endAt: DateAdd(DateValue(dpEndDate.SelectedDate), ddEndHour.Selected.Value * 60 + ddEndMinute.Selected.Value, TimeUnit.Minutes),
+                  s: ddStartHour.Selected.Value * 60 + ddStartMinute.Selected.Value
+                },
                 If(
-                  IsBlank(varMe.User), Set(varRequestError, "Your Dataverse user is unavailable."),
+                  IsBlank(varMe), Set(varRequestError, "Your Dataverse user is unavailable."),
                   IsBlank(Trim(txtTitle.Text)), Set(varRequestError, "Enter a short title."),
-                  IsBlank(dpLeave.SelectedDate), Set(varRequestError, "Select one leave date."),
+                  IsBlank(dpLeave.SelectedDate), Set(varRequestError, "Select a start date."),
+                  IsBlank(dpEndDate.SelectedDate), Set(varRequestError, "Select an end date."),
                   IsBlank(ddCategory.Selected.Value), Set(varRequestError, "Select one category."),
                   IsBlank(cbApprover1.Selected.Id), Set(varRequestError, "Choose Approver 1."),
-                  !IsBlank(h) && !IsMatch(h, "([0-9]|1[0-9]|2[0-4])", MatchOptions.Complete), Set(varRequestError, "Hours must be blank or an integer from 0 to 24."),
-                  e <= s, Set(varRequestError, "End time must be later on the same date."),
+                  DateDiff(startAt, endAt, TimeUnit.Minutes) <= 0, Set(varRequestError, "End date-time must be later than start date-time."),
+                  Mod(DateDiff(startAt, endAt, TimeUnit.Minutes), 15) <> 0, Set(varRequestError, "The requested duration must use 15-minute increments."),
                   Lower(cbApprover1.Selected.Id) = Lower(Text(User().EntraObjectId)) ||
                   (!IsBlank(cbApprover2.Selected.Id) && Lower(cbApprover2.Selected.Id) = Lower(Text(User().EntraObjectId))) ||
                   (!IsBlank(cbApprover3.Selected.Id) && Lower(cbApprover3.Selected.Id) = Lower(Text(User().EntraObjectId))), Set(varRequestError, "Self-approval is not permitted."),
@@ -335,20 +360,22 @@ Screens:
                       {
                         a1: LookUp(Users, 'Azure AD Object ID' = GUID(cbApprover1.Selected.Id), ThisRecord),
                         a2: If(!IsBlank(cbApprover2.Selected.Id), LookUp(Users, 'Azure AD Object ID' = GUID(cbApprover2.Selected.Id), ThisRecord)),
-                        a3: If(!IsBlank(cbApprover3.Selected.Id), LookUp(Users, 'Azure AD Object ID' = GUID(cbApprover3.Selected.Id), ThisRecord))
+                        a3: If(!IsBlank(cbApprover3.Selected.Id), LookUp(Users, 'Azure AD Object ID' = GUID(cbApprover3.Selected.Id), ThisRecord)),
+                        eTotal: DateDiff(DateValue(dpLeave.SelectedDate), endAt, TimeUnit.Minutes),
+                        quarterUnits: RoundDown(DateDiff(startAt, endAt, TimeUnit.Minutes) / 15, 0)
                       },
                       If(
-                        IsBlank(a1.User) ||
-                        (!IsBlank(cbApprover2.Selected.Id) && IsBlank(a2.User)) ||
-                        (!IsBlank(cbApprover3.Selected.Id) && IsBlank(a3.User)),
+                        IsBlank(a1) ||
+                        (!IsBlank(cbApprover2.Selected.Id) && IsBlank(a2)) ||
+                        (!IsBlank(cbApprover3.Selected.Id) && IsBlank(a3)),
                         Set(varSubmitting, false); Set(varRequestError, "Every selected approver must be provisioned in this Dataverse environment. No request was saved."),
                         a1.Status <> 'Status (Users)'.Enabled || a1.'Access Mode' <> 'Access Mode (Users)'.'Read-Write' ||
-                        (!IsBlank(a2.User) && (a2.Status <> 'Status (Users)'.Enabled || a2.'Access Mode' <> 'Access Mode (Users)'.'Read-Write')) ||
-                        (!IsBlank(a3.User) && (a3.Status <> 'Status (Users)'.Enabled || a3.'Access Mode' <> 'Access Mode (Users)'.'Read-Write')),
+                        (!IsBlank(a2) && (a2.Status <> 'Status (Users)'.Enabled || a2.'Access Mode' <> 'Access Mode (Users)'.'Read-Write')) ||
+                        (!IsBlank(a3) && (a3.Status <> 'Status (Users)'.Enabled || a3.'Access Mode' <> 'Access Mode (Users)'.'Read-Write')),
                         Set(varSubmitting, false); Set(varRequestError, "Every selected approver must be enabled with Read-Write access in Dataverse. No request was saved."),
                         Set(varSelectedRequest, Patch('LEAP Requests', Defaults('LEAP Requests'),
-                          {Title: Trim(txtTitle.Text), Description: txtDescription.Text, 'Leave Date': dpLeave.SelectedDate,
-                           'Start Minute': s, 'End Minute': e, 'Leave Hours': If(IsBlank(h), Blank(), Value(h)),
+                          {Title: Trim(txtTitle.Text), Description: txtDescription.Text, 'Leave Date': DateValue(dpLeave.SelectedDate),
+                           'Start Minute': s, 'End Minute': eTotal, 'Leave Hours': quarterUnits,
                            'Leave Category': ddCategory.Selected.Value,
                            'Approver 1': a1, 'Approver 2': a2, 'Approver 3': a3}));
                         Set(varSubmitting, false); Refresh('LEAP Requests'); Notify("Request submitted.", NotificationType.Success); Navigate(scrDetails)
@@ -361,7 +388,7 @@ Screens:
             Text: =If(varSubmitting, "Submitting...", "Submit request")
             Width: =310
             X: =1010
-            Y: =680
+            Y: =708
       - btnCancel:
           Control: Classic/Button
           Properties:
@@ -371,4 +398,4 @@ Screens:
             Text: ="Cancel"
             Width: =240
             X: =700
-            Y: =680
+            Y: =708

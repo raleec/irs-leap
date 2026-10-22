@@ -55,10 +55,10 @@ Screens:
             OnSelect: |-
               =Set(varAnnualTotal, Blank()); Set(varTotalError, "");
               If(
-                IsBlank(varTotalsRequester.User), Set(varTotalError, "Select an authorized requester."),
+                IsBlank(varTotalsRequester) || IsBlank(varTotalsRequester.'Azure AD Object ID'), Set(varTotalError, "Select an authorized requester."),
                 !IsMatch(Trim(txtYear.Text), "[1-9][0-9]{3}", MatchOptions.Complete), Set(varTotalError, "Enter a four-digit year."),
                 Value(txtYear.Text) < 1900 || Value(txtYear.Text) > 2100, Set(varTotalError, "Choose a year from 1900 through 2100."),
-                IfError(Set(varAnnualTotal, Environment.leap_GetAnnualTotal({RequesterId: Text(varTotalsRequester.User), CalendarYear: Value(txtYear.Text)})),
+                IfError(Set(varAnnualTotal, Environment.leap_GetAnnualTotal({RequesterId: Text(varTotalsRequester.'Azure AD Object ID'), CalendarYear: Value(txtYear.Text)})),
                   Set(varAnnualTotal, Blank()); Set(varTotalError, FirstError.Message))
               )
             Text: ="Load annual totals"
@@ -75,7 +75,7 @@ Screens:
             TabIndex: =0
             Text: |-
               =If(IsBlank(varAnnualTotal), "Select a year and load totals.",
-                Text(Value(varAnnualTotal.TotalHours), "0") & " approved recorded hours" & Char(10) &
+                Text(Value(varAnnualTotal.TotalHours) / 4, "0.##") & " approved recorded hours" & Char(10) &
                 Text(Value(varAnnualTotal.ApprovedRequests), "0") & " approved requests" & Char(10) &
                 Text(Value(varAnnualTotal.MissingHours), "0") & " approved requests with hours not entered")
             Width: =1240
@@ -99,7 +99,7 @@ Screens:
             Height: =78
             Size: =14
             TabIndex: =0
-            Text: ="Totals use the year of the leave date, not the approval date. Separate overlapping requests each contribute their entered hours. Blank hours are not estimated. Authorized approvers can see annual aggregates without receiving access to unrelated request details."
+            Text: ="Totals use the year of the leave start date, not the approval date. Each 15-minute unit contributes one quarter-hour to annual totals. Authorized approvers can see annual aggregates without receiving access to unrelated request details."
             Width: =1260
             X: =24
             Y: =572

@@ -8,7 +8,7 @@
     <Descriptions>
       <Description description="Dataverse foundation for the one-day IRS LEAP Canvas workshop." languagecode="1033" />
     </Descriptions>
-    <Version>1.1.0.1</Version>
+    <Version>1.1.0.2</Version>
     <Managed>0</Managed>
     <Publisher>
       <UniqueName>IRSLEAP</UniqueName>

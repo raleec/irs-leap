@@ -76,6 +76,7 @@ internal static class Program
             [Schema.LeaveDate] = new DateTime(2026, 10, 21),
             [Schema.StartMinute] = 540,
             [Schema.EndMinute] = 600,
+            [Schema.Hours] = 4,
             [Schema.Category] = new OptionSetValue(100000000),
             [Schema.Approver1] = new EntityReference("systemuser", First)
         };
@@ -154,34 +155,45 @@ internal static class Program
                 Reject(() => Rules.Content(row), "leap_description");
             });
         }
-        Test("Content accepts omitted hours", () =>
+        Test("Content rejects omitted hours", () =>
         {
             var row = ValidRequest();
-            Rules.Content(row);
-            Check(!row.Contains(Schema.Hours), "Omitted hours must not become zero.");
+            row.Attributes.Remove(Schema.Hours);
+            Reject(() => Rules.Content(row), "Leave hours are required");
         });
-        foreach (var value in new object[] { null, 0, 1, 24 })
+        Test("Content accepts matching quarter-hour units without cap", () =>
+        {
+            var row = ValidRequest();
+            row[Schema.StartMinute] = 0;
+            row[Schema.EndMinute] = 3000;
+            row[Schema.Hours] = 200;
+            Rules.Content(row);
+            Check((int)row[Schema.Hours] == 200);
+        });
+        foreach (var value in new object[] { 4, 16, 4000 })
         {
             var hours = value;
-            Test("Content accepts hours " + (hours ?? "<blank>"), () =>
+            Test("Content accepts hours " + hours, () =>
             {
                 var row = ValidRequest();
+                row[Schema.StartMinute] = 0;
+                row[Schema.EndMinute] = (int)hours * 15;
                 row[Schema.Hours] = hours;
                 Rules.Content(row);
-                Check(Equals(row[Schema.Hours], hours), "Hours must preserve blank versus zero.");
+                Check(Equals(row[Schema.Hours], hours), "Hours must preserve explicit quarter-hour units.");
             });
         }
-        foreach (var value in new object[] { -1, 25, 1.5m, 1m, 1.0d, "1" })
+        foreach (var value in new object[] { -1, 1.5m, 1m, 1.0d, "1" })
         {
             var hours = value;
             Test("Content rejects hours " + hours + " (" + hours.GetType().Name + ")", () =>
             {
                 var row = ValidRequest();
                 row[Schema.Hours] = hours;
-                Reject(() => Rules.Content(row), "Hours must");
+                Reject(() => Rules.Content(row), "hours");
             });
         }
-        foreach (var pair in new[] { (0, 1), (0, 1440), (1439, 1440) })
+        foreach (var pair in new[] { (0, 15), (0, 1440), (0, 2895), (1425, 1440) })
         {
             var interval = pair;
             Test("Content accepts interval " + interval, () =>
@@ -189,10 +201,11 @@ internal static class Program
                 var row = ValidRequest();
                 row[Schema.StartMinute] = interval.Item1;
                 row[Schema.EndMinute] = interval.Item2;
+                row[Schema.Hours] = (interval.Item2 - interval.Item1) / 15;
                 Rules.Content(row);
             });
         }
-        foreach (var pair in new[] { (-1, 60), (1440, 1440), (0, 0), (0, 1441), (60, 60), (61, 60) })
+        foreach (var pair in new[] { (-1, 60), (1440, 1500), (0, 0), (0, 14), (60, 60), (61, 60), (0, 1441), (1, 16) })
         {
             var interval = pair;
             Test("Content rejects interval " + interval, () =>
@@ -200,7 +213,8 @@ internal static class Program
                 var row = ValidRequest();
                 row[Schema.StartMinute] = interval.Item1;
                 row[Schema.EndMinute] = interval.Item2;
-                Reject(() => Rules.Content(row), "Minutes must");
+                row[Schema.Hours] = Math.Max(0, (interval.Item2 - interval.Item1) / 15);
+                Reject(() => Rules.Content(row), "minute");
             });
         }
         Test("Content rejects decimal minute", () =>
@@ -208,6 +222,13 @@ internal static class Program
             var row = ValidRequest();
             row[Schema.StartMinute] = 540m;
             Reject(() => Rules.Content(row), "leap_startminute");
+        });
+        Test("Content rejects mismatched duration and quarter-hour units", () =>
+        {
+            var row = ValidRequest();
+            row[Schema.EndMinute] = 630;
+            row[Schema.Hours] = 4;
+            Reject(() => Rules.Content(row), "must equal the selected");
         });
         foreach (var year in new[] { 1900, 2100 })
         {
@@ -252,14 +273,15 @@ internal static class Program
                 Reject(() => Rules.Content(row), category is OptionSetValue ? "13 LEAP categories" : "leap_category");
             });
         }
-        Test("Content allows overlapping requests and explicit hours independent of duration", () =>
+        Test("Content allows overlapping requests with independent matching quarter-hour units", () =>
         {
             var first = ValidRequest();
             var second = ValidRequest();
             second.Id = Guid.NewGuid();
             second[Schema.StartMinute] = 570;
-            first[Schema.Hours] = 0;
-            second[Schema.Hours] = 24;
+            second[Schema.EndMinute] = 660;
+            first[Schema.Hours] = 4;
+            second[Schema.Hours] = 6;
             Rules.Content(first);
             Rules.Content(second);
         });
