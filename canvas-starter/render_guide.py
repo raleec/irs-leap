@@ -66,6 +66,7 @@ def main():
     sources = [
         (ROOT / "START-HERE.txt", "Start here", "overview"),
         (GUIDE / "RELEASE-1.1.txt", "Release 1.1 - actual components and target setup", "release"),
+        (GUIDE / "DIRECTORY-PICKER.txt", "Organization directory picker - release 1.1.0.1", "directory"),
         (GUIDE / "SOLUTIONS-FIRST.txt", "Solutions-first workshop - 150 minutes", "solutions"),
         (GUIDE / "COMPLETE-SOLUTION-PREPARATION.txt", "Rebuild and maintenance reference", "preparation"),
         (GUIDE / "CORE-LAB.txt", "Optional app/flow construction reference", "core"),

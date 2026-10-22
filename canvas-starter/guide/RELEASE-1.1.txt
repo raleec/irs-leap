@@ -1,11 +1,11 @@
-IRS LEAP - RELEASE 1.1.0.0 HANDOFF
+IRS LEAP - RELEASE 1.1.0.1 HANDOFF
 Complete component package; target configuration and rehearsal required
 
 WHAT IS INCLUDED
 ----------------
 Solution unique name: IRSLEAPCanvasStarter
 Publisher: IRSLEAP / leap
-Version: 1.1.0.0
+Version: 1.1.0.1
 
 Included in BOTH actual managed/unmanaged solution exports:
 - Native Canvas app "IRS LEAP", with calendar, new request, details and totals.
@@ -16,8 +16,8 @@ Included in BOTH actual managed/unmanaged solution exports:
 - Three portable connection references.
 - Two consumed Text environment-variable definitions.
 
-Use IRSLEAPCanvasStarter_1_1_0_0_unmanaged.zip for isolated workshop authoring.
-Use IRSLEAPCanvasStarter_1_1_0_0_managed.zip for a DIFFERENT downstream target.
+Use IRSLEAPCanvasStarter_1_1_0_1_unmanaged.zip for isolated workshop authoring.
+Use IRSLEAPCanvasStarter_1_1_0_1_managed.zip for a DIFFERENT downstream target.
 Do not import both flavors of this same solution into one environment.
 The outer IRS-LEAP-Canvas-Hackathon-Kit.zip is not a solution-import file.
 Version1.0.0.0 was the backend-only baseline; use1.1for the short workshop.
@@ -33,10 +33,13 @@ Source player (authorized source users only):
 Do NOT use that source URL as a target environment-variable value. After import,
 copy the TARGET app's actual published Web link from its Details page.
 
-The app uses native Dataverse as the signed-in user, native Users lookups and
+The app uses native Dataverse as the signed-in user,resolved Users lookups and
 the caller-bound Environment annual-total action. The packaged implementation
 uses a guarded create Patch and modern searchable approver pickers with explicit
-Full Name rendering. Older CORE-LAB construction examples use an Edit form and
+directory DisplayName+UPN rendering. Office365Users searches the signed-in user's
+organization;submit resolves selected Entra IDs to eligible Dataverse users.
+Read DIRECTORY-PICKER.txt for the new per-user connector requirement and guards.
+Older CORE-LAB construction examples use an Edit form and
 classic pickers; those remain reference exercises, not instructions to rebuild
 or overwrite the already packaged app.
 
@@ -57,6 +60,10 @@ approved target-owned connections and verify their owners can use them.
 Keep the target flow OFF until configuration,roles,recipients and message
 templates are approved. Target native flow-save/connection validation must
 succeed before activation. No source activation or notification sends occurred.
+
+Additionally,the Canvas app requires a per-user Office365Users OAuth connection
+to the target organization. This is NOT another flow reference. Directory search
+does not provision/license users or replace native Dataverse lookup/security.
 
 TARGET ENVIRONMENT VARIABLES - ACTUAL SCHEMA NAMES
 ------------------------------------------------

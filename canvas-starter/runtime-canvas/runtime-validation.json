@@ -16,6 +16,23 @@
   "decisionSimulation": "Synthetic decisions were written through administrator SDK only; native approval response was not exercised",
   "syntheticRecordsRemoved": 4,
   "notificationsSent": false,
+  "directoryPickerRelease": {
+    "version": "1.1.0.1",
+    "search": "Office365Users.SearchUserV2 under the signed-in user's organizational connection",
+    "mapping": "Resolve every selected Entra object ID to an enabled Read-Write Dataverse user immediately before save",
+    "observed": [
+      "Live directory search rendered a real enabled organization profile",
+      "Duplicate selections in required1 and optional2 rejected before save",
+      "Cleared optional2 and saved required1 as actual Dataverse user; explicit zero retained",
+      "Temporary synthetic unprovisioned Entra ID fixture in optional2 explicitly blocked the entire save",
+      "Fixture removed before save/publish/export; no hard-coded selection defaults",
+      "One valid synthetic request removed; rejected case created no request",
+      "Final native compile, app checker and accessibility diagnostics clear",
+      "Notification workflow remained off throughout"
+    ],
+    "noAutomaticProvisioningOrLicensing": true,
+    "targetOffice365UsersConsentAndGccRehearsalRequired": true
+  },
   "publishedPlayer": {
     "status": "Blocked by source owner lacking current Power Apps runtime plan",
     "trialStarted": false,

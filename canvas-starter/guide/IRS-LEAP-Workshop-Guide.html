@@ -98,10 +98,10 @@ Customer GCC validation remains required. This is not a production-approved IRS 
 <button id="expand" type="button">Expand all</button><button id="collapse" type="button">Collapse all</button>
 <button id="print" type="button">Print / save PDF</button></div></header>
 <div class="layout"><nav aria-label="Guide sections">
-<a href="#overview">Start here</a><a href="#release">Release 1.1 - actual components and target setup</a><a href="#solutions">Solutions-first workshop - 150 minutes</a><a href="#preparation">Rebuild and maintenance reference</a><a href="#core">Optional app/flow construction reference</a><a href="#facilitator">Detailed facilitator reference</a><a href="#admin">Administrator handoff</a><a href="#backend">Backend registration</a><a href="#snippet-0">00-Contract.txt</a><a href="#snippet-1">10-OnStart.powerfx</a><a href="#snippet-2">11-HourItems.powerfx</a><a href="#snippet-3">12-MinuteItems.powerfx</a><a href="#snippet-4">13-EndHourItems.powerfx</a><a href="#snippet-5">14-EndMinuteItems.powerfx</a><a href="#snippet-6">15-StartMinuteUpdate.powerfx</a><a href="#snippet-7">16-EndMinuteUpdate.powerfx</a><a href="#snippet-8">17-HoursUpdate.powerfx</a><a href="#snippet-9">18-SubmitOnSelect.powerfx</a><a href="#snippet-10">19-FormOnSuccess.powerfx</a><a href="#snippet-11">20-FormOnFailure.powerfx</a><a href="#snippet-12">21-CategoryItems.powerfx</a><a href="#snippet-13">22-Approver1Items.powerfx</a><a href="#snippet-14">23-Approver2Items.powerfx</a><a href="#snippet-15">24-Approver3Items.powerfx</a><a href="#snippet-16">30-CalendarItems.powerfx</a><a href="#snippet-17">31-CalendarPrevious.powerfx</a><a href="#snippet-18">32-CalendarNext.powerfx</a><a href="#snippet-19">33-DayRequestsItems.powerfx</a><a href="#snippet-20">34-RequestSummary.powerfx</a><a href="#snippet-21">35-RefreshOnSelect.powerfx</a><a href="#snippet-22">40-AnnualTotalOnSelect.powerfx</a><a href="#snippet-23">41-AnnualTotalText.powerfx</a><a href="#snippet-24">50-Flow-Build.txt</a><a href="#snippet-25">51-Flow-Expressions.txt</a><a href="#snippet-26">52-Flow-Recovery.txt</a><a href="#snippet-27">60-UAT.txt</a><a href="#snippet-28">61-GCC-Deployment.txt</a></nav><main><details id="overview" data-search="start here irs leap - canvas app hackathon starter
+<a href="#overview">Start here</a><a href="#release">Release 1.1 - actual components and target setup</a><a href="#directory">Organization directory picker - release 1.1.0.1</a><a href="#solutions">Solutions-first workshop - 150 minutes</a><a href="#preparation">Rebuild and maintenance reference</a><a href="#core">Optional app/flow construction reference</a><a href="#facilitator">Detailed facilitator reference</a><a href="#admin">Administrator handoff</a><a href="#backend">Backend registration</a><a href="#snippet-0">00-Contract.txt</a><a href="#snippet-1">10-OnStart.powerfx</a><a href="#snippet-2">11-HourItems.powerfx</a><a href="#snippet-3">12-MinuteItems.powerfx</a><a href="#snippet-4">13-EndHourItems.powerfx</a><a href="#snippet-5">14-EndMinuteItems.powerfx</a><a href="#snippet-6">15-StartMinuteUpdate.powerfx</a><a href="#snippet-7">16-EndMinuteUpdate.powerfx</a><a href="#snippet-8">17-HoursUpdate.powerfx</a><a href="#snippet-9">18-SubmitOnSelect.powerfx</a><a href="#snippet-10">19-FormOnSuccess.powerfx</a><a href="#snippet-11">20-FormOnFailure.powerfx</a><a href="#snippet-12">21-CategoryItems.powerfx</a><a href="#snippet-13">22-Approver1Items.powerfx</a><a href="#snippet-14">23-Approver2Items.powerfx</a><a href="#snippet-15">24-Approver3Items.powerfx</a><a href="#snippet-16">30-CalendarItems.powerfx</a><a href="#snippet-17">31-CalendarPrevious.powerfx</a><a href="#snippet-18">32-CalendarNext.powerfx</a><a href="#snippet-19">33-DayRequestsItems.powerfx</a><a href="#snippet-20">34-RequestSummary.powerfx</a><a href="#snippet-21">35-RefreshOnSelect.powerfx</a><a href="#snippet-22">40-AnnualTotalOnSelect.powerfx</a><a href="#snippet-23">41-AnnualTotalText.powerfx</a><a href="#snippet-24">50-Flow-Build.txt</a><a href="#snippet-25">51-Flow-Expressions.txt</a><a href="#snippet-26">52-Flow-Recovery.txt</a><a href="#snippet-27">60-UAT.txt</a><a href="#snippet-28">61-GCC-Deployment.txt</a></nav><main><details id="overview" data-search="start here irs leap - canvas app hackathon starter
 =====================================
 
-current delivery status - complete component release 1.1.0.0 exported
+current delivery status - complete component release 1.1.0.1 exported
 -------------------------------------------------------------------
 actual managed/unmanaged1.1solution zips contain the native canvas app, stopped
 approval flow,3connection references,2consumed environment-variable definitions
@@ -112,7 +112,10 @@ read guide\release-1.1.txt for the exact inventory and evidence boundaries.
 revised workshop: solutions first
 begin with guide\irs-leap-workshop-guide.html or guide\solutions-first.txt.
 the recommended150-minute agenda is import,configure,use,customize and promote.
-the complete component package is now included as version1.1.0.0.
+the complete component package is now included as version1.1.0.1.
+all3approverpickers now search office365users in the signed-in target organization
+and resolve selections to eligible dataverse users. read guide\directory-picker.txt.
+this adds a per-user office365users connection requirement,not a shared flow reference.
 the earlier1.0backend baseline remains separate; do not choose it for this lab.
 guide\complete-solution-preparation.txt is rebuild/maintenance reference.
 guide\core-lab.txt is an optional construction reference,not classroom prework
@@ -151,7 +154,7 @@ until target connections,configuration,access and synthetic recipients are revie
 
 which solution package to import
 -------------------------------
-use irsleapcanvasstarter_1_1_0_0_unmanaged.zip in an isolated development
+use irsleapcanvasstarter_1_1_0_1_unmanaged.zip in an isolated development
 environment when participants will build and customize in the same solution.
 
 use the managed1.1export for a different downstream administrator-controlled
@@ -202,7 +205,7 @@ configuration are intended to be included in the delivery kit.
 " open><summary>Start here</summary><div class="tools"><button type="button" class="copy">Copy text</button><span class="status" role="status"></span></div><pre tabindex="0">IRS LEAP - Canvas App Hackathon Starter
 =====================================
 
-CURRENT DELIVERY STATUS - COMPLETE COMPONENT RELEASE 1.1.0.0 EXPORTED
+CURRENT DELIVERY STATUS - COMPLETE COMPONENT RELEASE 1.1.0.1 EXPORTED
 -------------------------------------------------------------------
 Actual managed/unmanaged1.1solution ZIPs contain the native Canvas app, stopped
 approval flow,3connection references,2consumed environment-variable definitions
@@ -213,7 +216,10 @@ Read guide\RELEASE-1.1.txt for the exact inventory and evidence boundaries.
 REVISED WORKSHOP: SOLUTIONS FIRST
 Begin with guide\IRS-LEAP-Workshop-Guide.html or guide\SOLUTIONS-FIRST.txt.
 The recommended150-minute agenda is import,configure,use,customize and promote.
-The complete component package is now included as version1.1.0.0.
+The complete component package is now included as version1.1.0.1.
+All3approverpickers now search Office365Users in the signed-in target organization
+and resolve selections to eligible Dataverse users. Read guide\DIRECTORY-PICKER.txt.
+This adds a per-user Office365Users connection requirement,not a shared flow reference.
 The earlier1.0backend baseline remains separate; do not choose it for this lab.
 guide\COMPLETE-SOLUTION-PREPARATION.txt is rebuild/maintenance reference.
 guide\CORE-LAB.txt is an optional construction reference,not classroom prework
@@ -252,7 +258,7 @@ until target connections,configuration,access and synthetic recipients are revie
 
 Which solution package to import
 -------------------------------
-Use IRSLEAPCanvasStarter_1_1_0_0_unmanaged.zip in an isolated development
+Use IRSLEAPCanvasStarter_1_1_0_1_unmanaged.zip in an isolated development
 environment when participants will build and customize in the same solution.
 
 Use the managed1.1export for a different downstream administrator-controlled
@@ -300,14 +306,14 @@ runtime-canvas/ contains the actual app source and .msapp.
 runtime-flow/ contains the actual disabled flow and configuration mapping.
 No authentication tokens, passwords, private signing keys or environment
 configuration are intended to be included in the delivery kit.
-</pre></details><details id="release" data-search="release 1.1 - actual components and target setup irs leap - release 1.1.0.0 handoff
+</pre></details><details id="release" data-search="release 1.1 - actual components and target setup irs leap - release 1.1.0.1 handoff
 complete component package; target configuration and rehearsal required
 
 what is included
 ----------------
 solution unique name: irsleapcanvasstarter
 publisher: irsleap / leap
-version: 1.1.0.0
+version: 1.1.0.1
 
 included in both actual managed/unmanaged solution exports:
 - native canvas app &quot;irs leap&quot;, with calendar, new request, details and totals.
@@ -318,8 +324,8 @@ included in both actual managed/unmanaged solution exports:
 - three portable connection references.
 - two consumed text environment-variable definitions.
 
-use irsleapcanvasstarter_1_1_0_0_unmanaged.zip for isolated workshop authoring.
-use irsleapcanvasstarter_1_1_0_0_managed.zip for a different downstream target.
+use irsleapcanvasstarter_1_1_0_1_unmanaged.zip for isolated workshop authoring.
+use irsleapcanvasstarter_1_1_0_1_managed.zip for a different downstream target.
 do not import both flavors of this same solution into one environment.
 the outer irs-leap-canvas-hackathon-kit.zip is not a solution-import file.
 version1.0.0.0 was the backend-only baseline; use1.1for the short workshop.
@@ -335,10 +341,13 @@ source player (authorized source users only):
 do not use that source url as a target environment-variable value. after import,
 copy the target app&#x27;s actual published web link from its details page.
 
-the app uses native dataverse as the signed-in user, native users lookups and
+the app uses native dataverse as the signed-in user,resolved users lookups and
 the caller-bound environment annual-total action. the packaged implementation
 uses a guarded create patch and modern searchable approver pickers with explicit
-full name rendering. older core-lab construction examples use an edit form and
+directory displayname+upn rendering. office365users searches the signed-in user&#x27;s
+organization;submit resolves selected entra ids to eligible dataverse users.
+read directory-picker.txt for the new per-user connector requirement and guards.
+older core-lab construction examples use an edit form and
 classic pickers; those remain reference exercises, not instructions to rebuild
 or overwrite the already packaged app.
 
@@ -359,6 +368,10 @@ approved target-owned connections and verify their owners can use them.
 keep the target flow off until configuration,roles,recipients and message
 templates are approved. target native flow-save/connection validation must
 succeed before activation. no source activation or notification sends occurred.
+
+additionally,the canvas app requires a per-user office365users oauth connection
+to the target organization. this is not another flow reference. directory search
+does not provision/license users or replace native dataverse lookup/security.
 
 target environment variables - actual schema names
 ------------------------------------------------
@@ -437,14 +450,14 @@ snippets60uat and61gcc-deployment provide additional rehearsal checks.
 runtime-canvas/ contains actual app yaml,.msapp and observed-runtime report.
 runtime-flow/ contains the actual disabled definition,configuration mapping and
 validation reports. do not enable or send merely by reading these files.
-" open><summary>Release 1.1 - actual components and target setup</summary><div class="tools"><button type="button" class="copy">Copy text</button><span class="status" role="status"></span></div><pre tabindex="0">IRS LEAP - RELEASE 1.1.0.0 HANDOFF
+" open><summary>Release 1.1 - actual components and target setup</summary><div class="tools"><button type="button" class="copy">Copy text</button><span class="status" role="status"></span></div><pre tabindex="0">IRS LEAP - RELEASE 1.1.0.1 HANDOFF
 Complete component package; target configuration and rehearsal required
 
 WHAT IS INCLUDED
 ----------------
 Solution unique name: IRSLEAPCanvasStarter
 Publisher: IRSLEAP / leap
-Version: 1.1.0.0
+Version: 1.1.0.1
 
 Included in BOTH actual managed/unmanaged solution exports:
 - Native Canvas app &quot;IRS LEAP&quot;, with calendar, new request, details and totals.
@@ -455,8 +468,8 @@ Included in BOTH actual managed/unmanaged solution exports:
 - Three portable connection references.
 - Two consumed Text environment-variable definitions.
 
-Use IRSLEAPCanvasStarter_1_1_0_0_unmanaged.zip for isolated workshop authoring.
-Use IRSLEAPCanvasStarter_1_1_0_0_managed.zip for a DIFFERENT downstream target.
+Use IRSLEAPCanvasStarter_1_1_0_1_unmanaged.zip for isolated workshop authoring.
+Use IRSLEAPCanvasStarter_1_1_0_1_managed.zip for a DIFFERENT downstream target.
 Do not import both flavors of this same solution into one environment.
 The outer IRS-LEAP-Canvas-Hackathon-Kit.zip is not a solution-import file.
 Version1.0.0.0 was the backend-only baseline; use1.1for the short workshop.
@@ -472,10 +485,13 @@ Source player (authorized source users only):
 Do NOT use that source URL as a target environment-variable value. After import,
 copy the TARGET app&#x27;s actual published Web link from its Details page.
 
-The app uses native Dataverse as the signed-in user, native Users lookups and
+The app uses native Dataverse as the signed-in user,resolved Users lookups and
 the caller-bound Environment annual-total action. The packaged implementation
 uses a guarded create Patch and modern searchable approver pickers with explicit
-Full Name rendering. Older CORE-LAB construction examples use an Edit form and
+directory DisplayName+UPN rendering. Office365Users searches the signed-in user&#x27;s
+organization;submit resolves selected Entra IDs to eligible Dataverse users.
+Read DIRECTORY-PICKER.txt for the new per-user connector requirement and guards.
+Older CORE-LAB construction examples use an Edit form and
 classic pickers; those remain reference exercises, not instructions to rebuild
 or overwrite the already packaged app.
 
@@ -496,6 +512,10 @@ approved target-owned connections and verify their owners can use them.
 Keep the target flow OFF until configuration,roles,recipients and message
 templates are approved. Target native flow-save/connection validation must
 succeed before activation. No source activation or notification sends occurred.
+
+Additionally,the Canvas app requires a per-user Office365Users OAuth connection
+to the target organization. This is NOT another flow reference. Directory search
+does not provision/license users or replace native Dataverse lookup/security.
 
 TARGET ENVIRONMENT VARIABLES - ACTUAL SCHEMA NAMES
 ------------------------------------------------
@@ -574,6 +594,266 @@ Snippets60UAT and61GCC-Deployment provide additional rehearsal checks.
 runtime-canvas/ contains actual app YAML,.msapp and observed-runtime report.
 runtime-flow/ contains the actual disabled definition,configuration mapping and
 validation reports. Do not enable or send merely by reading these files.
+</pre></details><details id="directory" data-search="organization directory picker - release 1.1.0.1 irs leap - organization directory picker
+release1.1.0.1 | native canvas implementation
+
+what changed
+------------
+all three approver pickers now search office365users.searchuserv2 rather than
+listing only dataverse users. results come from the organization associated with
+the signed-in user&#x27;s office365users connector connection, not the developer&#x27;s
+hard-coded tenant and not their personal outlook contacts.
+
+search matches names,mail and user principal names. blank search returns no
+directory results. each query requests at most25results; refine the search if
+the intended person is not in that response. this is not a complete directory
+enumeration. search waits briefly while typing via delayoutput=true.
+disabled accounts and the signed-in user&#x27;s own entra object id are filtered out.
+each result displays displayname and userprincipalname for disambiguation.
+
+additional target connection requirement
+---------------------------------------
+the canvas app now needs the office365users connector(shared_office365users).
+each app user establishes/consents to their own target-organization connection.
+the target tenant&#x27;s dlp,conditional access,mailbox and connector policies apply.
+confirm gcc support using the customer&#x27;s actual tenant and policy.
+
+this is a canvas oauth connection dependency,not a fourth shared flow reference.
+the existing3flowreferences remain leap_leapdataverse,leap_leapapprovals and
+leap_leapoutlook. no service-account connection is shared for employee directory
+search or dataverse access. source connection ids are not target credentials.
+do not substitute an office365users connection signed into a different tenant.
+
+dataverse mapping is required
+----------------------------
+the leap approver1/2/3fields remain systemuser lookups. the picker returns
+directory user profiles; the app must not write that profile directly into a
+dataverse lookup or use its email as a substitute for the lookup.
+
+at submission,the app resolves each selected profile&#x27;s id(entra object guid)
+against users.&#x27;azure ad object id&#x27;. the returned dataverse record is what gets
+saved. this mapping is freshly evaluated inside the guarded submit operation;
+it does not trust stale cached onchange variables. clearing an optional picker
+leaves its lookup blank. switching selections always uses the current selection.
+entry controls are disabled while resolution/save is in progress.
+
+if required or optional selected users cannot be resolved,the entire save is
+blocked with an explicit provisioning error. no optional recipient is silently
+dropped and no partial request is created. resolved users must be enabled with
+read-write dataverse access. directory/dataverse errors surface to the user;
+there is no fallback to a display-name/email match or a cached user.
+self-approval and duplicate selections are explicitly blocked. server-side
+validation/sharing remains authoritative and unchanged.
+
+provisioning limitation
+----------------------
+being discoverable in office365users is not a dataverse user provision,license,
+role assignment or app share. administrators must provision eligible internal
+approvers in the target dataverse environment and give them the required
+premium entitlement,environment access and leap participant role.
+the picker does not auto-provision users or assign privileges.
+
+directory-only approval without dataverse/app access would require a separate
+backend/access-model design. this release deliberately preserves the current
+row security,calendar visibility and authorized annual-total model.
+
+actual property example
+-----------------------
+cbapprover1.items:
+filter(
+    office365users.searchuserv2(
+        {
+            searchterm: trim(cbapprover1.searchtext),
+            top: 25,
+            issearchtermrequired: true
+        }
+    ).value,
+    accountenabled = true,
+    lower(id) &lt;&gt; lower(text(user().entraobjectid))
+)
+
+cbapprover1.itemdisplaytext:
+thisitem.displayname &amp; &quot; (&quot; &amp; thisitem.userprincipalname &amp; &quot;)&quot;
+
+selectmultiple=false;issearchable=true;delayoutput=true.
+use the corresponding control name for approvers2and3.
+the native authoring service rejected coalesce in itemdisplaytext for this
+control/version,so the packaged app deliberately uses the upn field directly.
+the actual searchuserv2 schema uses id,displayname,mail,userprincipalname and
+accountenabled(capitalized),not the lowercase graph user-profile schema.
+
+submit behavior
+---------------
+the current complete btnsubmit.onselect is in runtime-canvas/scrnew.pa.yaml.
+it validates required fields,hours,times,self/duplicate choices;sets submitting;
+resolves all selected entra ids to native dataverse records;validates eligibility;
+and only then performs the one request-create patch. lookup/patch errors show
+their actual message and restore the submitting state.
+
+do not replace the current handler with just a3fieldpatch: doing so removes
+validation and can silently lose optional recipients. do not set only items and
+leave the old selected.user checks or direct selected lookup assignments.
+
+deploying the update
+-------------------
+use1.1.0.1managed/unmanaged exports with the normal same-solution upgrade path.
+keep flavor consistent with the target;do not import managed over unmanaged.
+confirm each target app user connects office365users to the target organization.
+refresh app/connection consent and publish/reopen as required by the platform.
+keep approval flow off until native approval/email rehearsal is authorized.
+no native approval or email sends occurred while preparing this update.
+
+observed preparation evidence
+-----------------------------
+- live office365users search returned a real development-organization profile.
+- duplicate selections in approvers1and2were blocked before any row save.
+- clearing optional2then saving resolved the required profile to a dataverse
+  user and created a pending request with explicit zero hours and no optional
+  lookup values.
+- an isolated temporary synthetic selection fixture with an unprovisioned entra
+  guid in optional2was explicitly rejected before save. the fixture was removed
+  before save/publish/export;no synthetic defaults or source user names remain.
+- the one valid synthetic request was removed;the blocked case created no row.
+- native authoring compilation,appchecker and accessibility reported no issues.
+
+not established here: target-tenant consent,dlp/conditionalaccess differences,
+gcc execution,licensed ordinary-user player,or native approval/email delivery.
+existing source runtime license limitation remains;no trial was started.
+
+references
+----------
+https://learn.microsoft.com/en-us/connectors/office365users/
+https://learn.microsoft.com/en-us/power-apps/maker/canvas-apps/controls/modern-controls/modern-control-combobox
+"><summary>Organization directory picker - release 1.1.0.1</summary><div class="tools"><button type="button" class="copy">Copy text</button><span class="status" role="status"></span></div><pre tabindex="0">IRS LEAP - ORGANIZATION DIRECTORY PICKER
+Release1.1.0.1 | Native Canvas implementation
+
+WHAT CHANGED
+------------
+All three approver pickers now search Office365Users.SearchUserV2 rather than
+listing only Dataverse Users. Results come from the organization associated with
+the signed-in user&#x27;s Office365Users connector connection, not the developer&#x27;s
+hard-coded tenant and not their personal Outlook contacts.
+
+Search matches names,mail and user principal names. Blank search returns no
+directory results. Each query requests at most25results; refine the search if
+the intended person is not in that response. This is not a complete directory
+enumeration. Search waits briefly while typing via DelayOutput=true.
+Disabled accounts and the signed-in user&#x27;s own Entra object ID are filtered out.
+Each result displays DisplayName and UserPrincipalName for disambiguation.
+
+ADDITIONAL TARGET CONNECTION REQUIREMENT
+---------------------------------------
+The Canvas app now needs the Office365Users connector(shared_office365users).
+Each app user establishes/consents to their own target-organization connection.
+The target tenant&#x27;s DLP,Conditional Access,mailbox and connector policies apply.
+Confirm GCC support using the customer&#x27;s actual tenant and policy.
+
+This is a Canvas OAuth connection dependency,not a fourth shared flow reference.
+The existing3flowreferences remain leap_LEAPDataverse,leap_LEAPApprovals and
+leap_LEAPOutlook. No service-account connection is shared for employee directory
+search or Dataverse access. Source connection IDs are not target credentials.
+Do not substitute an Office365Users connection signed into a different tenant.
+
+DATAVERSE MAPPING IS REQUIRED
+----------------------------
+The LEAP Approver1/2/3fields remain systemuser lookups. The picker returns
+directory user profiles; the app must NOT write that profile directly into a
+Dataverse lookup or use its email as a substitute for the lookup.
+
+At submission,the app resolves EACH selected profile&#x27;s Id(Entra object GUID)
+against Users.&#x27;Azure AD Object ID&#x27;. The returned Dataverse record is what gets
+saved. This mapping is freshly evaluated inside the guarded submit operation;
+it does not trust stale cached OnChange variables. Clearing an optional picker
+leaves its lookup blank. Switching selections always uses the current selection.
+Entry controls are disabled while resolution/save is in progress.
+
+If required or optional selected users cannot be resolved,the entire save is
+blocked with an explicit provisioning error. No optional recipient is silently
+dropped and no partial request is created. Resolved users must be Enabled with
+Read-Write Dataverse access. Directory/Dataverse errors surface to the user;
+there is no fallback to a display-name/email match or a cached user.
+Self-approval and duplicate selections are explicitly blocked. Server-side
+validation/sharing remains authoritative and unchanged.
+
+PROVISIONING LIMITATION
+----------------------
+Being discoverable in Office365Users is not a Dataverse user provision,license,
+role assignment or app share. Administrators must provision eligible internal
+approvers in the TARGET Dataverse environment and give them the required
+premium entitlement,environment access and LEAP Participant role.
+The picker does not auto-provision users or assign privileges.
+
+Directory-only approval without Dataverse/app access would require a separate
+backend/access-model design. This release deliberately preserves the current
+row security,calendar visibility and authorized annual-total model.
+
+ACTUAL PROPERTY EXAMPLE
+-----------------------
+cbApprover1.Items:
+Filter(
+    Office365Users.SearchUserV2(
+        {
+            searchTerm: Trim(cbApprover1.SearchText),
+            top: 25,
+            isSearchTermRequired: true
+        }
+    ).value,
+    AccountEnabled = true,
+    Lower(Id) &lt;&gt; Lower(Text(User().EntraObjectId))
+)
+
+cbApprover1.ItemDisplayText:
+ThisItem.DisplayName &amp; &quot; (&quot; &amp; ThisItem.UserPrincipalName &amp; &quot;)&quot;
+
+SelectMultiple=false;IsSearchable=true;DelayOutput=true.
+Use the corresponding control name for approvers2and3.
+The native authoring service rejected Coalesce in ItemDisplayText for this
+control/version,so the packaged app deliberately uses the UPN field directly.
+The actual SearchUserV2 schema uses Id,DisplayName,Mail,UserPrincipalName and
+AccountEnabled(capitalized),not the lowercase Graph user-profile schema.
+
+SUBMIT BEHAVIOR
+---------------
+The current complete btnSubmit.OnSelect is in runtime-canvas/scrNew.pa.yaml.
+It validates required fields,hours,times,self/duplicate choices;sets submitting;
+resolves all selected Entra IDs to native Dataverse records;validates eligibility;
+and only then performs the one request-create Patch. Lookup/patch errors show
+their actual message and restore the submitting state.
+
+Do not replace the current handler with just a3fieldPatch: doing so removes
+validation and can silently lose optional recipients. Do not set only Items and
+leave the old Selected.User checks or direct Selected lookup assignments.
+
+DEPLOYING THE UPDATE
+-------------------
+Use1.1.0.1managed/unmanaged exports with the normal same-solution upgrade path.
+Keep flavor consistent with the target;do not import managed over unmanaged.
+Confirm each target app user connects Office365Users to the target organization.
+Refresh app/connection consent and publish/reopen as required by the platform.
+Keep approval flow OFF until native approval/email rehearsal is authorized.
+No native approval or email sends occurred while preparing this update.
+
+OBSERVED PREPARATION EVIDENCE
+-----------------------------
+- Live Office365Users search returned a real development-organization profile.
+- Duplicate selections in approvers1and2were blocked before any row save.
+- Clearing optional2then saving resolved the required profile to a Dataverse
+  user and created a Pending request with explicit zero hours and no optional
+  lookup values.
+- An isolated temporary synthetic selection fixture with an unprovisioned Entra
+  GUID in optional2was explicitly rejected before save. The fixture was removed
+  before save/publish/export;no synthetic defaults or source user names remain.
+- The one valid synthetic request was removed;the blocked case created no row.
+- Native authoring compilation,appchecker and accessibility reported no issues.
+
+Not established here: target-tenant consent,DLP/ConditionalAccess differences,
+GCC execution,licensed ordinary-user player,or native approval/email delivery.
+Existing source runtime license limitation remains;no trial was started.
+
+REFERENCES
+----------
+https://learn.microsoft.com/en-us/connectors/office365users/
+https://learn.microsoft.com/en-us/power-apps/maker/canvas-apps/controls/modern-controls/modern-control-combobox
 </pre></details><details id="solutions" data-search="solutions-first workshop - 150 minutes irs leap - solutions-first workshop
 recommended delivery | 150 minutes | synthetic data only
 
@@ -586,13 +866,15 @@ the session understanding solution deployment and making one small change.
 
 package status - do not skip
 ----------------------------
-version1.1.0.0 is now included with the actual native canvas app,stopped approval
+version1.1.0.1 is now included with the actual native canvas app,stopped approval
 flow,3references,2consumed variable definitions and dataverse foundation.
 use the1.1exports for this lesson. version1.0was the backend-only baseline.
 see release-1.1.txt for exact components,configuration and remaining gates.
 the short agenda assumes target connections,licenses,roles and gcc rehearsal
 are prepared. import success alone is not end-to-end approval/mail evidence.
 core-lab and formula snippets remain optional build/reference material.
+directory search now requires each target user to connect office365users to the
+target organization. review directory-picker.txt and preserve dataverse provisioning.
 
 end state
 ---------
@@ -607,7 +889,7 @@ for this short workshop, use one complete solution with the approved irsleap
 publisher/leap prefix. add the completed app, core cloud flow, required
 connection references and configuration definitions to the existing foundation.
 preserve unique name irsleapcanvasstarter. the included complete-component
-release is1.1.0.0; increment version when making and exporting workshop changes.
+release is1.1.0.1; increment version when making and exporting workshop changes.
 do not create a second similarly named request table.
 
 export that complete version as:
@@ -862,13 +1144,15 @@ the session understanding solution deployment and making one small change.
 
 PACKAGE STATUS - DO NOT SKIP
 ----------------------------
-Version1.1.0.0 is now included with the actual native Canvas app,stopped approval
+Version1.1.0.1 is now included with the actual native Canvas app,stopped approval
 flow,3references,2consumed variable definitions and Dataverse foundation.
 Use the1.1exports for this lesson. Version1.0was the backend-only baseline.
 See RELEASE-1.1.txt for exact components,configuration and remaining gates.
 The short agenda assumes target connections,licenses,roles and GCC rehearsal
 are prepared. Import success alone is not end-to-end approval/mail evidence.
 CORE-LAB and formula snippets remain optional build/reference material.
+Directory search now requires each target user to connect Office365Users to the
+target organization. Review DIRECTORY-PICKER.txt and preserve Dataverse provisioning.
 
 END STATE
 ---------
@@ -883,7 +1167,7 @@ For this short workshop, use ONE complete solution with the approved IRSLEAP
 publisher/leap prefix. Add the completed app, core cloud flow, required
 connection references and configuration definitions to the existing foundation.
 Preserve unique name IRSLEAPCanvasStarter. The included complete-component
-release is1.1.0.0; increment version when making and exporting workshop changes.
+release is1.1.0.1; increment version when making and exporting workshop changes.
 Do not create a second similarly named request table.
 
 Export that complete version as:
@@ -3978,7 +4262,7 @@ guide; they are not evidence of a tenant rehearsal or deployment.
 read before running
 -------------------
 workshop revision: guide\solutions-first.txt is now the recommended participant
-path. version1.1.0.0 now includes the actual app,stopped approval flow,references
+path. version1.1.0.1 now includes the directory-backed app,stopped approval flow,references
 and variable definitions. see guide\release-1.1.txt before the generic source
 rebuild instructions below. no customer target environment was changed.
 
@@ -4136,8 +4420,8 @@ local .env and an authorized active pac profile.
 .\.venv\scripts\python.exe package.py --pac &quot;c:\path\to\pac.exe&quot; --environment https://your-approved-org.crm9.dynamics.com
 
 included development exports, also generated by future rebuilds:
-irsleapcanvasstarter_1_1_0_0_unmanaged.zip
-irsleapcanvasstarter_1_1_0_0_managed.zip
+irsleapcanvasstarter_1_1_0_1_unmanaged.zip
+irsleapcanvasstarter_1_1_0_1_managed.zip
 irs-leap-canvas-hackathon-kit.zip
 
 import the unmanaged export into a clean workshop sandbox and execute all uat
@@ -4149,6 +4433,11 @@ solution. extract it first; import only the chosen managed/unmanaged solution zi
 
 current evidence and remaining gates
 ----------------------------------
+version1.1.0.1uses per-useroffice365users directory search. each target user
+must connect to their own intended organization. submit resolves entra ids into
+eligible dataverse users and rejects any unresolved optional selection.
+read guide\directory-picker.txt;no users are auto-provisioned or licensed.
+
 the compiled plugin source passed its local contract harness. fifteen synthetic
 backend cases passed in commercial development: requester derivation, blank/zero,
 year derivation, immutable content, duplicate/self approvers, times/categories,
@@ -4190,7 +4479,7 @@ workshop. otherwise use the guide for design/training only and state the blocker
 READ BEFORE RUNNING
 -------------------
 WORKSHOP REVISION: guide\SOLUTIONS-FIRST.txt is now the recommended participant
-path. Version1.1.0.0 now includes the actual app,stopped approval flow,references
+path. Version1.1.0.1 now includes the directory-backed app,stopped approval flow,references
 and variable definitions. See guide\RELEASE-1.1.txt before the generic source
 rebuild instructions below. No customer target environment was changed.
 
@@ -4348,8 +4637,8 @@ local .env and an authorized active PAC profile.
 .\.venv\Scripts\python.exe package.py --pac &quot;C:\PATH\TO\pac.exe&quot; --environment https://YOUR-APPROVED-ORG.crm9.dynamics.com
 
 Included development exports, also generated by future rebuilds:
-IRSLEAPCanvasStarter_1_1_0_0_unmanaged.zip
-IRSLEAPCanvasStarter_1_1_0_0_managed.zip
+IRSLEAPCanvasStarter_1_1_0_1_unmanaged.zip
+IRSLEAPCanvasStarter_1_1_0_1_managed.zip
 IRS-LEAP-Canvas-Hackathon-Kit.zip
 
 Import the unmanaged export into a clean workshop sandbox and execute all UAT
@@ -4361,6 +4650,11 @@ solution. Extract it first; import ONLY the chosen managed/unmanaged solution ZI
 
 CURRENT EVIDENCE AND REMAINING GATES
 ----------------------------------
+Version1.1.0.1uses per-userOffice365Users directory search. Each target user
+must connect to their own intended organization. Submit resolves Entra IDs into
+eligible Dataverse users and rejects ANY unresolved optional selection.
+Read guide\DIRECTORY-PICKER.txt;no users are auto-provisioned or licensed.
+
 The compiled plugin source passed its local contract harness. Fifteen synthetic
 backend cases passed in commercial development: requester derivation, blank/zero,
 year derivation, immutable content, duplicate/self approvers, times/categories,

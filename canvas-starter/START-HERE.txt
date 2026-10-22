@@ -1,7 +1,7 @@
 IRS LEAP - Canvas App Hackathon Starter
 =====================================
 
-CURRENT DELIVERY STATUS - COMPLETE COMPONENT RELEASE 1.1.0.0 EXPORTED
+CURRENT DELIVERY STATUS - COMPLETE COMPONENT RELEASE 1.1.0.1 EXPORTED
 -------------------------------------------------------------------
 Actual managed/unmanaged1.1solution ZIPs contain the native Canvas app, stopped
 approval flow,3connection references,2consumed environment-variable definitions
@@ -12,7 +12,10 @@ Read guide\RELEASE-1.1.txt for the exact inventory and evidence boundaries.
 REVISED WORKSHOP: SOLUTIONS FIRST
 Begin with guide\IRS-LEAP-Workshop-Guide.html or guide\SOLUTIONS-FIRST.txt.
 The recommended150-minute agenda is import,configure,use,customize and promote.
-The complete component package is now included as version1.1.0.0.
+The complete component package is now included as version1.1.0.1.
+All3approverpickers now search Office365Users in the signed-in target organization
+and resolve selections to eligible Dataverse users. Read guide\DIRECTORY-PICKER.txt.
+This adds a per-user Office365Users connection requirement,not a shared flow reference.
 The earlier1.0backend baseline remains separate; do not choose it for this lab.
 guide\COMPLETE-SOLUTION-PREPARATION.txt is rebuild/maintenance reference.
 guide\CORE-LAB.txt is an optional construction reference,not classroom prework
@@ -51,7 +54,7 @@ until target connections,configuration,access and synthetic recipients are revie
 
 Which solution package to import
 -------------------------------
-Use IRSLEAPCanvasStarter_1_1_0_0_unmanaged.zip in an isolated development
+Use IRSLEAPCanvasStarter_1_1_0_1_unmanaged.zip in an isolated development
 environment when participants will build and customize in the same solution.
 
 Use the managed1.1export for a different downstream administrator-controlled

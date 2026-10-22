@@ -3,8 +3,8 @@
   "workshopMode": "solutions-first; target configuration and rehearsal required",
   "exports": [
     {
-      "file": "IRSLEAPCanvasStarter_1_1_0_0_unmanaged.zip",
-      "version": "1.1.0.0",
+      "file": "IRSLEAPCanvasStarter_1_1_0_1_unmanaged.zip",
+      "version": "1.1.0.1",
       "entries": 17,
       "plugins": [
         "PluginAssemblies/IrsLeapPlugins-47B19245-BCCD-F111-A05C-6045BD094F74/IrsLeapPlugins.dll"
@@ -29,8 +29,8 @@
       "preEventRehearsalRequired": true
     },
     {
-      "file": "IRSLEAPCanvasStarter_1_1_0_0_managed.zip",
-      "version": "1.1.0.0",
+      "file": "IRSLEAPCanvasStarter_1_1_0_1_managed.zip",
+      "version": "1.1.0.1",
       "entries": 17,
       "plugins": [
         "PluginAssemblies/IrsLeapPlugins-47B19245-BCCD-F111-A05C-6045BD094F74/IrsLeapPlugins.dll"

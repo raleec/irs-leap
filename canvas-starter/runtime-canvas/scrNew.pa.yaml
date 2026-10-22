@@ -46,6 +46,7 @@ Screens:
           Properties:
             AccessibleLabel: ="Required short request title"
             Default: =""
+            DisplayMode: =If(varSubmitting, DisplayMode.Disabled, DisplayMode.Edit)
             Height: =42
             MaxLength: =120
             Width: =620
@@ -66,6 +67,7 @@ Screens:
           Properties:
             AccessibleLabel: ="Optional brief description. Do not include medical details."
             Default: =""
+            DisplayMode: =If(varSubmitting, DisplayMode.Disabled, DisplayMode.Edit)
             Height: =98
             MaxLength: =1000
             Mode: =TextMode.MultiLine
@@ -86,6 +88,7 @@ Screens:
           Control: Classic/DatePicker
           Properties:
             AccessibleLabel: ="Required calendar date of leave"
+            DisplayMode: =If(varSubmitting, DisplayMode.Disabled, DisplayMode.Edit)
             EndYear: =2100
             Height: =42
             StartYear: =1900
@@ -107,6 +110,7 @@ Screens:
           Properties:
             AccessibleLabel: ="Optional whole-number leave hours from zero through twenty-four"
             Default: =""
+            DisplayMode: =If(varSubmitting, DisplayMode.Disabled, DisplayMode.Edit)
             Format: =TextFormat.Number
             Height: =42
             HintText: ="Blank means not entered; 0 means zero"
@@ -128,6 +132,7 @@ Screens:
           Properties:
             AccessibleLabel: ="Start hour, zero through twenty-three"
             Default: ="9"
+            DisplayMode: =If(varSubmitting, DisplayMode.Disabled, DisplayMode.Edit)
             Height: =42
             Items: =Sequence(24, 0, 1)
             Items.Value: =Value
@@ -139,6 +144,7 @@ Screens:
           Properties:
             AccessibleLabel: ="Start minute"
             Default: ="0"
+            DisplayMode: =If(varSubmitting, DisplayMode.Disabled, DisplayMode.Edit)
             Height: =42
             Items: =Sequence(60, 0, 1)
             Items.Value: =Value
@@ -160,6 +166,7 @@ Screens:
           Properties:
             AccessibleLabel: ="End hour, zero through twenty-four"
             Default: ="10"
+            DisplayMode: =If(varSubmitting, DisplayMode.Disabled, DisplayMode.Edit)
             Height: =42
             Items: =Sequence(25, 0, 1)
             Items.Value: =Value
@@ -171,6 +178,7 @@ Screens:
           Properties:
             AccessibleLabel: ="End minute; only zero is allowed at hour twenty-four"
             Default: ="0"
+            DisplayMode: =If(varSubmitting, DisplayMode.Disabled, DisplayMode.Edit)
             Height: =42
             Items: =Sequence(If(ddEndHour.Selected.Value = 24, 1, 60), 0, 1)
             Items.Value: =Value
@@ -193,6 +201,7 @@ Screens:
             AccessibleLabel: ="Required leave or exception category"
             AllowEmptySelection: =true
             Default: =Blank()
+            DisplayMode: =If(varSubmitting, DisplayMode.Disabled, DisplayMode.Edit)
             Height: =42
             Items: =Choices('LEAP Requests'.'Leave Category')
             Items.Value: =Value
@@ -213,10 +222,14 @@ Screens:
           Control: ModernCombobox
           Properties:
             AccessibleLabel: ="Required first approver"
+            DelayOutput: =true
+            DisplayMode: =If(varSubmitting, DisplayMode.Disabled, DisplayMode.Edit)
             Height: =42
-            InputTextPlaceholder: ="Search an enabled organization user"
-            ItemDisplayText: =ThisItem.'Full Name'
-            Items: =Filter(Users, Status = 'Status (Users)'.Enabled, 'Access Mode' = 'Access Mode (Users)'.'Read-Write', User <> varMe.User)
+            InputTextPlaceholder: ="Search your organization's directory"
+            ItemDisplayText: =ThisItem.DisplayName & " (" & ThisItem.UserPrincipalName & ")"
+            Items: |-
+              =Filter(Office365Users.SearchUserV2({searchTerm: Trim(cbApprover1.SearchText), top: 25, isSearchTermRequired: true}).value, AccountEnabled = true, Lower(Id) <> Lower(Text(User().EntraObjectId)))
+            OnChange: =Set(varRequestError, "")
             SelectMultiple: =false
             Width: =620
             X: =700
@@ -235,10 +248,14 @@ Screens:
           Control: ModernCombobox
           Properties:
             AccessibleLabel: ="Optional second approver"
+            DelayOutput: =true
+            DisplayMode: =If(varSubmitting, DisplayMode.Disabled, DisplayMode.Edit)
             Height: =42
             InputTextPlaceholder: ="Optional second approver"
-            ItemDisplayText: =ThisItem.'Full Name'
-            Items: =Filter(Users, Status = 'Status (Users)'.Enabled, 'Access Mode' = 'Access Mode (Users)'.'Read-Write', User <> varMe.User)
+            ItemDisplayText: =ThisItem.DisplayName & " (" & ThisItem.UserPrincipalName & ")"
+            Items: |-
+              =Filter(Office365Users.SearchUserV2({searchTerm: Trim(cbApprover2.SearchText), top: 25, isSearchTermRequired: true}).value, AccountEnabled = true, Lower(Id) <> Lower(Text(User().EntraObjectId)))
+            OnChange: =Set(varRequestError, "")
             SelectMultiple: =false
             Width: =620
             X: =700
@@ -257,10 +274,14 @@ Screens:
           Control: ModernCombobox
           Properties:
             AccessibleLabel: ="Optional third approver"
+            DelayOutput: =true
+            DisplayMode: =If(varSubmitting, DisplayMode.Disabled, DisplayMode.Edit)
             Height: =42
             InputTextPlaceholder: ="Optional third approver"
-            ItemDisplayText: =ThisItem.'Full Name'
-            Items: =Filter(Users, Status = 'Status (Users)'.Enabled, 'Access Mode' = 'Access Mode (Users)'.'Read-Write', User <> varMe.User)
+            ItemDisplayText: =ThisItem.DisplayName & " (" & ThisItem.UserPrincipalName & ")"
+            Items: |-
+              =Filter(Office365Users.SearchUserV2({searchTerm: Trim(cbApprover3.SearchText), top: 25, isSearchTermRequired: true}).value, AccountEnabled = true, Lower(Id) <> Lower(Text(User().EntraObjectId)))
+            OnChange: =Set(varRequestError, "")
             SelectMultiple: =false
             Width: =620
             X: =700
@@ -271,7 +292,7 @@ Screens:
             FocusedBorderThickness: =2
             Height: =72
             TabIndex: =0
-            Text: ="Select up to three distinct, provisioned internal users. The first valid approval or denial decides this request. Submitted requests cannot be edited."
+            Text: ="Search your organization's directory. Each selected person must also be an enabled, provisioned Dataverse user. Up to three distinct approvers; first response decides. Submitted requests cannot be edited."
             Width: =620
             X: =700
             Y: =490
@@ -300,19 +321,39 @@ Screens:
                   IsBlank(Trim(txtTitle.Text)), Set(varRequestError, "Enter a short title."),
                   IsBlank(dpLeave.SelectedDate), Set(varRequestError, "Select one leave date."),
                   IsBlank(ddCategory.Selected.Value), Set(varRequestError, "Select one category."),
-                  IsBlank(cbApprover1.Selected.User), Set(varRequestError, "Choose Approver 1."),
+                  IsBlank(cbApprover1.Selected.Id), Set(varRequestError, "Choose Approver 1."),
                   !IsBlank(h) && !IsMatch(h, "([0-9]|1[0-9]|2[0-4])", MatchOptions.Complete), Set(varRequestError, "Hours must be blank or an integer from 0 to 24."),
                   e <= s, Set(varRequestError, "End time must be later on the same date."),
-                  (!IsBlank(cbApprover2.Selected.User) && cbApprover2.Selected.User = cbApprover1.Selected.User) ||
-                  (!IsBlank(cbApprover3.Selected.User) && (cbApprover3.Selected.User = cbApprover1.Selected.User || cbApprover3.Selected.User = cbApprover2.Selected.User)), Set(varRequestError, "Choose distinct approvers."),
+                  Lower(cbApprover1.Selected.Id) = Lower(Text(User().EntraObjectId)) ||
+                  (!IsBlank(cbApprover2.Selected.Id) && Lower(cbApprover2.Selected.Id) = Lower(Text(User().EntraObjectId))) ||
+                  (!IsBlank(cbApprover3.Selected.Id) && Lower(cbApprover3.Selected.Id) = Lower(Text(User().EntraObjectId))), Set(varRequestError, "Self-approval is not permitted."),
+                  (!IsBlank(cbApprover2.Selected.Id) && Lower(cbApprover2.Selected.Id) = Lower(cbApprover1.Selected.Id)) ||
+                  (!IsBlank(cbApprover3.Selected.Id) && (Lower(cbApprover3.Selected.Id) = Lower(cbApprover1.Selected.Id) || Lower(cbApprover3.Selected.Id) = Lower(cbApprover2.Selected.Id))), Set(varRequestError, "Choose distinct approvers."),
                   Set(varSubmitting, true);
                   IfError(
-                    Set(varSelectedRequest, Patch('LEAP Requests', Defaults('LEAP Requests'),
-                      {Title: Trim(txtTitle.Text), Description: txtDescription.Text, 'Leave Date': dpLeave.SelectedDate,
-                       'Start Minute': s, 'End Minute': e, 'Leave Hours': If(IsBlank(h), Blank(), Value(h)),
-                       'Leave Category': ddCategory.Selected.Value,
-                       'Approver 1': cbApprover1.Selected, 'Approver 2': cbApprover2.Selected, 'Approver 3': cbApprover3.Selected}));
-                    Set(varSubmitting, false); Refresh('LEAP Requests'); Notify("Request submitted.", NotificationType.Success); Navigate(scrDetails),
+                    With(
+                      {
+                        a1: LookUp(Users, 'Azure AD Object ID' = GUID(cbApprover1.Selected.Id), ThisRecord),
+                        a2: If(!IsBlank(cbApprover2.Selected.Id), LookUp(Users, 'Azure AD Object ID' = GUID(cbApprover2.Selected.Id), ThisRecord)),
+                        a3: If(!IsBlank(cbApprover3.Selected.Id), LookUp(Users, 'Azure AD Object ID' = GUID(cbApprover3.Selected.Id), ThisRecord))
+                      },
+                      If(
+                        IsBlank(a1.User) ||
+                        (!IsBlank(cbApprover2.Selected.Id) && IsBlank(a2.User)) ||
+                        (!IsBlank(cbApprover3.Selected.Id) && IsBlank(a3.User)),
+                        Set(varSubmitting, false); Set(varRequestError, "Every selected approver must be provisioned in this Dataverse environment. No request was saved."),
+                        a1.Status <> 'Status (Users)'.Enabled || a1.'Access Mode' <> 'Access Mode (Users)'.'Read-Write' ||
+                        (!IsBlank(a2.User) && (a2.Status <> 'Status (Users)'.Enabled || a2.'Access Mode' <> 'Access Mode (Users)'.'Read-Write')) ||
+                        (!IsBlank(a3.User) && (a3.Status <> 'Status (Users)'.Enabled || a3.'Access Mode' <> 'Access Mode (Users)'.'Read-Write')),
+                        Set(varSubmitting, false); Set(varRequestError, "Every selected approver must be enabled with Read-Write access in Dataverse. No request was saved."),
+                        Set(varSelectedRequest, Patch('LEAP Requests', Defaults('LEAP Requests'),
+                          {Title: Trim(txtTitle.Text), Description: txtDescription.Text, 'Leave Date': dpLeave.SelectedDate,
+                           'Start Minute': s, 'End Minute': e, 'Leave Hours': If(IsBlank(h), Blank(), Value(h)),
+                           'Leave Category': ddCategory.Selected.Value,
+                           'Approver 1': a1, 'Approver 2': a2, 'Approver 3': a3}));
+                        Set(varSubmitting, false); Refresh('LEAP Requests'); Notify("Request submitted.", NotificationType.Success); Navigate(scrDetails)
+                      )
+                    ),
                     Set(varSubmitting, false); Set(varRequestError, FirstError.Message)
                   )
                 )

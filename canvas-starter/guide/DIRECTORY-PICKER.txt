@@ -1,0 +1,130 @@
+IRS LEAP - ORGANIZATION DIRECTORY PICKER
+Release1.1.0.1 | Native Canvas implementation
+
+WHAT CHANGED
+------------
+All three approver pickers now search Office365Users.SearchUserV2 rather than
+listing only Dataverse Users. Results come from the organization associated with
+the signed-in user's Office365Users connector connection, not the developer's
+hard-coded tenant and not their personal Outlook contacts.
+
+Search matches names,mail and user principal names. Blank search returns no
+directory results. Each query requests at most25results; refine the search if
+the intended person is not in that response. This is not a complete directory
+enumeration. Search waits briefly while typing via DelayOutput=true.
+Disabled accounts and the signed-in user's own Entra object ID are filtered out.
+Each result displays DisplayName and UserPrincipalName for disambiguation.
+
+ADDITIONAL TARGET CONNECTION REQUIREMENT
+---------------------------------------
+The Canvas app now needs the Office365Users connector(shared_office365users).
+Each app user establishes/consents to their own target-organization connection.
+The target tenant's DLP,Conditional Access,mailbox and connector policies apply.
+Confirm GCC support using the customer's actual tenant and policy.
+
+This is a Canvas OAuth connection dependency,not a fourth shared flow reference.
+The existing3flowreferences remain leap_LEAPDataverse,leap_LEAPApprovals and
+leap_LEAPOutlook. No service-account connection is shared for employee directory
+search or Dataverse access. Source connection IDs are not target credentials.
+Do not substitute an Office365Users connection signed into a different tenant.
+
+DATAVERSE MAPPING IS REQUIRED
+----------------------------
+The LEAP Approver1/2/3fields remain systemuser lookups. The picker returns
+directory user profiles; the app must NOT write that profile directly into a
+Dataverse lookup or use its email as a substitute for the lookup.
+
+At submission,the app resolves EACH selected profile's Id(Entra object GUID)
+against Users.'Azure AD Object ID'. The returned Dataverse record is what gets
+saved. This mapping is freshly evaluated inside the guarded submit operation;
+it does not trust stale cached OnChange variables. Clearing an optional picker
+leaves its lookup blank. Switching selections always uses the current selection.
+Entry controls are disabled while resolution/save is in progress.
+
+If required or optional selected users cannot be resolved,the entire save is
+blocked with an explicit provisioning error. No optional recipient is silently
+dropped and no partial request is created. Resolved users must be Enabled with
+Read-Write Dataverse access. Directory/Dataverse errors surface to the user;
+there is no fallback to a display-name/email match or a cached user.
+Self-approval and duplicate selections are explicitly blocked. Server-side
+validation/sharing remains authoritative and unchanged.
+
+PROVISIONING LIMITATION
+----------------------
+Being discoverable in Office365Users is not a Dataverse user provision,license,
+role assignment or app share. Administrators must provision eligible internal
+approvers in the TARGET Dataverse environment and give them the required
+premium entitlement,environment access and LEAP Participant role.
+The picker does not auto-provision users or assign privileges.
+
+Directory-only approval without Dataverse/app access would require a separate
+backend/access-model design. This release deliberately preserves the current
+row security,calendar visibility and authorized annual-total model.
+
+ACTUAL PROPERTY EXAMPLE
+-----------------------
+cbApprover1.Items:
+Filter(
+    Office365Users.SearchUserV2(
+        {
+            searchTerm: Trim(cbApprover1.SearchText),
+            top: 25,
+            isSearchTermRequired: true
+        }
+    ).value,
+    AccountEnabled = true,
+    Lower(Id) <> Lower(Text(User().EntraObjectId))
+)
+
+cbApprover1.ItemDisplayText:
+ThisItem.DisplayName & " (" & ThisItem.UserPrincipalName & ")"
+
+SelectMultiple=false;IsSearchable=true;DelayOutput=true.
+Use the corresponding control name for approvers2and3.
+The native authoring service rejected Coalesce in ItemDisplayText for this
+control/version,so the packaged app deliberately uses the UPN field directly.
+The actual SearchUserV2 schema uses Id,DisplayName,Mail,UserPrincipalName and
+AccountEnabled(capitalized),not the lowercase Graph user-profile schema.
+
+SUBMIT BEHAVIOR
+---------------
+The current complete btnSubmit.OnSelect is in runtime-canvas/scrNew.pa.yaml.
+It validates required fields,hours,times,self/duplicate choices;sets submitting;
+resolves all selected Entra IDs to native Dataverse records;validates eligibility;
+and only then performs the one request-create Patch. Lookup/patch errors show
+their actual message and restore the submitting state.
+
+Do not replace the current handler with just a3fieldPatch: doing so removes
+validation and can silently lose optional recipients. Do not set only Items and
+leave the old Selected.User checks or direct Selected lookup assignments.
+
+DEPLOYING THE UPDATE
+-------------------
+Use1.1.0.1managed/unmanaged exports with the normal same-solution upgrade path.
+Keep flavor consistent with the target;do not import managed over unmanaged.
+Confirm each target app user connects Office365Users to the target organization.
+Refresh app/connection consent and publish/reopen as required by the platform.
+Keep approval flow OFF until native approval/email rehearsal is authorized.
+No native approval or email sends occurred while preparing this update.
+
+OBSERVED PREPARATION EVIDENCE
+-----------------------------
+- Live Office365Users search returned a real development-organization profile.
+- Duplicate selections in approvers1and2were blocked before any row save.
+- Clearing optional2then saving resolved the required profile to a Dataverse
+  user and created a Pending request with explicit zero hours and no optional
+  lookup values.
+- An isolated temporary synthetic selection fixture with an unprovisioned Entra
+  GUID in optional2was explicitly rejected before save. The fixture was removed
+  before save/publish/export;no synthetic defaults or source user names remain.
+- The one valid synthetic request was removed;the blocked case created no row.
+- Native authoring compilation,appchecker and accessibility reported no issues.
+
+Not established here: target-tenant consent,DLP/ConditionalAccess differences,
+GCC execution,licensed ordinary-user player,or native approval/email delivery.
+Existing source runtime license limitation remains;no trial was started.
+
+REFERENCES
+----------
+https://learn.microsoft.com/en-us/connectors/office365users/
+https://learn.microsoft.com/en-us/power-apps/maker/canvas-apps/controls/modern-controls/modern-control-combobox

@@ -8,7 +8,7 @@ This is a training/prototype project, not an official IRS product or a
 production accreditation. Use synthetic data. Customer GCC compatibility and
 ordinary-user deployment rehearsal remain required.
 
-Release 1.1.0.0
+Release 1.1.0.1
 --------------
 
 The complete component package contains:
@@ -17,6 +17,11 @@ The complete component package contains:
 * A first-responder approval cloud flow, exported stopped.
 * The Dataverse request table, 13 category choices, roles, plug-ins and annual-total API.
 * Three unbound connection references and two consumed environment-variable definitions.
+
+All three approver pickers now search the signed-in organization's directory
+through Office 365 Users. Submission resolves every selected Entra object ID to
+an eligible Dataverse user; unresolved optional selections block the entire
+save rather than being silently omitted.
 
 The source workflow is not enabled, and no notification or trial enrollment is
 performed by these artifacts. Authenticated connections, target settings,
@@ -28,6 +33,7 @@ Start here
 * `Workshop overview <canvas-starter/START-HERE.txt>`_
 * `150-minute solutions-first facilitator script <canvas-starter/guide/SOLUTIONS-FIRST.txt>`_
 * `Release inventory and configuration <canvas-starter/guide/RELEASE-1.1.txt>`_
+* `Organization directory picker and target connection setup <canvas-starter/guide/DIRECTORY-PICKER.txt>`_
 * `Searchable HTML guide <canvas-starter/guide/IRS-LEAP-Workshop-Guide.html>`_
   (download/open locally).
 
@@ -35,7 +41,7 @@ Import a solution
 -----------------
 
 For an isolated authoring environment, import
-``canvas-starter/deliverables/IRSLEAPCanvasStarter_1_1_0_0_unmanaged.zip``.
+``canvas-starter/deliverables/IRSLEAPCanvasStarter_1_1_0_1_unmanaged.zip``.
 
 For a different downstream target, use the corresponding ``managed.zip``.
 Do not import both flavors over the same solution in one environment.
@@ -53,6 +59,11 @@ Supply current values for ``leap_AppPlayUrl`` and ``leap_OperationsMailbox``.
 Use the target app's real published Web link, not a source-environment link.
 Keep the flow off until connection ownership, licensing, data roles, sharing,
 synthetic recipients and notification templates have been reviewed.
+
+Each app user also needs an Office 365 Users connection signed into the target
+organization. This Canvas OAuth dependency is separate from the three flow
+references. Directory discovery does not provision users, assign licenses or
+grant Dataverse/app access. Personal Outlook contacts are not approval identities.
 
 Behavior
 --------

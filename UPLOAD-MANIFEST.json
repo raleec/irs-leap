@@ -1,5 +1,5 @@
 {
-  "version": "1.1.0.0",
+  "version": "1.1.0.1",
   "visibility": "private",
   "originalHistoryIncluded": false,
   "nativeArtifactsRetainNonSecretDeploymentMetadata": true,
@@ -11,8 +11,8 @@
     },
     {
       "path": "canvas-starter/ADMIN-HANDOFF.txt",
-      "bytes": 12133,
-      "sha256": "4e5e7c90ef70a700d407a29f0fa06075ca945a8217a41c23d11347367e41d0c9"
+      "bytes": 12453,
+      "sha256": "1341e9016f950a0267bf01cb3a44a7d2cc7147e14df88c793d56cfdbe2028240"
     },
     {
       "path": "canvas-starter/backend/.gitignore",
@@ -91,8 +91,8 @@
     },
     {
       "path": "canvas-starter/deliverables/IRS-LEAP-Canvas-Hackathon-Kit.zip",
-      "bytes": 2421443,
-      "sha256": "8bd0e30d47b82901521cc574f7bf31e5b7a9b194be419207e7d779299d0409b0"
+      "bytes": 2453522,
+      "sha256": "23c637dcdcd17f4dbbc8a393bb674988f4f45551466d0fafa11aa436f460a9aa"
     },
     {
       "path": "canvas-starter/deliverables/IRSLEAPCanvasStarter_1_1_0_0_managed.zip",
@@ -105,9 +105,19 @@
       "sha256": "e7cc0727b843e2e49f7b2cc5e7997e8347c692ba228a19369342dbe2fcd6250b"
     },
     {
+      "path": "canvas-starter/deliverables/IRSLEAPCanvasStarter_1_1_0_1_managed.zip",
+      "bytes": 543554,
+      "sha256": "3b3fefd8f9423c794b9bba45ba88d8eb1daf4a1305e31b3180b213856adef62a"
+    },
+    {
+      "path": "canvas-starter/deliverables/IRSLEAPCanvasStarter_1_1_0_1_unmanaged.zip",
+      "bytes": 543707,
+      "sha256": "f85f7cec6394c820c746d62df773b315326ccab091acee5e00b42521636fd46a"
+    },
+    {
       "path": "canvas-starter/deliverables/package-report.json",
       "bytes": 1798,
-      "sha256": "0a6cacde43895d62437b7068d65b2ff15e9fac22685b40e82cb49bf1559f85e7"
+      "sha256": "de3951bef66f4dc77a45eed54342948397397408d4747e18f2260fc8fe936f3e"
     },
     {
       "path": "canvas-starter/guide/COMPLETE-SOLUTION-PREPARATION.txt",
@@ -120,19 +130,24 @@
       "sha256": "bcb88417fdd12abace9fff315d2489fc7a9e5fcddf35ae31b20e95af3969ad13"
     },
     {
+      "path": "canvas-starter/guide/DIRECTORY-PICKER.txt",
+      "bytes": 6871,
+      "sha256": "1082e256835319a8d255f38b34eb919f73c4eb24465bc26fcd885d3f5dafb857"
+    },
+    {
       "path": "canvas-starter/guide/Facilitator-Guide.txt",
       "bytes": 49593,
       "sha256": "c9c0f564eaa1ad2af1f656b32460f07e3c2334d4710480b48818266b487a16bd"
     },
     {
       "path": "canvas-starter/guide/IRS-LEAP-Workshop-Guide.html",
-      "bytes": 527302,
-      "sha256": "58774acfe1be56e6b6eba7b97b74959fbc3f1b4a8953e0d33bd663288f6aa7be"
+      "bytes": 544017,
+      "sha256": "f3b6680bce2d7534049a0768c15e0a3aba4bc7e38f33ce054231a44b70e26dcf"
     },
     {
       "path": "canvas-starter/guide/RELEASE-1.1.txt",
-      "bytes": 7702,
-      "sha256": "3c4fec31f36f01772b36b12db7b96f175a6fc856c7d759f2cc64dcf177baf946"
+      "bytes": 8169,
+      "sha256": "ee92c5a848fdb87fbd1126e36ae27693a25ccbbe6e7c90c7709ac6bedef332c6"
     },
     {
       "path": "canvas-starter/guide/Snippets/00-Contract.txt",
@@ -281,8 +296,8 @@
     },
     {
       "path": "canvas-starter/guide/SOLUTIONS-FIRST.txt",
-      "bytes": 14964,
-      "sha256": "6407575894254f718b6de9a68fab2c5cd6583878b44651a8551fc48e1c900304"
+      "bytes": 15132,
+      "sha256": "48220f32135404f9176acd3a2ee750331b361659b7a759d670501000fd5c109d"
     },
     {
       "path": "canvas-starter/package.py",
@@ -296,8 +311,8 @@
     },
     {
       "path": "canvas-starter/render_guide.py",
-      "bytes": 8759,
-      "sha256": "faa0c9c8e9e00bf7d6c23711eb713f4a53f726f2e26521455ed80f214851e0a6"
+      "bytes": 8866,
+      "sha256": "e29f70f9db7613c025da38d855f2dcfb27732ee09a0650f49b9658fd025b667a"
     },
     {
       "path": "canvas-starter/runtime-canvas/.gitignore",
@@ -316,13 +331,13 @@
     },
     {
       "path": "canvas-starter/runtime-canvas/IRS-LEAP.msapp",
-      "bytes": 497770,
-      "sha256": "2f0084caa6321e781c3d4b4b7f138e24251fb030f2c3c52972eb9b8ee594389f"
+      "bytes": 503540,
+      "sha256": "126a6be155c41372f8ce2b0a3ca3ed2aedf8f7f529707f92da0ebbb64f1b8a9e"
     },
     {
       "path": "canvas-starter/runtime-canvas/runtime-validation.json",
-      "bytes": 1728,
-      "sha256": "7fc1af8f996b264351b5001b80bf9b665512f52bae701b9f639e9a0a082e8812"
+      "bytes": 2817,
+      "sha256": "1ededdc6f191038d76e2c782a754169c6e95157eaf3f643d16d598b0ed9c8e1c"
     },
     {
       "path": "canvas-starter/runtime-canvas/scrCalendar.pa.yaml",
@@ -336,8 +351,8 @@
     },
     {
       "path": "canvas-starter/runtime-canvas/scrNew.pa.yaml",
-      "bytes": 12397,
-      "sha256": "185a5cf9b99839660c12ccc78479d13e79614149015d6c68be29872918365c61"
+      "bytes": 15675,
+      "sha256": "af8c311ab021647f831235f79f87eaa1805188a71605cec5b69d534c0e2536c5"
     },
     {
       "path": "canvas-starter/runtime-canvas/scrTotals.pa.yaml",
@@ -386,13 +401,13 @@
     },
     {
       "path": "canvas-starter/solution-source/CanvasApps/leap_irsleap_e1c7a.meta.xml",
-      "bytes": 2584,
-      "sha256": "6ad991616288befc2f7461526e953933b55720c2b8fa897e1869e081043db5c0"
+      "bytes": 3057,
+      "sha256": "0f05d98603553cd60b144e267f771fc8f3e24dedf0f3b8ac03b5c390c10eb64e"
     },
     {
       "path": "canvas-starter/solution-source/CanvasApps/leap_irsleap_e1c7a_AdditionalUris0_identity.json",
       "bytes": 3755,
-      "sha256": "9f3daf60f3db5913d8acea640dfeeac198c9932505cbc39005f515009e36ca32"
+      "sha256": "cece74ca727256a31aad24fccbb00906047fc1d6960e5ce42a9d6b7d2dd33a37"
     },
     {
       "path": "canvas-starter/solution-source/CanvasApps/leap_irsleap_e1c7a_BackgroundImageUri",
@@ -401,8 +416,8 @@
     },
     {
       "path": "canvas-starter/solution-source/CanvasApps/leap_irsleap_e1c7a_DocumentUri.msapp",
-      "bytes": 497770,
-      "sha256": "2f0084caa6321e781c3d4b4b7f138e24251fb030f2c3c52972eb9b8ee594389f"
+      "bytes": 503540,
+      "sha256": "126a6be155c41372f8ce2b0a3ca3ed2aedf8f7f529707f92da0ebbb64f1b8a9e"
     },
     {
       "path": "canvas-starter/solution-source/customapis/leap_GetAnnualTotal/customapi.xml",
@@ -552,7 +567,7 @@
     {
       "path": "canvas-starter/solution-source/Other/Solution.xml",
       "bytes": 5712,
-      "sha256": "89d921768a1ab039ac008d554f96e13ea132099d2589eae23cb0ce32d169afe9"
+      "sha256": "e071576084f2e64ff0d1c0ccde2f5df240aa25408b79c3933a49eb1014d4811e"
     },
     {
       "path": "canvas-starter/solution-source/PluginAssemblies/IrsLeapPlugins-47B19245-BCCD-F111-A05C-6045BD094F74/IrsLeapPlugins.dll",
@@ -606,13 +621,13 @@
     },
     {
       "path": "canvas-starter/START-HERE.txt",
-      "bytes": 5677,
-      "sha256": "03fb6d86bd7c2f27f6aaab9101f2dd42cfa091fc27ee2b3e3f567978517be06a"
+      "bytes": 5936,
+      "sha256": "c468e553ecdc81a3696ecd22b809723fa9f18e2616254a5b3869f598aee0e56f"
     },
     {
       "path": "README.rst",
-      "bytes": 4568,
-      "sha256": "feebf68ea82ac33c9c3e47c916e753d542eb6ab956fa84ba765fd7092a518c50"
+      "bytes": 5276,
+      "sha256": "84fe0119ac391807d8f1156ef4f7b35c7aba6771451bfadc5570c4fe9f3a9437"
     },
     {
       "path": "scripts/auth.py",

@@ -10,13 +10,15 @@ the session understanding solution deployment and making one small change.
 
 PACKAGE STATUS - DO NOT SKIP
 ----------------------------
-Version1.1.0.0 is now included with the actual native Canvas app,stopped approval
+Version1.1.0.1 is now included with the actual native Canvas app,stopped approval
 flow,3references,2consumed variable definitions and Dataverse foundation.
 Use the1.1exports for this lesson. Version1.0was the backend-only baseline.
 See RELEASE-1.1.txt for exact components,configuration and remaining gates.
 The short agenda assumes target connections,licenses,roles and GCC rehearsal
 are prepared. Import success alone is not end-to-end approval/mail evidence.
 CORE-LAB and formula snippets remain optional build/reference material.
+Directory search now requires each target user to connect Office365Users to the
+target organization. Review DIRECTORY-PICKER.txt and preserve Dataverse provisioning.
 
 END STATE
 ---------
@@ -31,7 +33,7 @@ For this short workshop, use ONE complete solution with the approved IRSLEAP
 publisher/leap prefix. Add the completed app, core cloud flow, required
 connection references and configuration definitions to the existing foundation.
 Preserve unique name IRSLEAPCanvasStarter. The included complete-component
-release is1.1.0.0; increment version when making and exporting workshop changes.
+release is1.1.0.1; increment version when making and exporting workshop changes.
 Do not create a second similarly named request table.
 
 Export that complete version as:
