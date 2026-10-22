@@ -1,0 +1,123 @@
+LEAP DATAVERSE CONTRACT / PREIMPORT COMPARISON CHECKLIST
+
+Table display singular: LEAP Request
+Table display plural: LEAP Requests
+Table logical/schema: leap_request
+Entity set (confirm in target): leap_requests
+Primary record GUID display: LEAP Request; logical leap_requestid
+Primary name: Title; logical leap_name
+Ownership: User or team owned. Create plug-in binds owner/requester to caller.
+Users primary GUID: User; logical systemuserid
+Users name: Full Name; logical fullname
+Users email: Primary Email; logical internalemailaddress
+Users Entra GUID: Azure AD Object ID; logical azureactivedirectoryobjectid
+Users disabled Boolean logical: isdisabled (display label can vary).
+
+Display name                 Logical name              Type / entry policy
+Title                        leap_name                 Text; required
+Description                  leap_description          Multiline text; optional
+Leave Date                   leap_leavedate            DateOnly format AND behavior
+Start Minute                 leap_startminute          Whole number 0..1439
+End Minute                   leap_endminute            Whole number 1..1440, > start
+Leave Hours                  leap_hours                Optional whole number 0..24
+Leave Category               leap_category             Required local Choice
+Request Status               leap_status               Local Choice; server/flow only
+Calendar Year                leap_year                 Whole number; server-derived
+Requester                    leap_requesterid          User lookup; server-derived
+Approver 1                   leap_approver1id           User lookup; required
+Approver 2                   leap_approver2id           User lookup; optional
+Approver 3                   leap_approver3id           User lookup; optional
+Decided By                   leap_decidedbyid           User lookup; automation only
+Decided On                   leap_decidedon             Date and time; server stamp
+Decision Comments            leap_decisioncomments      Multiline text; automation only
+Approval ID                  leap_approvalid            Text; automation only
+Processing Note              leap_processingnote        Single Line Text, max 500; F only
+
+Confirm exact spellings of decision logical names against imported metadata;
+Canvas formulas below reference display names and flow uses dynamic field inputs.
+No employee form cards for status/requester/year/owner/decision/processing fields.
+No native statecode/statuscode substitutes for the custom Request Status.
+Web API lookup GUIDs use _leap_requesterid_value, _leap_approver1id_value,
+_leap_approver2id_value, and _leap_approver3id_value. Users systemuserid is
+NOT azureactivedirectoryobjectid. Decided By binds a systemuserid.
+Workflow-only updates (Approval ID / Processing Note) are allowed only while
+Pending. A terminal transition includes status and, for Approve/Reject,
+Decided By / Decision Comments; it MUST NOT include Processing Note or Approval
+ID. After finalization the guard rejects all row updates, including notes.
+Expiry sends status only. Decided On is stamped by the server, never the flow.
+
+LEAVE CATEGORY LOCAL CHOICE: EXACT LABELS / INTEGER VALUES
+100000000 Annual
+100000001 Sick
+100000002 Admin
+100000003 Exception A: Management-Requested Work During Approved Leave
+100000004 Exception B: Office Time Over 50% of Duty Hours
+100000005 Exception C: Leave Exceeding 50% of Duty Hours
+100000006 Exception D: Medical Reason (Employee or Dependent)
+100000007 Exception E: Emergency Home Repairs
+100000008 Exception F: Emergency Caregiving Needs
+100000009 Exception G: Other Exigent Circumstances
+100000010 Exception H: Interim 90-Day RA Exception
+100000011 No Exception I: Authorized Situation Telework Instances
+100000012 Other
+
+REQUEST STATUS LOCAL CHOICE
+100000000 Pending
+100000001 Approved
+100000002 Denied
+100000003 Expired
+
+Native Canvas category source:
+Choices([@'LEAP Requests'].'Leave Category')
+The form card Update is ddCategory.Selected.Value (native choice).
+If authoring a create Patch instead of this form, use the SAME Selected.Value
+choice value, not ddCategory.SelectedText or Text(...).
+This workshop uses SubmitForm, not lookup/choice Patch reconstruction.
+Generated Canvas type often appears as 'Request Status (LEAP Requests)'.
+Select the ACTUAL generated choice type via IntelliSense if renamed/localized.
+No client formula in this guide writes that status type.
+
+CUSTOM API
+Unique name: leap_GetAnnualTotal
+Unbound action (not a Web API function-only operation).
+Inputs:
+  RequesterId  Text containing a Dataverse systemuserid GUID, not Entra GUID.
+  CalendarYear Whole number integer of LEAVE year.
+Outputs:
+  TotalHours        Known approved hours, adding each row independently.
+  MissingHours      Number of approved rows with null/blank Leave Hours.
+  ApprovedRequests  Count of all approved rows, including blanks and zeros.
+  RequesterName     Authorized target requester's display name.
+The calling principal must be the current Canvas user. Self is allowed.
+Otherwise the caller must be a selected approver on ANY saved request for that
+requester, regardless of request year or status. This is lifetime requester-level
+authorization: selection in one year authorizes aggregates for other years too.
+CalendarYear limits aggregation, NOT the authorization relationship.
+An approver may receive employee-wide approved aggregate without hidden details.
+The API must deny unrelated users before privileged aggregation.
+Never call it through F's owner-connected flow to emulate end-user totals.
+
+SECURITY MINIMUM (VERIFY ACTUAL IMPORTED ROLES AND PRIVILEGES)
+E, A, B, U:
+  Request Create and user-level Read (plus appropriate create lookup Append /
+  Users Append To privileges). NO request Write/Delete, Assign, or broad Share.
+  Read only their own or explicitly shared authorized records.
+  Read sufficient Users metadata for native lookup and own identity resolution.
+  Execute API under caller identity with server authorization.
+Selected approvers:
+  Server grants row-specific Read access; app sharing alone does not do this.
+F:
+  Dedicated authorized automation identity. Request Read/required restricted
+  Write and required Users Read plus connector/approval/email permissions.
+  Plug-in authorization for F must match the starter configuration.
+  No participant access to F's connection credentials, and no System Admin as
+  a permanent service-account shortcut.
+Administrator:
+  Separate deployment/role/audit/operations responsibility; do not use as UAT E.
+
+SEMANTICS
+One category + one selected date per row; separate rows for cross-day leave.
+Overlaps and repeated dates are allowed and must not be deduplicated in totals.
+Hours is independently entered, never calculated from minutes.
+Blank != zero. Approved blank increments MissingHours; explicit zero does not.
+Calendar Year derives from Leave Date, not Created On or Decided On.

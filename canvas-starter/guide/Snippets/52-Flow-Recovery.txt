@@ -1,0 +1,229 @@
+52 - TIMEOUT, FAILURE, DUPLICATE AND SAVED-ID RECONCILIATION
+
+SCOPE
+These are operator instructions, not executed recovery operations. Use the
+actual completed backend export, exact 50/51 flow, and approved synthetic test
+environment. The parent deployment reports final provisioning/export status
+separately. This guide makes no claim that a tenant rehearsal was performed.
+
+INVARIANTS
+* Only Pending (100000000) accepts workflow-only Approval ID / Processing Note
+  writes. Processing Note is Single Line Text, maximum 500, never a memo.
+* Approve/Reject transition contains ONLY Request Status, Decided By and Decision
+  Comments. Expired transition contains ONLY Request Status (100000003).
+  Never include Approval ID or Processing Note in a terminal transition.
+* Approved=100000001; Denied=100000002. Never use built-in statecode/statuscode.
+  Decided On is always server stamped; expiry has no human Decided By.
+* A finalized row cannot be updated, including its Processing Note. Record
+  support notes outside the request, in the approved restricted operations log.
+* Retry/repair must preserve request and approval correlation and original
+  selected membership. An operator does not acquire authority to invent a vote.
+* Read guards reduce ordinary replays; they are not a lock, atomic outbox, or
+  exactly-once delivery. Native first response arbitration is not proof of
+  race-safe downstream Dataverse transitions.
+
+RUN-AFTER MATRIX (EXACT ACTION NAMES FROM 50)
+Configure run after is under Settings/Run after in the applicable designer.
+Select ONLY the listed predecessor status boxes; uncheck all others.
+All actions not overridden below use predecessor SUCCEEDED only.
+
+Action                          Predecessor                    Allowed status
+Scope_Process                   Initialize_Issue               Succeeded
+Condition_ReadyToCreate          Condition_DispatchAllowed      Succeeded
+Condition_ApprovalIdReturned     Set_ApprovalId                 Succeeded
+Save_ApprovalID                  ID-return condition YES        normal entry
+Condition_ApprovalPersisted      Condition_ReadyToCreate         Succeeded
+Scope_AwaitDecision              persisted condition YES        normal entry
+Wait_Approval                   first in Scope_AwaitDecision    normal entry
+Get_Request_Decision             Wait_Approval                   Succeeded ONLY
+Condition_DecisionCorrelation    Get_Request_Decision            Succeeded
+Scope_Expire                     Wait_Approval                   Timed out ONLY
+Get_Request_Expiry               first in Scope_Expire           normal entry
+Condition_ExpiryPendingSameApproval Get_Request_Expiry           Succeeded
+Update_Expired                   condition YES branch           normal entry
+Set_Terminal_Expired             Update_Expired                  Succeeded ONLY
+Set_Terminal_Approved            Update_Approved                 Succeeded ONLY
+Set_Terminal_Denied              Update_Denied                   Succeeded ONLY
+Condition_ResponderMembership    Condition_ResponderIdPresent    Succeeded
+Scope_Notify                     Scope_Process                   Succeeded,
+                                                               Failed,
+                                                               Timed out,
+                                                               Skipped
+Scope_Recovery                   Scope_Notify                    Succeeded,
+                                                               Failed,
+                                                               Timed out,
+                                                               Skipped
+Condition_RecoveryPending        Get_Request_Recovery            Succeeded ONLY
+Send_Admin_Alert                 Condition_RecoveryPending       Succeeded,
+                                                               Failed,
+                                                               Timed out,
+                                                               Skipped
+Terminate_RecoveryRequired       Send_Admin_Alert                all four statuses
+Terminate_Completed              Scope_Recovery                  Succeeded ONLY
+
+Save_ApprovalID belongs in Condition_ApprovalIdReturned's YES branch, after
+Set_ApprovalId. Do not make it run when ID validation failed.
+Condition_ApprovalPersisted checks Save_ApprovalID's actual Succeeded status
+before entering the wait scope. Keep the three processing gates as siblings,
+not a deeply nested chain; see 50's exact tree and the eight-level nesting limit.
+Scope_Expire is a parallel branch INSIDE Scope_AwaitDecision, directly from
+Wait_Approval, not a branch after Scope_Process or after Update_Approved.
+Do not put it after a scope that can time out for unrelated operations.
+Run-after can reference actions only at the applicable containment level.
+The expired path is not reached if the Wait action was skipped or failed.
+Process/Notify/Recovery are sibling TOP-LEVEL scopes. Their broad run-after is
+safe only with the explicit predicates from 51; it is NOT permission to expire.
+
+EXPECTED PATHS
+A. Ordinary approval: Get_Request -> valid selected set -> Create_Approval ->
+   Set_ApprovalId -> nonempty-ID check -> Save_ApprovalID -> Wait succeeds -> correlate ->
+   verify response membership -> Switch_Outcome -> Update_Approved or
+   Update_Denied -> matching Set_Terminal_* -> Scope_Notify. Expiry is skipped.
+B. Real wait timeout: Wait_Approval TimedOut -> Scope_Expire -> fresh Pending/
+   same-ID check -> status-only Update_Expired -> Set_Terminal_Expired -> notify.
+   A containing scope can report a timed-out child. Recovery expression exempts
+   a handled successful Update_Expired, not every failed/timed-out Process.
+C. Preparation failure: Wait_Approval Skipped. Scope_Expire MUST be Skipped too.
+   Scope_Notify has no terminal result. Scope_Recovery checks the current row,
+   notes only Pending, and alerts. This must NOT become Expired or Denied.
+D. Decision write failed: varTerminalStatus remains empty. No result email.
+   Recovery notes only if still Pending, alerts, and preserves approval ID.
+E. Result email failed after successful decision: status is already terminal.
+   Recovery does NOT write Processing Note. Only generic operations alert and
+   restricted external support record; repair notification independently.
+F. Another run changed the row: correlation predicate fails. Do not overwrite or
+   use its terminal state as this run's successful decision. Investigate IDs.
+
+THE CREATE / SAVE / WAIT IMMEDIATE-RESPONSE RACE
+Create an approval returns before Wait for an approval subscribes. An approver
+can click immediately during ID persistence. The approval service can complete
+while Wait is not yet registered, and the flow can then wait until timeout.
+Saving the ID immediately narrows the window; it does NOT eliminate it.
+Do not add a Delay, mark this "race safe", or imply every immediate result is
+delivered. Do not replace it with Start and wait PLUS Create (two approvals).
+The workshop deliberately retains the durable-ID split contract and exposes
+this limitation. Production requires engineered service-state reconciliation.
+
+Reconcile a suspected missed immediate response using the SAME saved ID:
+1. Authorized operator records request ID, saved Approval ID, run ID, current
+   status, create/save/wait times and selected user GUIDs in the approved support
+   record. Use synthetic data in rehearsal; restrict run history access.
+2. Open the same-cloud Power Automate Approvals portal under the authorized
+   approval owner/operations identity and locate that exact approval. Match ID,
+   not generic title alone. Inspect service status, response, responder and
+   timestamps. If the portal does not expose the needed ID, use the tenant's
+   approved supported administrative tooling/support path; do not guess.
+   Standard approvals does not promise a universally available "Get approval
+   details" action in this flow. This guide does not invent that action or grant
+   broad access to internal approval tables.
+3. If still awaiting response, retain ID and use an authorized recovery flow
+   that waits on THAT existing ID, without any Create action. A second Wait is
+   not proof it will replay an already-completed result; inspect service state.
+4. If completed and request still Pending, validate the exact service outcome
+   (Approve/Reject), identity and original selected-user membership with the
+   same Entra-to-systemuserid rules as 51. Stop/coordinate the old run first so
+   it cannot later expire/decide concurrently. Re-read Pending/same ID immediately
+   before a controlled F-authorized status+Decided By+Comments-only update.
+   Never spoof responder JSON into the normal flow or accept a forwarded email.
+   Use an approved, audited reconciliation implementation; this is NOT a
+   claim that the starter packages an automatic reconciliation worker.
+5. A normal Wait timeout only means the flow received no completion. It does not
+   prove the native service received no response. The baseline expiry branch's
+   Pending/same-ID check prevents stale-ID/terminal overwrites but cannot
+   distinguish a missed early response. Reconcile service state during the
+   timing rehearsal and before treating such expiry as a business fact.
+6. If baseline expiry already finalized the row despite a prior native decision,
+   do NOT reopen it or edit its note. Escalate through approved business
+   correction/audit procedures. Record the timing discrepancy externally.
+   Do not silently mark UAT PASS. One successful timing trial does not prove the
+   window impossible; this remains a documented non-production limitation.
+
+ORDINARY P7D EXPIRY
+Wait settings: Timeout P7D. The branch must run only on actual TimedOut.
+Get_Request_Expiry retrieves status and Approval ID afresh. Both Pending and
+exactly this run's nonempty Approval ID are required for Update_Expired.
+No note may be included with Expired, even "Timed out"; that mixed update is
+rejected by the guard. Do not set Decided By/On or fake a Reject response.
+Timeout may leave the native approval visible/actionable. A late service reply
+does not authorize changing an Expired Dataverse row. Cancellation/closure of
+that service item, when tenant-supported and authorized, is a separate operation
+using the exact saved ID. Do not delete audit data to hide it.
+
+CONTROLLED FAILURE AND SAFE DIAGNOSTICS
+Validation NO branches set only static varIssue codes; Scope_Recovery handles
+them even when Scope_Process itself reported Succeeded. Unexpected connector
+failures/timeouts also reach recovery. Secure Inputs/Outputs may be appropriate
+for actions carrying comments/Users data; govern restricted troubleshooting
+access and audit retention. Do not capture sensitive raw output in handouts.
+Get_Request_Recovery -> Condition_RecoveryPending -> Update_ProcessingNote:
+  Note only: Automation review required; consult the approved operations runbook.
+  Single Line Text <=500. No status/decision/approval-ID change.
+If the row finalized after that read, note write can fail. Send_Admin_Alert's
+all-status run-after still sends generic request ID/run ID/app URL only.
+The alert must not include varIssue detail, exception stacks, response comments,
+Description, Title, category, hours, date, mailbox list or serialized action data.
+If Get_Request_Recovery fails, its condition is skipped and alert still runs.
+If alert also fails, Terminate_RecoveryRequired still ends Failed. Platform owner
+must monitor failed runs/connection health through approved tooling; no recursive
+email loop or promise of guaranteed notification.
+
+FAULT-INJECTION REHEARSALS (DISPOSABLE COPY ONLY)
+Use the fewest necessary synthetic operations with explicit workshop authority.
+Do not weaken security or alter the live business flow to induce a failure.
+1. Before Create: configure the COPY's internal-cohort array to exclude one
+   selected test approver. Expect static issue, Pending note/alert, NO approval,
+   Wait Skipped, Scope_Expire Skipped, row still Pending.
+2. After create / before ID save: a controlled copy with a deliberately failing
+   save simulates ambiguity. Capture actual Create_Approval output ID securely.
+   Expect no second Create on repair. Locate approval using that ID.
+3. During Wait: PT2M with no response. Expect actual Wait TimedOut and status-only
+   expiry after the fresh correlation guard. Restore P7D and verify saved flow.
+4. After terminal write: in a COPY route Send_Requester_Result to a controlled
+   delivery failure. Expect terminal state preserved and no Processing Note write;
+   generic operations alert runs. Do not send to an arbitrary real address.
+5. Immediate response: tester acts immediately after native item exists. Compare
+   approval service status/timestamp with Wait subscription/result. If missed,
+   execute the saved-ID procedure above; record NOT VERIFIED/FAILED as applicable.
+6. If testing malformed response mappings, use an isolated non-sending test
+   harness or controlled copy. Do not forge real approval-service identities.
+   Absent/unknown outcome and present-but-unmatched ID must never become Denied.
+
+DUPLICATE / AMBIGUOUS-CREATE DECISION TABLE
+Saved state / evidence                   Safe next action
+Terminal request                         No request writes; no new approval.
+Pending + ID + native awaiting            Reconcile/wait existing ID only.
+Pending + ID + native completed           Validate/correlate; controlled repair.
+Pending + blank ID + Create definitely
+never reached/sent                        Repair cause, then controlled retry.
+Pending + blank ID + Create succeeded
+but Save failed                          Recover returned ID; persist only while
+                                         Pending; NEVER create another first.
+Pending + blank ID + Create outcome
+unknown (network timeout, missing logs)   Inspect service/admin support; no blind
+                                         resubmit or clearing of evidence.
+Two runs/approvals from concurrent start  Stop unsafe writers; reconcile both IDs,
+                                         native results and audit with operations.
+                                         Never silently pick the most convenient.
+
+Run-history Resubmit replays from the trigger; it is NOT "retry from failed
+action." A completed-run replay should stop at the saved-ID/status guard.
+This test proves only the sequential replay guard. Two starts can both read blank
+Approval ID and both Create before either Save. Create can also succeed while
+its response or persistence is lost. Neither union(), a text Processing marker,
+nor global trigger concurrency=1 fixes these transaction boundaries.
+
+PRODUCTION HARDENING IS A SEPARATE DELIVERABLE
+Require atomic per-request dispatch claim/unique outbox state, durable service
+correlation, idempotent decision delivery, atomic row-version-aware transitions,
+monitored reconciler for missing/early completions, service cancellation/expiry
+reconciliation, retry policy analysis, connection lifecycle, retention, and
+concurrency/load testing. Do not claim the starter guard implements all of this.
+Any pre-operation "Pending" read alone can race with another update; an ordinary
+success test does not establish atomic backend serialization.
+
+HANDOFF
+Record each recovery rehearsal outcome, unresolved timing/dispatch limitations,
+actual P7D restoration, support owner and approved external case location. No
+terminal note edits, direct employee decision Patch, or unverified production
+readiness claims. Readiness requires actual completed export + executed UAT;
+the parent supplies final environment/provisioning/export status separately.

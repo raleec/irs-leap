@@ -1,0 +1,1 @@
+AddColumns(Sequence(42, 0, 1), CellDate, DateAdd(varGridStart, Value, TimeUnit.Days))

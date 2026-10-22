@@ -1,0 +1,747 @@
+IRS LEAP: ONE-DAY CANVAS + FULL DATAVERSE + POWER AUTOMATE WORKSHOP
+Facilitator edition | Authored 2026-10-21 | English (United States) formulas
+
+READ THIS FIRST
+REVISED PARTICIPANT PATH: use SOLUTIONS-FIRST.txt for the150-minute deployment/
+configuration/customization lesson. Complete app/flow packaging is prework.
+CORE-LAB.txt is the build-once reference for the native Start-and-wait flow.
+Stages 0-4 and 7-8 below provide detailed preparation, Canvas and handoff guidance.
+Stage 5/6 and Snippets50/51/52 are an ADVANCED split-create/wait alternative.
+Do not combine those two flow paths.
+
+This directory contains instructions and pasteable examples, not an imported,
+published, or tested Canvas app or approval flow. The separate Dataverse starter
+supplies the table, choices, server-side security/validation plug-ins, and annual
+total custom API. Participants build their screens and approval flow LIVE.
+An import succeeding does not prove the security, connectors, or app work.
+Only the rehearsal and ordinary-user tests below establish workshop readiness.
+This is a synthetic-data hackathon, NOT an accredited IRS production system.
+Use this guide with the actual completed solution export and its verified
+metadata, not a partially provisioned table. The parent deployment work will
+report final provisioning/export status separately; see START-HERE.txt and
+ADMIN-HANDOFF.txt in this kit. The Dataverse development exports are included;
+For the original baseline construction exercises,the app and flow were built
+live. Version1.1now includes both: use RELEASE-1.1and SOLUTIONS-FIRST for the
+short workshop; this long guide remains optional construction reference.
+
+BUILD OUTCOME
+An internal, licensed employee enters one category and one calendar day per
+request, selects one to three internal approvers, and optionally supplies whole
+number hours. Dataverse records the authenticated requester and year of leave.
+One native Approve/Reject - First to respond approval is assigned to those users.
+A selected responder's first valid decision is written by the automation account;
+the server stamps the decision time. Other approvers then see the terminal state.
+The app shows a 42-cell month date picker and an authorized selected-day list.
+Annual totals come from the secured server API, never a sum of visible rows.
+
+NON-NEGOTIABLE BUSINESS RULES
+1. Exactly one category per request, using the 13 labels in Snippets\00-Contract.txt.
+2. One date per request. Start Minute is 0..1439; End Minute is 1..1440 and must
+   exceed Start Minute. End 1440 means 24:00 at the END of the selected day, not
+   the next day's 00:00 as a second date. Cross-day leave requires separate rows.
+3. Leave Hours is OPTIONAL and independently entered, integer 0..24. Blank means
+   unknown; zero means explicitly zero. Do not infer hours from elapsed minutes.
+4. Multiple requests on one day and overlapping intervals are permitted. Do not
+   add uniqueness or overlap-rejection logic to the app, flow, or table.
+5. Annual total means approved recorded hours for the YEAR OF LEAVE, not the
+   year of approval. Overlapping approved records each contribute their hours.
+   Approved blanks contribute zero known hours AND increment MissingHours;
+   approved explicit zeros contribute zero hours without incrementing MissingHours.
+6. Requester/owner, Calendar Year, status, and decision stamps are server-owned.
+   There is no employee edit/delete/cancel or direct Canvas decision Patch.
+7. Lookup selection does not grant a license, provision a Dataverse user, or
+   create security privileges. Onboard the internal user FIRST.
+
+TIMING: SIX HOURS OF FACILITATED BUILD/TEST TIME, SEVEN-HOUR DAY
+09:00-09:20  Stage 1: outcome, identity, and security demonstration      20 minutes
+09:20-10:00  Stage 2: import, contract, roles, connection rehearsal     40 minutes
+10:00-11:00  Stage 3: Canvas identity and validated request form        60 minutes
+11:00-11:15  Break
+11:15-12:00  Stage 4: calendar, details, and annual totals               45 minutes
+12:00-12:30  Lunch
+12:30-13:50  Stage 5: build native approval and persist decisions       80 minutes
+13:50-14:05  Break
+14:05-14:50  Stage 6: timeout, failure, and duplicate recovery           45 minutes
+14:50-15:40  Stage 7: ordinary-user UAT and publish/share               50 minutes
+15:40-16:00  Stage 8: export, evidence, and handoff                      20 minutes
+Stage 0 is facilitator/admin preparation OUTSIDE the six hours.
+Pair one maker with one tester; use a small preprovisioned cohort. Building
+plug-ins from scratch, obtaining licenses, and tenant policy changes are not
+credible day-of activities. If a gate fails, resolve it before running the class.
+
+MATERIALS AND PASTE CONVENTIONS
+All numbered files below are in Snippets, relative to this guide directory.
+00-Contract.txt is the naming/security checklist.
+*.powerfx contains ONLY a formula for one specified property. Paste the entire
+file into that property's formula bar, not into a text label or a code editor.
+10-OnStart.powerfx -> App.OnStart.
+11-HourItems.powerfx -> ddStartHour.Items.
+12-MinuteItems.powerfx -> ddStartMinute.Items and ddEndMinute.Items (end override
+                         is in 14-EndMinuteItems.powerfx).
+13-EndHourItems.powerfx -> ddEndHour.Items.
+14-EndMinuteItems.powerfx -> ddEndMinute.Items.
+15-StartMinuteUpdate.powerfx -> dcStartMinute.Update.
+16-EndMinuteUpdate.powerfx -> dcEndMinute.Update.
+17-HoursUpdate.powerfx -> dcHours.Update.
+18-SubmitOnSelect.powerfx -> btnSubmit.OnSelect.
+19-FormOnSuccess.powerfx -> frmRequest.OnSuccess.
+20-FormOnFailure.powerfx -> frmRequest.OnFailure.
+21-CategoryItems.powerfx -> ddCategory.Items.
+22-Approver1Items.powerfx -> cbApprover1.Items.
+23-Approver2Items.powerfx -> cbApprover2.Items.
+24-Approver3Items.powerfx -> cbApprover3.Items.
+30-CalendarItems.powerfx -> galMonth.Items.
+31-CalendarPrevious.powerfx -> btnPrevious.OnSelect.
+32-CalendarNext.powerfx -> btnNext.OnSelect.
+33-DayRequestsItems.powerfx -> galRequests.Items.
+34-RequestSummary.powerfx -> a label inside galRequests.Text.
+35-RefreshOnSelect.powerfx -> btnRefresh.OnSelect.
+40-AnnualTotalOnSelect.powerfx -> btnLoadTotals.OnSelect.
+41-AnnualTotalText.powerfx -> lblAnnualTotal.Text.
+50-Flow-Build.txt -> flow action-by-action runbook and expressions.
+51-Flow-Expressions.txt -> expressions keyed by exact action names.
+52-Flow-Recovery.txt -> failure, timeout, and duplicate runbook.
+60-UAT.txt -> acceptance matrix and evidence checklist.
+61-GCC-Deployment.txt -> cloud, publishing, and deployment checklist.
+
+Use CLASSIC controls throughout: classic Text input has Text, classic Drop down
+has Selected.Value/Selected.Label, classic Date picker has SelectedDate, and
+classic Combo box has Selected. Modern controls use different properties.
+If the Insert pane groups controls differently, search the control's exact name
+and choose its classic variant. Do not mix modern Value with classic Text.
+Formulas use commas for arguments and semicolons for behavior chaining. In a
+different authoring locale, Studio may require semicolons and double semicolons.
+Use a US-English maker session for a uniform room; do not blindly replace commas
+inside strings or JSON. All component/control names below are deliberate.
+Display names and generated choice-type names can differ after localization or
+renaming. Use IntelliSense to select the actual generated field/type; the imported
+logical names in 00-Contract.txt are the authority. Do not type an invented enum.
+
+STAGE 0. PREREHEARSAL: COMPLETE 2-5 BUSINESS DAYS BEFORE THE WORKSHOP
+SAY
+"We are practicing a governed workflow using synthetic leave data. An approval
+email is not permission to browse all employees. The server is the authority."
+DO
+0.1 Ask the tenant/environment administrator to provide a full Dataverse sandbox
+    in the correct cloud, with capacity, plug-in execution enabled, and backups.
+    Dataverse for Teams is NOT the target. Rehearse with the actual GCC tenant,
+    not a commercial developer tenant and an assumption of parity.
+0.2 Sign in at https://make.gov.powerapps.us and
+    https://make.gov.powerautomate.us for GCC. Commercial portals are
+    https://make.powerapps.com and https://make.powerautomate.com.
+    GCC High/DoD use their tenant-specific endpoints; see 61-GCC-Deployment.txt.
+    Select the SAME environment in each portal and verify its environment ID.
+0.3 Confirm full Dataverse/Power Apps and Power Automate premium entitlement
+    suitable for each participant and the automation identity. Microsoft 365
+    alone is not blanket full-Dataverse licensing. Validate current agency
+    licensing with the administrator, including shared/process-flow licensing.
+0.4 Provision employee E, approvers A and B, unrelated user U, and automation
+    identity F as enabled internal Dataverse users. Use a second requester E2
+    for the non-disclosure aggregate test. Give E/A/B/U only ordinary end-user
+    request privileges, not Environment Maker, System Customizer, or System
+    Administrator. Makers may use a separate maker identity while building.
+    Confirm each can sign in, has a mailbox, and has the required environment
+    security-group membership. Guests/external users are outside this lab.
+0.5 Import and inspect the starter following Stage 2. Assign its actual employee,
+    approver, and automation roles. Inspect the packaged role names; do not
+    invent a role name to make an error disappear. Validate the permission
+    matrix in 00-Contract.txt against the actual package. In particular, neither
+    end-user role may have request Write/Delete or organization-wide request Read.
+    F must have only the required automation privileges/authorization, not
+    System Administrator. Determine how the plug-in identifies F and configure
+    that mechanism EXACTLY as the starter deployment instructions require.
+0.6 Verify DLP permits Dataverse + Standard approvals + Office 365 Outlook in
+    the same allowed business-data group. Create same-cloud connections under F
+    for the flow. Consent/conditional-access/service-account policies apply.
+    Outlook is used for the final generic requester email; native approvals
+    sends its own approval email. Do not route through an anonymous HTTP URL.
+0.7 Preinitialize the Approvals capability as the administrator if the first
+    approval requires environment setup. Approvers can respond in their native
+    approval email or Power Automate Approvals portal if actionable email is
+    unavailable. Check quarantine, mailbox policies, and approvals availability.
+    Email is the BASELINE; no Teams adaptive-card or Flow Bot dependency.
+0.8 Build the instructions once in a disposable/rehearsal solution. Participants
+    will build live; do not advertise this guide as an imported Canvas app.
+    Rehearse every expression against actual connector outputs, including
+    Approval ID, responses[0].responder.id/email, and choice display labels.
+    Rename flow actions before inserting any expressions.
+0.9 Confirm native Environment.leap_GetAnnualTotal is discoverable in Canvas,
+    returns all four documented outputs, and authorizes the actual CALLER.
+    Test self, authorized approver, and unrelated U. Do not substitute an
+    owner-connected Power Automate flow that accepts a caller's arbitrary ID.
+0.10 Run 60-UAT.txt using ordinary accounts. Rehearse timeout with PT2M in a
+     rehearsal copy, then restore P7D. Save an evidence sheet outside the app,
+     with synthetic request IDs, observed status, caller, and total outputs.
+0.11 Confirm auditing is enabled/configured where supported for create/decision
+     operations and access procedures, retention, administrator support contact,
+     and safe synthetic-data cleanup plan. Do not collect medical/RA narratives.
+PASTE
+Use the files in Snippets while rehearsing; record the actual app URL,
+environment ID, solution name/version, role names, F's Dataverse user ID, and
+admin mailbox in the workshop's approved handout/secure configuration.
+EXPECT
+An ordinary user can create/read their own row, selected approvers can read
+their shared rows, unrelated U cannot, and only F can submit decision updates.
+CHECKPOINT
+No unresolved licensing, cloud, DLP, user-provisioning, plug-in, custom API,
+or email gate. A clean import is necessary but NOT sufficient.
+RECOVERY
+Postpone the hands-on if a security test fails. Never solve permissions by
+granting System Administrator to participants or widening request Read to the
+whole organization. If a cloud connector is unavailable, escalate to tenant
+administration; do not move agency data to a commercial tenant.
+
+STAGE 1. FRAME THE MODEL AND IDENTITIES (20 MINUTES)
+SAY
+"A row is a request, not a person-day. Two rows can share a date and even overlap.
+Hours are entered facts; no hours is not zero. Annual means the leave date's year."
+DO
+1.1 Draw E -> Dataverse create -> F's create-only flow -> A/B native approval ->
+    F's status update -> server stamp -> E's generic result email.
+1.2 Explain identity boundaries: the Canvas Dataverse connection runs as the
+    signed-in user; the flow Dataverse connection runs as F; an approval responder
+    is separately validated against the original request's selected users.
+1.3 Demonstrate a synthetic Approved row with blank hours, one with 0, and two
+    overlapping Approved rows with 2 and 3 hours. Expected known total is 5,
+    approved request count is 4, missing-hours count is 1.
+1.4 Open the same date as E, A, and U using separate browser profiles. Explain
+    why a calendar can show different authorized rows to different people.
+PASTE
+Nothing. Use 00-Contract.txt as the on-screen contract, not a hard-coded local
+collection masquerading as Dataverse data.
+EXPECT
+Participants can state who creates, who decides, and why visible rows cannot
+be the input to an employee-wide annual total.
+CHECKPOINT
+Ask: "An October leave request approved next January belongs to which year?"
+Answer: October's calendar year. "Blank vs zero?" Unknown vs explicitly zero.
+RECOVERY
+Resolve the data semantics now. Do not implement inferred duration, one-row-
+per-day constraints, a single all-employee cache, or delegated-flow identity.
+
+STAGE 2. IMPORT AND INSPECT FULL DATAVERSE (40 MINUTES)
+SAY
+"We import the server foundation; we do not import a completed app or flow.
+Managed and unmanaged solutions serve different lifecycle purposes."
+DO
+2.1 In Power Apps, select the target environment, then Solutions > Import
+    solution > Browse. Select the starter ZIP produced by the parent starter
+    build instructions. Inspect the package actually delivered; this guide
+    makes no assertion that a ZIP was already imported or built on your tenant.
+    Use the UNMANAGED starter in an isolated workshop development environment
+    when components must be edited. Use a rehearsed MANAGED artifact for a
+    downstream test/production-style deployment. Do not import both variants
+    into the same target simply to try them. Keep the publisher prefix leap.
+2.2 Complete the import wizard, inspect any connection-reference prompts that
+    actually appear, and open Solution history if import reports a failure.
+    No Canvas app/approval flow should be expected from the backend package.
+2.3 Open the imported solution > Tables > LEAP Request > Columns. Depending on
+    the navigation surface, the list can display plural LEAP Requests. Compare
+    every column/type/choice value with 00-Contract.txt. Open Leave Date:
+    BOTH Format = Date only and Time zone adjustment/behavior = Date only.
+    A User local date-time formatted to hide its time is not equivalent.
+2.4 Open Leave Category and Request Status and verify local choices including
+    all exact labels/values. Request Status is leap_status; it is NOT Dataverse's
+    built-in Status/statecode or Status Reason/statuscode.
+2.5 Verify required Approver 1, optional Approver 2/3, whole-number min/max,
+    and user/team ownership. Table properties and plug-in implementation must
+    agree with the contract. Do not "fix" metadata to bypass failed validation.
+2.6 Inspect the installed plug-in steps and custom API with the starter's
+    deployment instructions. Verify Create binds requester/owner to the caller,
+    derives Calendar Year, shares read access, rejects malformed hours/time,
+    protects decision fields, and restricts automation updates.
+2.7 In the Power Platform admin center, select the environment > Settings >
+    Users + permissions > Users, open the provisioned user, and Manage security
+    roles. UI placement can change; use the actual Users/security-role page.
+    Assign the starter's least-privilege roles and verify role definitions.
+    Application sharing is a separate step; neither operation replaces the other.
+2.8 Build within an unmanaged workshop solution that contains/references the
+    imported components. Use an appropriate publisher, not a random second leap
+    table. If a managed foundation is used, create the app/flow in a separate
+    unmanaged extension solution and preserve the managed dependency.
+PASTE
+The field/type/value inventory in 00-Contract.txt is a comparison checklist,
+not SQL or an alternative table creation script.
+EXPECT
+Exactly one intended LEAP Request table and one callable annual-total action.
+CHECKPOINT
+Show logical names leap_request, leap_leavedate, leap_status, leap_requesterid,
+and leap_approver1id. A/B/User lookups point to Users, not Contacts or text email.
+RECOVERY
+For import failure, inspect dependency/error details, target cloud/version,
+plug-in assembly and Custom API availability, and correct ZIP flavor. Repair
+the actual package/dependency; do not manually create an insecure lookalike
+table and continue. Re-run Stage 0 security gates after any foundation change.
+
+STAGE 3. CREATE THE CANVAS APP AND REQUEST FORM (60 MINUTES)
+SAY
+"The form submits only employee-entered fields. Server-owned values never appear
+as editable cards. A successful Canvas save is not yet an approved request."
+DO
+3.1 In the workshop solution, New > App > Canvas app. Choose a tablet/responsive
+    layout suitable for the room, name it IRS LEAP Workshop, and create a blank
+    Canvas app. Studio creation entry points vary; select a blank Canvas app,
+    not a model-driven app or a template that silently adds another data source.
+3.2 In Studio, Data > Add data, add native Dataverse LEAP Requests and Users from
+    the current environment. Select Add data, search Environment, and add the
+    Environment language object for Dataverse actions. If a newly imported API
+    is missing, refresh Environment or remove/re-add that object.
+3.3 Create/rename four Blank screens: scrCalendar, scrNew, scrDetails, scrTotals.
+    Set App.StartScreen = scrCalendar. Paste 10-OnStart.powerfx into App.OnStart.
+    Select App in Tree view and Run OnStart from its menu, then preview.
+    Add a label on scrCalendar with Text =
+      If(IsBlank(varMe.User), "User is not provisioned; contact support.",
+         "Signed in: " & varMe.'Full Name')
+    Disable New/total actions when varMe.User is blank.
+    Azure AD Object ID is the Dataverse display name often generated for the
+    Entra object GUID. Select it via IntelliSense. It maps to
+    azureactivedirectoryobjectid. Do not compare the Users primary key to an
+    Entra ID: systemuserid and the Entra object ID are different identifiers.
+3.4 Insert a classic Edit form on scrNew. Rename frmRequest. Set DataSource =
+    [@'LEAP Requests'], Item = Defaults([@'LEAP Requests']), DefaultMode =
+    FormMode.New. In Edit fields, add ONLY Title, Description, Leave Date,
+    Start Minute, End Minute, Leave Hours, Leave Category, Approver 1,
+    Approver 2, Approver 3. Remove Owner, Requester, Calendar Year, Request
+    Status, all decision fields, Approval ID, and Processing Note if offered.
+    Do not remove protected columns from the table; remove them from the form.
+3.5 Keep the generated Title/Description/date card DataField and validation
+    bindings. Unlock cards only when modifying their child controls/Update.
+    Rename the Title text input txtTitle; keep Title card Update =
+    Trim(txtTitle.Text). Use a synthetic ID-like title, not a medical summary.
+    Rename the classic date picker dpLeave; set its DefaultDate = Today() and
+    its card Update = dpLeave.SelectedDate. Keep the generated required/error
+    labels. Clear the picker and confirm the form does not silently submit today.
+3.6 Rename Start Minute card dcStartMinute. Delete its generated number input,
+    insert two classic Drop down controls INSIDE the card, rename ddStartHour
+    and ddStartMinute. Set ddStartHour.Items using 11-HourItems.powerfx and
+    ddStartMinute.Items using 12-MinuteItems.powerfx.
+    For BOTH controls set the displayed Value column to Label (property
+    Value = "Label" on classic Drop down), AllowEmptySelection = false.
+    Set ddStartHour.Default = "09"; ddStartMinute.Default = "00".
+    Set dcStartMinute.Update using 15-StartMinuteUpdate.powerfx.
+3.7 Repeat for End Minute card dcEndMinute with ddEndHour and ddEndMinute.
+    Items use 13-EndHourItems.powerfx and 14-EndMinuteItems.powerfx.
+    Display Value = "Label", AllowEmptySelection = false.
+    Defaults are "10" and "00". Card Update = 16-EndMinuteUpdate.powerfx.
+    Add labels Hour / Minute and "24:00 is the end of this selected date."
+    Selecting end hour 24 makes only minute 00 available and Update returns
+    1440 explicitly. The start list never offers 24. These controls support
+    every minute; there is no undocumented quarter-hour-only restriction.
+3.8 Rename Leave Hours card dcHours; replace its child with classic Text input
+    txtHours. Set Default = ""; HintText = "Optional whole number, 0-24".
+    Set Format = TextFormat.Number, DelayOutput = false. Numeric keyboard/
+    Format is NOT validation. Set Update = 17-HoursUpdate.powerfx.
+    Add a label "Blank = unknown; 0 = explicitly zero. No duration inference."
+    The submit guard rejects decimals, negative values, letters, and >24.
+    Inputs "00" and "01" are deliberately rejected: use "0" and "1".
+3.9 Rename category card dcCategory and its classic Drop down ddCategory.
+    Items = 21-CategoryItems.powerfx, Value = "Value",
+    AllowEmptySelection = true, Default = Blank().
+    Set dcCategory.Update = ddCategory.Selected.Value. Leave required true.
+    Choices returns native typed options, not a string collection; never paste
+    labels into Patch as if the column were plain text.
+3.10 KEEP the three generated native lookup Combo boxes inside their original
+     cards. Rename controls cbApprover1, cbApprover2, cbApprover3. Set Items
+     using the respective 22-Approver1Items.powerfx, 23-Approver2Items.powerfx,
+     and 24-Approver3Items.powerfx files and SelectMultiple = false,
+     IsSearchable = true. Preserve generated DisplayFields/SearchFields that
+     select the Users primary name (Full Name; logical fullname). Depending on
+     the generated control, the column-name strings may use "fullname"; use
+     what the native card generated and IntelliSense, not guessed strings.
+     Card Update is cbApproverN.Selected; DefaultSelectedItems remains the
+     generated Parent.Default binding. Approver 1 is required, 2/3 optional.
+     A native Choices lookup supplies User records for the correct lookup.
+     Do not replace it with Office365Users people-search results.
+3.11 The lookup service respects user access; it is not guaranteed to hide every
+     disabled/unlicensed account. Confirm selected users are enabled/provisioned
+     before the session. Server/flow validation must reject unusable recipients.
+     Do not guess whether this tenant calls the disabled flag "Status" or
+     "Is Disabled" in Canvas. Keep native lookup bindings and validate the
+     actual enabled flag server-side/by Users Get a row in the flow.
+3.12 Add btnSubmit, OnSelect = 18-SubmitOnSelect.powerfx, DisplayMode =
+       If(varSubmitting || IsBlank(varMe.User), DisplayMode.Disabled,
+          DisplayMode.Edit)
+     Set frmRequest.OnSuccess = 19-FormOnSuccess.powerfx and OnFailure =
+     20-FormOnFailure.powerfx. Keep a visible form-error label with Text =
+     frmRequest.Error. Do not convert server errors into a fake success banner.
+3.13 On scrCalendar add btnNew, Text = "New request", DisplayMode =
+       If(IsBlank(varMe.User), DisplayMode.Disabled, DisplayMode.Edit)
+     OnSelect =
+       NewForm(frmRequest); Set(varSubmitting, false);
+       Navigate(scrNew, ScreenTransition.None)
+     On scrNew add Cancel, OnSelect =
+       ResetForm(frmRequest); Set(varSubmitting, false);
+       Navigate(scrCalendar, ScreenTransition.None)
+     Disable Cancel while varSubmitting to avoid abandoning an in-flight save.
+PASTE
+10 through 24 files into the properties identified above, NOT as a single script.
+EXPECT
+Submitting a valid request makes one Pending row. Calendar Year equals
+Year(Leave Date), Requester/Owner equals E, and selected approvers can read it.
+Blank hours remains null. Zero remains numeric zero. App refresh is required
+to see asynchronous decisions; it is not a live push channel.
+CHECKPOINT
+Submit one blank-hours row and one 0-hours row; inspect the saved values.
+Try end before start and 2.5 hours: neither should submit. Verify Approver 1
+cannot be omitted. Do not bulk-enter real employee or health information.
+RECOVERY
+If User lookup/choice formulas are red, select the native field/type with
+IntelliSense and verify data source names. For a UPN/email mismatch, do not
+fall back to a display-name match. Prefer Entra GUID identity. A rehearsed
+alternative is LookUp(Users, 'Primary Email' = User().Email), but it is valid
+ONLY if the administrator confirms User().Email equals internalemailaddress;
+UPN and mailbox SMTP may differ. Never silently choose First(Users).
+For "insufficient privileges", inspect create/read/Append/Append To and user
+provisioning, not broad Write. For server error, fix the data/configuration;
+do not move protected values back into the client.
+
+STAGE 4. CALENDAR, DETAIL, AND SERVER TOTALS (45 MINUTES)
+SAY
+"This is a usable month selector plus a selected-day authorized list, not an
+attempt to reproduce a full resource-calendar matrix in 45 minutes."
+DO
+4.1 On scrCalendar insert a Blank vertical gallery, rename galMonth, set
+    WrapCount = 7, show 6 rows, and Items = 30-CalendarItems.powerfx.
+    Size TemplateSize/height to fit 42 cells. Add a label inside:
+      Text = Text(ThisItem.CellDate, "d")
+      OnSelect = Set(varSelectedDate, ThisItem.CellDate)
+    Set the gallery template OnSelect to the same formula and any overlaid
+    button OnSelect = Select(Parent). Color dates outside the month lightly:
+      If(Month(ThisItem.CellDate) = Month(varMonth),
+         Color.Black, Color.Gray)
+    Add a selected-date border/fill using ThisItem.CellDate = varSelectedDate.
+    This gallery contains ONLY 42 local dates; it does not cache request rows.
+4.2 Add seven static headings Monday..Sunday and a month label:
+      Text(varMonth, "[$-en-US]mmmm yyyy")
+    Add Previous/Next buttons using 31 and 32. Month navigation selects the
+    first of the displayed month. Leading/trailing cells may be visible, but
+    clicking one outside the month returns no list until you navigate to that
+    month (the query deliberately uses the displayed month boundary).
+4.3 Add a vertical gallery galRequests beside/below galMonth, Items =
+    33-DayRequestsItems.powerfx. Add a label using 34-RequestSummary.powerfx.
+    Add classic Drop down ddRequestView with Items =
+      ["Authorized day", "My requests", "My approvals"]
+    Set Value = "Value", Default = "Authorized day",
+    AllowEmptySelection = false. File 33 uses this selector. My requests matches
+    Requester.User to varMe.User; My approvals matches any Approver N.User to
+    that same Dataverse GUID, including requests already finalized. Both My
+    views require nonblank varMe.User, avoiding blank optional-lookup matches.
+    Set galRequests.OnSelect =
+      Set(varSelectedRequest, ThisItem);
+      Navigate(scrDetails, ScreenTransition.None)
+    Set child labels OnSelect = Select(Parent). Use an empty-state text label:
+    "Choose a date. This list contains only requests you are authorized to read."
+    Do not imply that an empty list means nobody else has leave.
+4.4 The list queries LEAP Requests DIRECTLY, applying Leave Date >= varMonth
+    and < DateAdd(varMonth, 1, TimeUnit.Months), plus the selected-date condition.
+    Equality/range predicates and Sort on the native columns are delegable to
+    Dataverse. Inspect Studio for delegation warnings. Do NOT ClearCollect the
+    request dataset, use Distinct on requesters, or Sum a local gallery.
+    Data row limits of 500/2,000 are not a security or total-correctness fix.
+4.5 Add btnRefresh, OnSelect = 35-RefreshOnSelect.powerfx. Poll manually; do not
+    add a fast timer that floods Dataverse during the class.
+4.6 On scrDetails add a Display form frmDetails, DataSource = [@'LEAP Requests'],
+    Item = varSelectedRequest. Show request ID, Title, Leave Date, Start/End
+    Minute, Leave Hours, Leave Category, Request Status, Requester, Approvers,
+    Decided By, Decided On, Decision Comments. Display form only; no edit/approve
+    button. Hide processing/technical fields from ordinary users unless policy
+    specifically allows them; column security must enforce sensitive fields.
+    Add an hours label to preserve meaning:
+      If(IsBlank(varSelectedRequest.'Leave Hours'),
+         "Hours: not entered", "Hours: " & Text(varSelectedRequest.'Leave Hours'))
+    Add Back -> Navigate(scrCalendar, ScreenTransition.None).
+    Add btnRequesterTotals, OnSelect =
+      Set(varTotalsRequester, varSelectedRequest.Requester);
+      Set(varAnnualTotal, Blank());
+      Set(varTotalError, "");
+      Navigate(scrTotals, ScreenTransition.None)
+    Disable when the selected Requester.User is blank.
+4.7 On scrCalendar add btnMyTotals, OnSelect =
+      Set(varTotalsRequester, varMe);
+      Set(varAnnualTotal, Blank());
+      Set(varTotalError, "");
+      Navigate(scrTotals, ScreenTransition.None)
+    Disable when varMe.User is blank.
+    There is NO unbounded all-users requester picker for totals.
+4.8 On scrTotals add classic Text input txtYear, Default =
+    Text(Year(varSelectedDate), "0"), DelayOutput = false.
+    Add btnLoadTotals, OnSelect = 40-AnnualTotalOnSelect.powerfx.
+    Add lblAnnualTotal, Text = 41-AnnualTotalText.powerfx, and
+    lblTotalError.Text = varTotalError. Add Back to scrCalendar.
+    API inputs: RequesterId is Text(varTotalsRequester.User); CalendarYear is an
+    integer. RequesterId is the DATAVERSE user GUID, NOT an Entra GUID.
+    API outputs: TotalHours, MissingHours, ApprovedRequests, RequesterName.
+    The server authorizes self OR a caller selected as an approver on ANY saved
+    request for that requester, in ANY year, before elevated aggregation.
+    This is lifetime requester-level authorization, not year-scoped or limited
+    to Pending rows. CalendarYear filters the aggregate, not authorization.
+    A selected approver can query other leave years for that requester. A valid
+    GUID alone grants nothing. The API returns aggregate only, no hidden details.
+4.9 With Environment added, type Environment. and select leap_GetAnnualTotal
+    from IntelliSense. Expected invocation is the record argument in file 40:
+      Environment.leap_GetAnnualTotal(
+        {RequesterId: Text(varTotalsRequester.User),
+         CalendarYear: Value(txtYear.Text)})
+    Confirm generated signature and capitalization after import. If Studio
+    requests a dynamic/untyped record rather than typed primitives, consult
+    the Learn reference below and the actual signature; only then use
+    ParseJSON(JSON({...})) for the required dynamic parameter. Do not alter
+    the server contract or invent a custom connector/HTTP endpoint.
+    If unavailable in this GCC environment, this is a rehearsal BLOCKER, not
+    permission to use a privileged owner-flow total function.
+PASTE
+30 through 41 into the corresponding properties.
+EXPECT
+All same-day authorized rows remain visible separately. The API's annual total
+can legitimately exceed the hours in the selected approver's visible list.
+CHECKPOINT
+E creates two Approved rows in the same year: one shared to A and one only to B.
+A sees only their shared row, yet gets E's approved annual aggregate (per the
+server authorization policy); A must NOT retrieve the other row's details.
+U cannot get E's total. Also test A querying a different year after assignment
+on an older, finalized request; the lifetime requester policy permits it.
+RECOVERY
+An empty list: check selected date, month boundary, sharing/role, environment,
+and Refresh. A wrong annual total: inspect server output, leave-year derivation,
+blank-hour semantics, and status; do not "correct" it using local Sum. A denied
+API call must show an error with no previous person's total left on the screen.
+
+STAGE 5. BUILD THE NATIVE APPROVAL FLOW (80 MINUTES)
+SAY
+"Email/native approvals is our supported baseline. First to respond means one
+approval assigned to several selected people, not three separate approvals."
+DO
+5.1 Save the app so its Details page provides a web play link. Copy the actual
+    same-cloud play URL. Keep it private to the workshop; do not paste a maker
+    edit URL or a commercial-host link into a GCC flow.
+5.2 In the SAME solution, New > Automation > Cloud flow > Automated. Name it
+    LEAP - Request approval. Select Microsoft Dataverse trigger When a row is
+    added, modified or deleted. Set Change type = Added; Table name = LEAP
+    Requests; Scope = Organization. No modified trigger and no OData filter on
+    status. Trigger Organization scope controls event coverage, NOT app security.
+5.3 Use F's connection references for Dataverse/Approvals/Outlook. Make F a flow
+    owner with the minimum privileges required by the starter, not a shared
+    administrator credential. Do not add every participant as flow co-owner.
+5.4 Open trigger Settings. Leave Concurrency Control OFF. In particular, do not
+    set Degree of Parallelism = 1 for a flow waiting up to seven days: that
+    serializes all employees behind the first pending request. This does not
+    mean per-row duplication is solved; see Stage 6.
+5.5 Open 50-Flow-Build.txt and implement every action in order. Rename each action
+    exactly as shown BEFORE pasting expressions from 51-Flow-Expressions.txt.
+    If the new designer hides an input, use Add new parameter/advanced parameters.
+    Use Expression/fx to paste expressions without @{...}; interpolation syntax
+    is only used in plain text fields, and these examples avoid relying on it.
+5.6 The flow builds an array from saved Approver lookup GUIDs, removes blanks,
+    and Lists the corresponding Users rows with systemuserid equality clauses.
+    It never sends to free text entered by an employee. It validates the exact
+    selected set against enabled users and the approved internal cohort, Selects
+    Entra GUIDs, union-deduplicates, then joins with semicolons.
+    Native approval Assigned to supports Entra user GUIDs as well as email/UPN.
+    Entra GUID assignment avoids UPN/SMTP mismatches. An unusable account is an
+    explicit operational error, not silently removed from the selected set.
+5.7 Use Standard approvals > Create an approval:
+    Approval type = Approve/Reject - First to respond;
+    Enable notifications = Yes; Enable reassignment = No.
+    Persist the returned Approval ID on the request BEFORE Wait for an approval.
+    This is ONE approval, split into create/wait so its durable ID can be saved.
+    Do not additionally add Start and wait for an approval, which creates a
+    second independent approval.
+    IMPORTANT: create/save/wait has a documented immediate-response race. A
+    response before Wait registers can be missed even though the native service
+    completed the approval. Reconcile using the saved ID; do not declare every
+    response timing safe. Files 52 and 60 require this negative/race rehearsal.
+5.8 On Wait for an approval set Timeout = P7D in action Settings. Seven days is
+    intentionally shorter than the standard platform run-duration limit; verify
+    current tenant/platform constraints in rehearsal. Use PT2M only for the
+    timeout test and restore P7D before handoff. Timeout does not necessarily
+    remove the native approval from clients; the terminal Dataverse status is
+    authoritative and late replies must not change Expired.
+5.9 Validate the returned responder ID (preferred) or, only when ID absent, email
+    against the selected Users rows; map the matching row to its Dataverse
+    systemuserid for Decided By. Do not write the Entra GUID into a User lookup.
+    Switch Outcome on case-sensitive Approve / Reject. Unknown, empty, or
+    malformed response -> Processing Note + administrator recovery, NOT Denied.
+5.10 Use Dataverse Update a row for leap_status and Decided By/Decision Comments
+     on the matching Pending request. Send ONLY these transition fields. Do not
+     include Processing Note or Approval ID in the transition. The guard permits
+     workflow-only writes while Pending and a separate terminal transition.
+     Do not set Decided On; server stamps it.
+     Use the custom Request Status field, not built-in Status or Status Reason.
+     A read-then-update guard is not an atomic compare-and-swap; the plug-in's
+     guard is not a proven race-safe backend or exactly-once dispatcher.
+5.11 Send the requester only request ID, terminal status, and app URL through
+     Office 365 Outlook > Send an email (V2). Do not echo Title, Description,
+     category, comments, health/RA details, hours, or other employees. Email
+     failure after a successful decision must not cause a new approval.
+PASTE
+50 and 51 provide every action, branch, lookup binding, and expression.
+EXPECT
+E saves a request -> a run begins -> selected A/B receive one native approval ->
+one selects Approve or Reject -> row reaches Approved or Denied with selected
+Decided By and server Decided On -> E receives generic result email.
+CHECKPOINT
+Create two different Pending requests before responding. Verify BOTH flows
+reach Wait concurrently. Confirm one has three optional-recipient cases tested
+(one approver, two, three) and no blank semicolon entries or duplicate recipients.
+RECOVERY
+No run: confirm flow On, environment, Added trigger, Organization scope, F
+privileges, and trigger registration. No approval email: inspect Create action
+and Approvals portal, mailbox/DLP, connection cloud, and selected provisioned
+users. "User not found" is not solved by changing to a global directory picker.
+If approval output schema differs, inspect the synthetic run's raw output and
+bind the equivalent actual Approval ID/Outcome/Responses tokens. Never treat
+an unknown token as Reject. Document the rehearsed mapping for the class.
+
+STAGE 6. TIMEOUT, FAILURE, DUPLICATE, AND OPTIONAL TEAMS (45 MINUTES)
+SAY
+"The platform delivers events at least once. Our saved-ID guard reduces ordinary
+replays; it is NOT an exactly-once dispatcher or a durable atomic outbox."
+DO
+6.1 Add the Scope_Expire and failure branches exactly as 52-Flow-Recovery.txt.
+    Use Configure run after/Settings > Run after in the designer. Timed out,
+    Failed, Skipped, and Succeeded are different statuses: select only the
+    ones stated. A skipped Wait because of a preparation failure is NOT expiry.
+6.2 Scope_Expire gets the row AGAIN, verifies Pending and the same Approval ID,
+    and updates ONLY custom Request Status to Expired. No Processing Note,
+    Approval ID, Decided By, or Decided On is included in that update. A skipped
+    Wait must never enter this branch. A timed-out Wait does not establish that
+    the service received no immediate response; use the saved-ID reconciliation
+    procedure and record this timing limitation.
+6.3 A generic failure note is concise and non-sensitive. Alert only the approved
+    operations mailbox, with request ID, run ID, and app link. Do not dump action
+    outputs or medical text into email/logs. Follow the decision/notification
+    separation in 52: notification failure does not undo a valid decision.
+6.4 Run the PT2M timeout rehearsal and restore P7D. Submit an approval afterwards:
+    the row must remain Expired, and neither an ordinary user nor an old flow
+    run may overwrite the terminal state.
+6.5 Resubmit a synthetic completed run from Run history only in rehearsal.
+    Approval ID/status guard must stop before Create an approval. This test does
+    not establish race safety: two executions can both read a blank ID before
+    either writes it. Also, creation may succeed before ID persistence fails.
+    Never blindly resubmit that ambiguous run; inspect the Approvals service.
+6.6 Explain production hardening: atomic per-request dispatch claim with unique
+    key/outbox state, durable Approval ID correlation, idempotent decision writes,
+    row-version/atomic transition control, retry/reconciliation workers, monitoring,
+    least-privilege identity lifecycle, and cancellation/expiry reconciliation.
+    The starter does not claim to supply this full outbox. A production release
+    needs an engineered and tested implementation, not a trigger concurrency=1
+    workaround or a text "Processing" marker treated as a lock.
+6.7 OPTIONAL, only after baseline succeeds and time remains: make a SEPARATE
+    manual test flow, not part of the approval decision path. Use Microsoft Teams
+    > Post message in a chat or channel, Post as = User, Post in = Channel, and
+    choose a permitted STANDARD test channel where F is a member. Post only
+    "Synthetic LEAP workshop notification test - no action required."
+    Run once with approval from the workshop owner in the target tenant, then
+    record the connector operation, User poster, successful run, and receipt.
+    This guide itself sends nothing. If not tested/allowed, record NOT VERIFIED
+    and omit the feature. Do not post individual leave details to a team channel.
+    Flow Bot is unsupported in GCC/GCCH/DoD; the official connector reference
+    directs government tenants to use User instead. A connector appearing in the
+    catalog is NOT proof that a particular poster/action/channel is supported.
+    Do not use adaptive-card-and-wait as the workshop's approval engine.
+PASTE
+52-Flow-Recovery.txt supplies the run-after matrix and repair actions.
+EXPECT
+Timeout is a distinct Expired status; failure is diagnosable without silently
+denying leave; duplicate replay does not intentionally create another approval.
+CHECKPOINT
+Show timeout proof, a controlled failure note, and the replay guard. Clearly mark
+the unresolved concurrent-delivery/dispatch-gap limitation in the handoff.
+RECOVERY
+If a pending approval has an ID, reconcile/wait on THAT ID. Do not clear it and
+send again. If status already terminal, repair only notification delivery and
+keep operational notes in the approved support/audit record OUTSIDE the row.
+The guard rejects Processing Note updates on finalized rows, even from F.
+Never reopen/delete the original audit row or attempt to append a terminal note.
+When mail delivery fails, a native Approvals portal response is an allowed
+baseline fallback. A custom email cannot itself become an actionable native
+approval. If a selected responder cannot be validated, stop and investigate.
+
+STAGE 7. UAT, PUBLISH, AND SHARE (50 MINUTES)
+SAY
+"A maker's preview proves almost nothing about least privilege. We test the
+published app and API using ordinary identities with no maker/admin inheritance."
+DO
+7.1 Work through 60-UAT.txt, using E/A/B/U and E2 in separate profiles. Capture
+    synthetic request IDs, actual dates, observed outcomes, and failures. Two
+    ordinary users are the minimum functional test; the unrelated-user and
+    split-approver tests are mandatory security tests, not optional stretch.
+7.2 In Studio run App checker. Resolve formula/errors and unexpected delegation
+    warnings; review accessibility labels, keyboard tab order, required-field
+    errors, long category wrapping, and 24:00 labels. Do not "fix" totals by
+    increasing the nondelegation row limit.
+7.3 Save, then Publish > Publish this version (wording/location can vary).
+    In Power Apps > Apps > app menu > Share, share the actual app with the
+    approved cohort/security group and appropriate user permission, not
+    co-owner permission for every employee. Copy the web play link from Details.
+7.4 Assign the separate Dataverse roles/security group membership. Share the
+    app AND grant data privileges. Make sure direct native Dataverse connections
+    use each signed-in user's identity. Only F owns the privileged flow
+    connections; users must never receive its connection credentials.
+7.5 Turn on the solution flow; check connection references and owners. Verify an
+    ordinary employee's request starts it without granting them flow-edit access.
+    Open the published link as E, not only Studio Preview, and re-run one real
+    synthetic approval. Confirm the published app version contains the latest
+    formulas. Requests are immutable; a failed test gets a new synthetic row.
+PASTE
+Use 60-UAT.txt as the test script. Record outcomes; do not mark an unexecuted
+test PASS because a formula looks correct.
+EXPECT
+Published app + roles + active flow produce the same observed result as rehearsal.
+CHECKPOINT
+All functional and security gates pass, or the handoff clearly says NOT READY.
+RECOVERY
+App opens but no data: examine environment membership, role, sharing, and caller.
+Maker-only success is a failed UAT. Old UI: save/publish correct version and
+refresh the play session. Missing connection: repair references under F and
+recheck DLP, not a blanket permission grant.
+
+STAGE 8. PACKAGE AND HANDOFF (20 MINUTES)
+SAY
+"A solution export transports components, not environment policy, user onboarding,
+connection credentials, or production accreditation."
+DO
+8.1 Publish customizations as appropriate, add the newly built Canvas app/cloud
+    flow and required connection references/environment variables to the
+    solution, and inspect dependencies. Use a version increment.
+8.2 Export UNMANAGED for source/development handoff, and, after rehearsal,
+    MANAGED for downstream deployment. Preserve the backend solution dependency
+    if app/flow live in a separate extension solution. Never claim a file in
+    this guide is an importable approval flow or Canvas .msapp.
+8.3 Use 61-GCC-Deployment.txt for the target checklist. Rebind connections and
+    environment-specific app URL/admin mailbox; provision users and assign
+    roles separately. Import does not carry live connections/secrets.
+8.4 Deliver the actual exported solution(s), app/flow names, environment/cloud,
+    deployment settings, role mapping, synthetic UAT evidence, runbook,
+    documented limitations, and operational owner. If an export/import was not
+    performed, label it NOT PERFORMED; do not imply a verified deployment.
+8.5 Leave synthetic data in the agreed retention state; only an authorized
+    administrator performs approved cleanup. Participants have no Delete.
+    Turn off unused rehearsal flows and remove any test Teams posting feature.
+PASTE
+The deployment and UAT checklists, not credentials or employee datasets.
+EXPECT
+The recipient can distinguish completed/tested work from unexecuted examples.
+CHECKPOINT
+Handoff includes blank-hours/overlap/year rules, ordinary-user security proof,
+known dispatch race/gap limitations, and the automation support owner.
+RECOVERY
+Do not turn a hackathon artifact into production by relabeling the environment.
+Schedule agency privacy/security/accessibility/records review, ALM validation,
+capacity/load/race tests, monitoring, support, and authorization before real use.
+
+REFERENCE LINKS (PUBLIC DOCUMENTATION; REVIEWED WHILE AUTHORING)
+Native Dataverse data, delegation, and Environment actions:
+https://learn.microsoft.com/en-us/power-apps/maker/canvas-apps/connections/connection-common-data-service#call-dataverse-actions-directly-in-power-fx
+Forms and SubmitForm:
+https://learn.microsoft.com/en-us/power-platform/power-fx/reference/function-form
+Standard approvals; recipient formats and case-sensitive Approve/Reject:
+https://learn.microsoft.com/en-us/connectors/approvals/
+Teams connector; government Flow Bot restriction and User poster:
+https://learn.microsoft.com/en-us/connectors/teams/
+US Government Power Apps:
+https://learn.microsoft.com/en-us/power-platform/admin/powerapps-us-government
+US Government Power Automate:
+https://learn.microsoft.com/en-us/power-automate/us-govt
+Cloud/service UI and connector availability evolve. These documents inform this
+guide; they are not evidence of a tenant rehearsal or deployment.

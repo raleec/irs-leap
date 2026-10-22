@@ -1,0 +1,6 @@
+EditorState:
+  ScreensOrder:
+    - scrCalendar
+    - scrNew
+    - scrDetails
+    - scrTotals

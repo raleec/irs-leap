@@ -1,0 +1,101 @@
+IRS LEAP - Canvas App Hackathon Starter
+=====================================
+
+CURRENT DELIVERY STATUS - COMPLETE COMPONENT RELEASE 1.1.0.0 EXPORTED
+-------------------------------------------------------------------
+Actual managed/unmanaged1.1solution ZIPs contain the native Canvas app, stopped
+approval flow,3connection references,2consumed environment-variable definitions
+and existing Dataverse foundation. No notification sends or trial enrollment.
+Target connections/configuration/licensing and GCC rehearsal remain required.
+Read guide\RELEASE-1.1.txt for the exact inventory and evidence boundaries.
+
+REVISED WORKSHOP: SOLUTIONS FIRST
+Begin with guide\IRS-LEAP-Workshop-Guide.html or guide\SOLUTIONS-FIRST.txt.
+The recommended150-minute agenda is import,configure,use,customize and promote.
+The complete component package is now included as version1.1.0.0.
+The earlier1.0backend baseline remains separate; do not choose it for this lab.
+guide\COMPLETE-SOLUTION-PREPARATION.txt is rebuild/maintenance reference.
+guide\CORE-LAB.txt is an optional construction reference,not classroom prework
+that must be repeated for this prepared release.
+guide\Facilitator-Guide.txt remains detailed construction/reference material.
+The longer Snippets50/51/52 split-approval flow is an ADVANCED ALTERNATIVE,
+not additional steps to combine with the core Start-and-wait flow.
+
+The package includes a prebuilt native Canvas app and a disabled approval flow.
+Connection references and variable values are intentionally unconfigured.
+Native email delivery,licensed ordinary-user published app access,clean-target
+import and GCC compatibility still require customer rehearsal.
+See ADMIN-HANDOFF.txt for deployment and explicitly outstanding gates.
+
+Purpose
+-------
+Deploy/configure/customize a reusable complete solution during a short workshop.
+App/flow construction moves to facilitator preparation, not classroom time.
+The Dataverse starter supplies the request table, the 13 category choices,
+participant/automation roles, request protection/read sharing, and an authorized
+annual-total operation.
+
+This is a workshop foundation, not a production-approved IRS system.
+Use synthetic descriptions and leave data throughout the event.
+
+What participants do with the prepared complete release
+------------------------------------------------------
+1. Import and inspect solution components.
+2. Bind target connections/configuration and grant appropriate access.
+3. Use requests,approvals,calendar and annual totals under ordinary identities.
+4. Make one safe presentation change and publish.
+5. Export managed for a second environment or an explicitly labeled handoff.
+
+The included flow is stopped. Verify flow state during import and keep it OFF
+until target connections,configuration,access and synthetic recipients are reviewed.
+
+Which solution package to import
+-------------------------------
+Use IRSLEAPCanvasStarter_1_1_0_0_unmanaged.zip in an isolated development
+environment when participants will build and customize in the same solution.
+
+Use the managed1.1export for a different downstream administrator-controlled
+environment; make workshop edits in the unmanaged authoring environment.
+Do not import both variants of the same solution into the same environment.
+
+Read guide/SOLUTIONS-FIRST.txt first. Do complete-release prework and
+ordinary-user GCC rehearsal before scheduling the end-to-end short workshop.
+
+Important behavior
+------------------
+- One calendar date and exactly one category per request.
+- Leave hours are optional whole numbers from 0 through 24.
+- Blank hours are not estimated and are not the same as an explicit zero.
+- Overlapping requests and multiple requests per day are allowed.
+- Annual totals sum approved entered hours independently, including overlaps.
+- Totals use the year of the leave date, not the year of the approval.
+- The requester and their assigned approvers can see annual aggregate totals.
+- Aggregate access does not grant access to unrelated individual requests.
+- Submitted requests are immutable in this MVP.
+- Approved/Denied are final decisions; edits and cancellations are not included.
+- The calendar is a month/day view, not a pixel-for-pixel calendar-matrix clone.
+
+Identity, security, and deployment
+---------------------------------
+All participants need appropriate premium entitlement and provisioned Dataverse
+users. Choosing a directory person does not license or provision them.
+Assign Basic User plus IRS LEAP Participant to ordinary app users.
+Use a dedicated flow connection owner with required connector entitlements,
+Basic User and IRS LEAP Automation, not a System Administrator account.
+Sharing the app does not assign Dataverse roles.
+
+The development source environment is commercial Dataverse. The customer GCC
+environment requires a separate import, connection setup, ordinary-user
+rehearsal and admin approval. Do not infer GCC compatibility from development
+export success. Native approval email is the workshop baseline; Teams card
+actions are optional and must be proven in the actual GCC tenant.
+
+Source and support
+------------------
+backend/ contains plugin source, the signed binary and build instructions.
+solution-source/ contains the actual Dataverse-exported solution source.
+guide/Snippets/ contains copy/paste text.
+runtime-canvas/ contains the actual app source and .msapp.
+runtime-flow/ contains the actual disabled flow and configuration mapping.
+No authentication tokens, passwords, private signing keys or environment
+configuration are intended to be included in the delivery kit.

@@ -1,0 +1,74 @@
+{
+  "timestamp": "2026-10-22T12:54:00.132327+00:00",
+  "workflowId": "4033f29c-15ce-f111-a05b-6045bd094f74",
+  "actualState": {
+    "category": 5,
+    "statuscode": 1,
+    "type": 1,
+    "workflowid": "4033f29c-15ce-f111-a05b-6045bd094f74",
+    "statecode": 0,
+    "clientdataMatchesSource": true
+  },
+  "highConfidenceNewFindings": [],
+  "securitySpecialistResult": "No security vulnerabilities found in reviewed deployed definition.",
+  "runtimeDefinitionChanged": false,
+  "deployUpdateRequired": false,
+  "appConfiguration": "App ID acknowledged; both portable environment-variable definitions and current values deliberately remain blank.",
+  "actionCount": 24,
+  "actionTypes": {
+    "OpenApiConnection": 7,
+    "Compose": 2,
+    "Query": 2,
+    "If": 5,
+    "Select": 1,
+    "OpenApiConnectionWebhook": 1,
+    "Terminate": 6
+  },
+  "explanationOfCompactCount": "Dataverse expand reads requester and selected users in one action; Select/Query replace per-approver loops and variables; native start-and-wait is one action; compound predicates replace multiple Conditions. No required gate is omitted.",
+  "validatorRegressionChecks": [
+    {
+      "case": "cannot read an action from the alternative timeout scope",
+      "result": "correctly rejected"
+    },
+    {
+      "case": "cannot read a downstream action",
+      "result": "correctly rejected"
+    },
+    {
+      "case": "reject cyclic same-scope runAfter",
+      "result": "correctly rejected"
+    },
+    {
+      "case": "all original nested references are reachable through runAfter ancestors",
+      "result": "passed",
+      "references": 49
+    }
+  ],
+  "reviewedLogic": {
+    "approver1": "Required by explicit nonempty saved _leap_approver1id_value guard, plus valid-selected count equals all nonempty saved lookup slots.",
+    "optionalApprovers": "Null slots remain in createArray but safe-navigation/coalesce predicates reject those items without dereference failure; valid 1/2/3 approvers pass expected count.",
+    "enabledInternalUsers": "Every selected user requires isdisabled=false, nonempty nonzero Entra GUID, no applicationid, accessmode 0/1/2, internal nonempty non-EXT domain, and not the requester. Backend independently validates at create/decision.",
+    "firstResponse": "Exactly one response; outcome exactly Approve or Reject; approverResponse agrees; responder.id lowercased matches exactly one ORIGINAL selected Entra GUID snapshot; map back to that systemuserid. No lookup by response email.",
+    "freshGuard": "Read current request after wait; require Pending and all original requester/selected lookup IDs unchanged; UpdateOnlyRecord with fresh row ETag.",
+    "decisionWrites": "Only status 100000001/100000002, DecidedBy lookup and comments truncated to 1000. No decidedon, content, year, ApprovalId or ProcessingNote write.",
+    "unknownOutcome": "Explicit Terminate Failed branches for unknown/missing outcome or unknown responder; never treated as Denied.",
+    "timeout": "Native webhook limit.timeout=P7D. Only TimedOut runs timeout reread; only fresh Pending permits status-only Expired 100000003 using ETag. Failed connector follows separate explicit Failed termination and does not expire/deny.",
+    "hourValidation": "Existing backend Rules.cs lines 96-99 accepts blank or integer 0..24. Flow never reads or mutates hours; backend owns input validation."
+  },
+  "exportDependencyVerification": {
+    "method": "Dataverse RetrieveRequiredComponents(ObjectId=workflowId,ComponentType=29), read-only",
+    "allThreeConnectionReferencesRequired": true,
+    "bothEnvironmentVariableDefinitionsRequired": true,
+    "leapRequestTableRequired": true,
+    "allSixComponentsInSolution": "Previously read-back verified; no solution/export changes made in this review."
+  },
+  "remainingLimitations": [
+    "Native credential-bound validation/save is blocked by intentionally unbound references; documented exact platform rejection remains unchanged.",
+    "Actual seven-day elapsed timeout, connector cancellation/approval-center cleanup and runtime expression execution cannot be empirically verified without activating/running approvals. No such action was attempted.",
+    "Power Automate action timeout should not be represented as a verified cancellation of the underlying approval; source has no explicit cancel operation.",
+    "Previously attempted /flows/{id}/validate endpoint returns 404; no activation or binding workaround used."
+  ],
+  "sourceSHA256": "4f8383650fb602e9baf9b71baee72e6e69ac7f36f877e00723a59ce64a7ec733",
+  "cloudWritesDuringReview": false,
+  "sendsOrApprovalsDuringReview": false
+}

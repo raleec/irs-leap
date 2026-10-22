@@ -1,0 +1,235 @@
+60 - ORDINARY-USER ACCEPTANCE AND EVIDENCE
+
+HOW TO USE
+Test the actual completed backend export plus the built/published Canvas app
+and the selected flow path, not an unfinished table or only a maker preview.
+RECOMMENDED ONE-DAY PATH IS CORE-LAB.txt. Its native Start-and-wait action leaves
+Approval ID blank, uses individual Get_Approver1/2/3 actions, requires responder
+ID matching (no email fallback), and has ScopeTimeout. Apply foundation/form/
+calendar/total/role tests below to either path. For core approvals/recovery use
+CORE-LAB's own final checkpoint; interpret A01-A03 as ONE Wait_Approval with the
+correct recipient count, A06 without saved-ID retention, A08 with no fallback,
+and R04 as ScopeTimeout/status-only expiry without an ID comparison.
+A12 (split-create immediate-response race), R01 approval-ID writes, saved-ID
+correlation/recovery, and the List rows/allow-list specifics are ADVANCED-ONLY
+checks for the alternative Snippets50/51/52 path. Mark them NOT APPLICABLE to
+core rather than mixing two approval implementations.
+Parent deployment work reports final provisioning/export status separately.
+This matrix is a script, NOT a record of executed tests. Initially mark every
+case NOT RUN. Use PASS, FAIL, NOT VERIFIED, or NOT APPLICABLE with evidence.
+Do not perform environment operations or sends merely by reading this document.
+Execute only authorized synthetic rehearsals in the designated environment.
+
+IDENTITIES
+E: requester. E2: second requester. A/B/C: three distinct internal approvers.
+U: unrelated ordinary user. F: authorized automation account. Admin: operator.
+E/E2/A/B/C/U must not inherit maker, administrator, broad request read/write,
+or F's connections. Separate browser profiles prevent mixed cached identities.
+Use actual provisioned Users rows. Record systemuserid AND Entra object GUID
+separately for each test user. Administrator verifies licensed enabled internal
+member status and the controlled approver allow-list before the tests.
+
+EVIDENCE TEMPLATE (KEEP IN APPROVED EXTERNAL LOCATION, NOT REQUEST COMMENTS)
+Case ID; date/time/time zone; cloud/environment ID; solution/export version;
+published app version; flow version; caller; synthetic request ID; saved approval
+ID when relevant; run ID; expected; observed; result; evidence reference; tester.
+Capture only necessary synthetic data. Restrict run output and identity mappings.
+Never label a blank evidence field PASS or copy real health/RA content.
+
+FOUNDATION AND IDENTITIES
+F01 Inspect actual metadata: leap_request with user/team ownership, correct
+    thirteen category integer values, Request Status 100000000..100000003;
+    Date Only format AND behavior; optional integer Hours 0..24; Processing Note
+    Single Line Text max 500. Record actual logical names and solution version.
+F02 Inspect live guard registration, authorization of F, sharing behavior and
+    leap_GetAnnualTotal signature. Import success alone is insufficient.
+F03 Sign in as each ordinary identity through the published play link. Verify
+    varMe.User equals that identity's systemuserid after Entra GUID lookup.
+    No First(Users), display-name match, F connection, or unverified email fallback.
+F04 Employee save sets Requester/Owner to authenticated caller and Calendar Year
+    to Year(Leave Date), not client-entered IDs or approval date.
+F05 Confirm actual role privileges: ordinary users no request Write/Delete,
+    broad Read/Share/Assign. Selected approvers gain only intended row Read.
+    App sharing, environment group membership, licenses and data roles are
+    separate checks, not alternatives to one another.
+
+FORM AND DATE/TIME
+V01 Required Title/date/category/Approver 1 omitted individually: visible error,
+    no successful save. Whitespace title must not pass.
+V02 All thirteen category options selectable as native choices; inspect saved
+    integer/label for representative long labels and Other. Exactly one per row.
+V03 Start 00:00 End 00:01 accepted (0/1); Start 23:59 End 24:00 accepted
+    (1439/1440). End 24 permits only minute 00; start never permits hour 24.
+V04 End equal to or before start rejected; cross-day interval rejected. Two
+    separate rows are the supported cross-day representation.
+V05 Hours blank -> Dataverse null; Hours "0" -> numeric zero. "1" and "24"
+    accepted; "2.5", "-1", "25", letters, "01" rejected by the client guard.
+    Optional hours is NOT inferred from elapsed time.
+V06 In an approved API/plug-in test harness under E, bypass Canvas and attempt
+    invalid minutes, fractional hours, bad category or missing Approver 1.
+    Backend rejects invalid data. Do not weaken privileges to run this test.
+V07 Two overlapping same-day requests both save. No uniqueness or overlap guard.
+V08 Double-click Submit: disabled/submitting behavior prevents intentional
+    duplicate client submissions. This is not proof of server exactly-once create.
+V09 Different local time zones: Leave Date remains selected calendar date, not
+    shifted UTC day; year derives from that same date.
+
+CALENDAR, DETAILS AND DELEGATION
+C01 Calendar has 42 local date cells, Monday-first; navigate short/long months,
+    year boundary and a leap February. Selected-date border and heading agree.
+C02 Selected day lists all authorized separate same-day rows, including overlaps;
+    selecting leading/trailing out-of-month cell follows guide's month-boundary
+    rule. Empty does not imply no other employee leave.
+C03 ddRequestView "My requests": Requester.User = varMe.User. "My approvals":
+    any Approver N.User = varMe.User; include already-finalized assigned rows.
+    "Authorized day": all authorized selected-day rows. No client dataset cache.
+C04 Studio shows no unexpected delegation warnings for native date range,
+    lookup primary GUID equality, OR predicates and Sort. Verify native Users
+    primary key display name with IntelliSense. Exercise data beyond local row
+    limits using an approved seeded rehearsal dataset if available; if not
+    exercised, record NOT VERIFIED, not an invented load-test PASS.
+C05 Open details and refresh after a decision. Display form only; no employee
+    edit/delete/cancel/approve control. Blank hours says not entered; 0 shows 0.
+C06 U cannot retrieve E's request through gallery, direct Dataverse row query or
+    a copied app detail link. Hidden controls are not the security test.
+C07 A sees E's row assigned to A; B-only rows remain inaccessible to A by direct
+    retrieval. Ordinary roles must not allow organization-wide request Read.
+
+NATIVE APPROVALS AND IDENTITY
+A01 E selects only A (2/3 blank). One Create_Approval; one saved Approval ID;
+    Assigned to has exactly A's Entra GUID and no blank semicolon entries.
+    List rows filter contains only systemuserid eq <A's Dataverse GUID>.
+A02 Select A and B, third blank. Exactly one native First to respond approval,
+    two assigned GUIDs; correct List rows count and selected-user membership.
+A03 Select A/B/C. Same one approval, three assigned GUIDs. No per-user Create,
+    no Everyone must approve, no extra Start and wait action.
+A04 Disabled/unprovisioned/guest/not-in-approved-internal-cohort selection fails
+    closed. It is not silently removed while other recipients receive approval.
+    Test only a safe prearranged synthetic account; do not disable a real user.
+A05 Duplicate selected users rejected by server or controlled flow validation;
+    never silently claim all original distinct selections were notified.
+A06 Normal Approve after Wait registered: custom status 100000001; mapped
+    systemuserid in Decided By; server-stamped Decided On; saved approval ID
+    retained. Inspect the update body: status/Decided By/Comments ONLY.
+A07 Normal Reject: same checks, status 100000002. Unknown/case-mismatched/
+    absent outcome must not become Denied. Rehearse malformed data only in an
+    isolated harness or controlled non-sending copy, not a forged live response.
+A08 Responder.id equals selected User.azureactivedirectoryobjectid; flow maps
+    back to that row.systemuserid. Verify they differ where actual values differ.
+    If ID absent, exact selected-user email fallback must be unique. Present
+    unmatched ID cannot use a matching email to bypass membership validation.
+A09 Forwarding/reassignment/unrelated responder cannot write a decision. Native
+    Enable reassignment = No; saved selected-set verification still mandatory.
+A10 A and B respond near-simultaneously. Record native service's first response
+    and observed Dataverse result. Never infer general atomic backend protection
+    from one passing trial. An inconsistent result is FAIL, not hidden by a retry.
+A11 Create two separate requests before responding. Both runs reach Wait
+    concurrently. Trigger Concurrency Control is OFF; no global degree-1 queue.
+A12 Immediate-response timing test: act as soon as the native approval exists,
+    before/while ID persistence completes. Inspect saved ID, service response
+    time and Wait registration/result. The split pattern CAN MISS this response.
+    If missed, use 52's saved-ID reconciliation; no new Create. Record the gap.
+    A normal-path PASS cannot turn this known limitation into "all cases ready."
+    If no gap happened in a finite trial, state "not reproduced; risk remains."
+A13 Result mail contains only request GUID, terminal status and app link. Native
+    approval title/details also generic. No sensitive title, description, category,
+    comments, hours, date or another employee's data. Portal fallback works if
+    native actionable email is unavailable; custom email is not actionable.
+
+GUARD, TIMEOUT, FAILURE AND DUPLICATES
+R01 While Pending, F can persist Approval ID or a standalone generic note. An
+    ordinary user cannot write either. Processing Note >500 is not valid.
+R02 A terminal transition mixed with Processing Note or Approval ID is rejected,
+    even by F. Test in approved harness. Separate workflow write is not combined.
+R03 After Approved/Denied/Expired, attempt Processing Note edit with F through
+    approved test tooling. Guard must reject. Support notes belong externally.
+R04 PT2M in a rehearsal COPY, no response: actual Wait_Approval TimedOut ->
+    Scope_Expire gets current row -> Pending/same nonempty ID -> status-only
+    Expired (100000003); no Decided By/On/Comments/Note in the expiry update.
+    Record actual branch/action statuses and restore saved Timeout P7D.
+R05 Preparation failure before Wait: Wait Skipped, Scope_Expire Skipped, row
+    still Pending; generic note only if Pending; generic admin alert. Never
+    Expired because a scope failed or Wait was skipped.
+R06 Row terminal or Approval ID different at expiry re-read: expiry write must
+    not run. Correlation/read guards do not eliminate subsequent write races.
+R07 Late response after expiry leaves Dataverse Expired. Native service item may
+    still appear; record reconciliation/cancellation requirement separately.
+R08 Missed immediate response must not be misreported as proven nonresponse:
+    inspect service by saved ID. If the baseline already Expired despite an
+    earlier service decision, escalate externally; do not reopen or append note.
+R09 Failure after Create before ID save: identify same service approval using
+    returned ID/restricted logs; no blind resubmit. Unknown create outcome must
+    be reconciled with service/admin support, not assumed "nothing happened."
+R10 Resubmit completed synthetic run in rehearsal: guard skips new Create.
+    Pending with an existing ID routes to reconciliation, not a second Create.
+R11 Document simultaneous-delivery/blank-ID dispatch race and non-atomic
+    read/update guard. If deliberately tested, stop duplicate writers, preserve
+    both IDs/audit evidence and reconcile; do not claim exactly once.
+R12 Result-email failure AFTER successful decision: status remains final, no
+    Processing Note write at all. Admin alert IDs/link only; no approval retry.
+R13 Failure-note write loses race to finalization: guard rejects it; all-status
+    Send_Admin_Alert still runs. No terminal note retry or rollback.
+R14 Alert delivery fails too: Terminate_RecoveryRequired still executes; approved
+    failed-run monitoring owns detection. No promise of guaranteed alert email.
+
+ANNUAL TOTAL: CALLER AUTHORIZATION AND SEMANTICS
+Use native Environment.leap_GetAnnualTotal directly as the signed-in Canvas
+caller. Inputs RequesterId = systemuserid TEXT; CalendarYear = integer.
+Do not use a privileged owner-connected flow or aggregate the gallery.
+
+T01 Seed four Approved E rows in leave year Y: Hours blank, 0, 2, 3. Make the
+    2/3 rows overlap. Expected TotalHours=5, MissingHours=1, ApprovedRequests=4,
+    RequesterName=E. The independent Hours need not match elapsed time.
+T02 Add Pending, Denied, Expired rows with nonzero hours: totals unchanged.
+    Add an Approved blank: MissingHours and ApprovedRequests each +1 only.
+    Add an Approved explicit zero: ApprovedRequests +1, MissingHours unchanged.
+T03 Leave in December Y, approved January Y+1: included in Y, not Y+1.
+    Use an approved fixture/test clock mechanism; do not change tenant time.
+T04 E calls self: allowed, including years with zero records.
+T05 Split approved rows for E: A assigned one, B another. A cannot read B's row,
+    but API returns E's employee-wide approved aggregate for the requested year,
+    not merely A's visible rows. No hidden row details in response.
+T06 IMPORTANT LIFETIME POLICY: A is selected on ANY saved E request in year Y,
+    including a finalized one. A can query E's aggregate for year Y+1/Y-1 too,
+    even without an A-assigned row in that queried year. CalendarYear filters
+    the aggregate, not authorization. Record this disclosure boundary explicitly.
+T07 U supplies E's valid RequesterId: denied before elevated aggregation. E
+    supplies unrelated E2's valid ID with no selection relationship: denied.
+    Knowing a GUID, app link or display name grants nothing.
+T08 A selected for E but not E2: E permitted, E2 denied; no aggregate/name leakage.
+T09 Wrong/empty/malformed RequesterId or year input produces an error. Entra ID
+    must not be substituted for systemuserid. No silent empty/zero success.
+T10 After authorized total, cause a denied/failed call. UI clears previous total
+    and displays error; it must not leave another person's total onscreen.
+T11 Response has exactly documented fields TotalHours, MissingHours,
+    ApprovedRequests, RequesterName; no hidden request rows/comments.
+T12 Inspect Environment API signature in the actual exported target; run as an
+    ordinary user. A successful F/admin call does not prove caller authorization.
+
+PUBLISH, EXPORT AND HANDOFF
+D01 Save/publish actual app version; share play permission, not co-owner, with
+    authorized cohort. Assign data roles separately. E opens published link.
+D02 Actual target references F's same-cloud connections and correct environment/
+    app URL/admin mailbox/internal cohort; no maker personal connection leaks.
+D03 Add app/flow/dependencies to solution, version/export, inspect actual artifact
+    inventory. Do not claim the backend-only export contains app/flow.
+D04 Authorized downstream import + same-cloud rebind + smoke/UAT must be
+    evidenced separately. NOT RUN if not executed; do not manufacture success.
+D05 Confirm Timeout restored P7D, create retry policy None, trigger concurrency
+    OFF, Enable reassignment No, generic message templates, and exact update
+    field sets. Disable unused fault-injection copies after approved rehearsal.
+D06 Support owner accepts 52, lifetime aggregate disclosure, immutable terminal
+    rows, create/save/wait timing race, dispatch ambiguity and non-atomic guard.
+
+ACCEPTANCE DECISION
+Functional baseline requires executed ordinary-user normal approve/reject,
+blank/zero/overlap/date-year tests, exact recipient mapping, timeout vs skipped,
+failure/notification separation and published-app proof.
+Security gates require no unauthorized row/aggregate access, server validation,
+selected-response membership, restricted F writes, no mixed terminal note update,
+and immutable final records. Any failed security gate means NOT READY.
+No imported/exported artifact or guide can erase the known immediate-response
+and concurrent-dispatch gaps. Report these as unresolved limitations even when
+ordinary-path tests pass; production acceptance requires separate engineered
+reconciliation/atomicity work and agency approval. Do not state universal
+race-safe readiness. Parent deployment final status is separate from this script.

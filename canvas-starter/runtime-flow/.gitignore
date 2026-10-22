@@ -1,0 +1,10 @@
+__pycache__/
+*-api.json
+*-attributes.json
+target-inspection.json
+request-metadata.json
+component-metadata.json
+flow-environment-evidence.json
+flow-platform-actions.json
+control-plane-flow-readback.json
+saved-workflow.clientdata.json

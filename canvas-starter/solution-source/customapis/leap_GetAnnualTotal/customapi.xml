@@ -1,0 +1,19 @@
+<customapi uniquename="leap_GetAnnualTotal">
+  <allowedcustomprocessingsteptype>0</allowedcustomprocessingsteptype>
+  <bindingtype>0</bindingtype>
+  <description default="Returns approved hours only for the requester or their assigned approvers.">
+    <label description="Returns approved hours only for the requester or their assigned approvers." languagecode="1033" />
+  </description>
+  <displayname default="Get LEAP Annual Total">
+    <label description="Get LEAP Annual Total" languagecode="1033" />
+  </displayname>
+  <executeprivilegename>prvReadleap_Request</executeprivilegename>
+  <iscustomizable>1</iscustomizable>
+  <isfunction>0</isfunction>
+  <isprivate>0</isprivate>
+  <name>leap_GetAnnualTotal</name>
+  <plugintypeid>
+    <plugintypeexportkey>4eb19245-bccd-f111-a05c-6045bd094f74</plugintypeexportkey>
+  </plugintypeid>
+  <workflowsdkstepenabled>1</workflowsdkstepenabled>
+</customapi>

@@ -1,0 +1,2 @@
+Set(varSubmitting, false);
+Notify(Coalesce(frmRequest.Error, "Request was not saved. Review the form or contact support."), NotificationType.Error)

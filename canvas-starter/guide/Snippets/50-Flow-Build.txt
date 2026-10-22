@@ -1,0 +1,365 @@
+50 - BUILD ONE NATIVE APPROVAL PER REQUEST
+
+PURPOSE AND LIMITS
+This is a designer runbook, not an importable flow. Use with the actual completed
+backend export, 00-Contract.txt, and the parent deployment's final status report.
+No environment changes or messages are performed by this document.
+Build in the same solution/environment as the Canvas app. Use synthetic data.
+Follow 51 for exact expressions and 52 for run-after/recovery configuration.
+Do not substitute a second approval, a Canvas decision Patch, an anonymous HTTP
+callback, or a flow-owner-connected annual-total endpoint.
+
+IMPORTANT: native First to respond normally arbitrates the first response at the
+approval service. The split Create / persist ID / Wait pattern has an immediate-
+response race: Wait can miss a response made before it registers. Saved ID gives
+an operational correlation key, not proof of reliable delivery. Read 52 before
+calling the flow ready. Read/update guards are not an atomic claim or CAS.
+
+PREPARATION
+1. Confirm the actual leap_request metadata and guard/API behavior in 00.
+   Requester and Owner are stamped from the authenticated create caller. NEVER
+   accept a requester/recipient supplied as free text by the Canvas app.
+2. F is the dedicated authorized automation Dataverse user and flow owner.
+   F has the deployed least-privilege automation role, NOT System Administrator.
+   Use F-owned same-cloud Dataverse, Standard approvals, and Outlook connections.
+   DLP, licenses, mailbox permissions and government cloud support must be tested.
+3. Record actual app play URL and operations mailbox in approved configuration.
+   Neither is an employee-entered value. Do not paste the maker edit URL.
+4. For this finite workshop cohort, have the administrator verify each eligible
+   approver is an internal Entra member, enabled/licensed/provisioned in Dataverse,
+   and able to receive approvals. Record their lowercase Entra object GUIDs in
+   varInternalApproverEntraIds. It is an admin-controlled allow-list, not an app
+   parameter. Dataverse Users GUID and Entra GUID are different identifiers.
+   isdisabled=false alone does NOT prove internal membership or licensing.
+   An empty/unverified allow-list is a failed preparation gate; never allow all.
+   For deployment, use governed environment configuration and a lifecycle process
+   for this list; do not add an unverified guest to make a test pass.
+5. Create a solution-aware automated cloud flow: LEAP - Request approval.
+   Rename each action BEFORE expressions are added; exact internal names below
+   use underscores. Inspect Peek code/code view if a duplicate name got a suffix.
+   Expressions in 51 go into the fx editor without a leading @ or @{...}.
+   Use Boolean false and integer choice values as typed values, not text.
+
+EXACT ACTION TREE
+Indentation denotes containment; YES/NO and cases are designer branches, not
+extra actions. Empty NO branches remain empty. Initializers are TOP LEVEL.
+
+Trigger_RequestAdded
+Initialize_RequestId
+Initialize_AppUrl
+Initialize_AdminMailbox
+Initialize_InternalApprovers
+Initialize_ApprovalId
+Initialize_DecidedById
+Initialize_TerminalStatus
+Initialize_ReadyToCreate
+Initialize_Issue
+Scope_Process
+  Get_Request
+  Condition_DispatchAllowed
+    YES
+      Compose_ApproverCandidates
+      Filter_ApproverGuids
+      Compose_SelectedApproverGuids
+      Condition_SelectionValid
+        YES
+          Select_ApproverUserClauses
+          List_rows_ApproverUsers
+          Filter_ValidApproverUsers
+          Select_ApproverEntraIds
+          Condition_ApproversValid
+            YES
+              Get_Requester
+              Condition_RequesterValid
+                YES: Set_ReadyToCreate
+                NO: Set_Issue_Requester
+            NO: Set_Issue_Approvers
+        NO: Set_Issue_Selection
+    NO
+      Condition_ExistingApprovalPending
+        YES: Set_Issue_ExistingApproval
+  Condition_ReadyToCreate
+    YES
+      Compose_AssignedTo
+      Create_Approval
+      Set_ApprovalId
+      Condition_ApprovalIdReturned
+        YES: Save_ApprovalID
+        NO: Set_Issue_ApprovalId
+  Condition_ApprovalPersisted
+    YES
+      Scope_AwaitDecision
+        Wait_Approval
+        Get_Request_Decision                         [Wait succeeded branch]
+        Condition_DecisionCorrelation
+          YES
+            Condition_ResponseEnvelope
+              YES
+                Compose_Response
+                Condition_ResponderIdPresent
+                  YES
+                    Filter_ResponderById
+                    Condition_ResponderIdUnique
+                      YES: Set_DecidedBy_FromId
+                      NO: Set_Issue_ResponderId
+                  NO
+                    Filter_ResponderByEmail
+                    Condition_ResponderEmailUnique
+                      YES: Set_DecidedBy_FromEmail
+                      NO: Set_Issue_ResponderEmail
+                Condition_ResponderMembership
+                  YES
+                    Switch_Outcome
+                      Approve
+                        Update_Approved
+                        Set_Terminal_Approved
+                      Reject
+                        Update_Denied
+                        Set_Terminal_Denied
+                      Default
+                        Set_Issue_Outcome
+                  NO: Set_Issue_ResponderMembership
+              NO: Set_Issue_ResponseEnvelope
+          NO: Set_Issue_DecisionCorrelation
+        Scope_Expire                                [Wait timed out ONLY]
+          Get_Request_Expiry
+          Condition_ExpiryPendingSameApproval
+            YES
+              Update_Expired
+              Set_Terminal_Expired
+            NO: Compose_ExpiryNotApplied
+Scope_Notify
+  Condition_HasTerminalResult
+    YES
+      Get_Request_Notification
+      Condition_NotificationCorrelation
+        YES: Send_Requester_Result
+        NO: Set_Issue_NotificationCorrelation
+Scope_Recovery
+  Condition_RecoveryNeeded
+    YES
+      Get_Request_Recovery
+      Condition_RecoveryPending
+        YES: Update_ProcessingNote
+      Send_Admin_Alert
+      Terminate_RecoveryRequired
+Terminate_Completed
+
+TRIGGER AND INITIAL VARIABLES
+Trigger_RequestAdded: Microsoft Dataverse, When a row is added, modified or
+deleted. Change type Added; Table LEAP Requests; Scope Organization; no filter
+rows, no modified events. Leave trigger Concurrency Control OFF. Degree 1 would
+serialize every employee behind a seven-day wait; it is not per-request locking.
+Use the connection/reference for F, not each employee's personal connection.
+
+Each Initialize_* is Variables > Initialize variable. Initialize in tree order:
+  Action                         Variable                     Type / value
+  Initialize_RequestId           varRequestId                 String / 51
+  Initialize_AppUrl              varAppUrl                    String / actual URL
+  Initialize_AdminMailbox        varAdminMailbox              String / actual mailbox
+  Initialize_InternalApprovers   varInternalApproverEntraIds  Array / approved GUIDs
+  Initialize_ApprovalId          varApprovalId                String / empty
+  Initialize_DecidedById         varDecidedById               String / empty
+  Initialize_TerminalStatus      varTerminalStatus            String / empty
+  Initialize_ReadyToCreate       varReadyToCreate             Boolean / false
+  Initialize_Issue               varIssue                     String / empty
+Array example is ["actual-lowercase-entra-guid-a","actual-lowercase-entra-guid-b"];
+replace every example with verified GUIDs. Never submit these literal examples.
+Do not Initialize variables inside conditions or scopes. Set-variable actions
+later assign these initialized variables. No loops or parallel array appends are
+needed in this baseline.
+Keep Condition_DispatchAllowed, Condition_ReadyToCreate and
+Condition_ApprovalPersisted as SIBLINGS inside Scope_Process. Flattening those
+gates avoids exceeding Power Automate's eight-level action nesting limit. Do not
+move the create/wait/decision tree inside all of the preparation conditions.
+
+GET THE SAVED REQUEST, NOT THE APP'S CLAIMS
+Scope_Process is Control > Scope. Get_Request is Dataverse > Get a row by ID:
+Table LEAP Requests; Row ID varRequestId; select columns from 51.
+Condition_DispatchAllowed requires Pending AND empty Approval ID.
+If NO, Condition_ExistingApprovalPending distinguishes Pending with an existing
+ID from a finalized row. Existing Pending ID sets a generic recovery issue;
+finalized rows take no action. Neither case creates another native approval.
+This is a replay/read guard ONLY. Concurrent starts can both see an empty ID.
+
+BUILD THE EXACT SELECTED USER SET
+Compose_ApproverCandidates reads _leap_approver1id_value, optional 2 and 3 from
+Get_Request. These are typed saved User lookup GUIDs, not email or display name.
+Filter_ApproverGuids removes null/empty optional slots BEFORE constructing OData.
+Compose_SelectedApproverGuids union-deduplicates. Condition_ApproversValid also
+requires the original nonblank count equal the distinct count; duplicate choices
+are not silently converted into fewer selected people.
+Condition_SelectionValid runs BEFORE any Users query and requires a nonempty
+Approver 1 and one to three distinct nonblank GUIDs. Its NO branch sets the
+static issue; an entirely empty selection must never issue an unfiltered Users
+List rows request. Do not move this check after the query.
+Select_ApproverUserClauses is Data Operations > Select. Set From per 51 and
+switch Map to TEXT mode. Output must be an array of STRINGS such as
+["systemuserid eq 11111111-1111-1111-1111-111111111111", ...], not key/value objects.
+List_rows_ApproverUsers: Dataverse > List rows, Table Users; Select columns and
+Filter rows per 51; Row count 4; pagination OFF. There are at most three IDs.
+Never produce "systemuserid eq " for a blank, put quotes around a GUID, filter
+by fullname, or retrieve the whole directory and use First().
+If Approver 1 is absent, the server contract is already violated. The validation
+fails; any invalid/empty OData failure routes to recovery and never to approval.
+Filter_ValidApproverUsers checks enabled interactive human users with a usable
+Entra GUID in the trusted internal allow-list. Require the fetched/valid counts
+to match the selected set exactly. Never silently drop an unusable selection.
+
+Get_Requester: Get a row by ID, Table Users, Row ID from saved
+_leap_requesterid_value. Its email is only for the later generic result email.
+It is not the approval assignee or an API total identity. Select/validate per 51.
+Do not substitute trigger Created By: delegated creates and ownership may differ;
+the server-derived saved Requester lookup is the business identity.
+Condition_RequesterValid's YES contains Set_ReadyToCreate, setting the Boolean
+varReadyToCreate to true. NO sets its issue. Later sibling Condition_ReadyToCreate
+must require that flag and no issue; do not infer readiness from skipped outputs.
+
+ONE CREATE; SAVE ID IMMEDIATELY; THEN WAIT
+Select_ApproverEntraIds: Data Operations > Select in TEXT mode, from the filtered
+saved selected Users rows. Map azureactivedirectoryobjectid as lowercase strings.
+Place it before Condition_ApproversValid so that condition can also verify that
+distinct Entra ID count equals selected user count, rejecting ambiguous identity
+mapping instead of silently notifying fewer people.
+Compose_AssignedTo joins union-deduplicated Entra GUID strings with semicolons.
+The matching user array remains available for responder verification later.
+
+Create_Approval: Standard approvals > Create an approval:
+  Approval type: Approve/Reject - First to respond
+  Title: expression in 51 (generic request GUID only)
+  Assigned to: outputs('Compose_AssignedTo')
+  Details: "Synthetic LEAP request. Open the authorized app for details."
+  Item link: variables('varAppUrl')
+  Item link description: "Open LEAP"
+  Enable notifications: Yes
+  Enable reassignment: No
+Do not set Requestor from employee-entered text or copy leave details/comments.
+If Requestor is exposed, leave its optional value unset unless a verified
+same-cloud policy requires a supported requester identity. Never mix user GUIDs.
+Action Settings > Retry policy: None for Create_Approval. A retried non-idempotent
+create can duplicate an approval after an ambiguous network failure.
+
+Set_ApprovalId: Set varApprovalId to Create_Approval's actual Approval ID token.
+Common raw property is body/name (51). Verify on a synthetic run; do not guess
+that display title or a response ID is the approval ID.
+Condition_ApprovalIdReturned requires a nonempty ID. Its YES contains the immediate
+Save_ApprovalID; its NO sets a static recovery issue and never waits. There is no
+connector call/delay between create and persistence.
+Save_ApprovalID: Dataverse Update a row, Table LEAP Requests, Row ID varRequestId.
+Supply ONLY Approval ID = varApprovalId. No status, note, decision fields, owner,
+or form fields. Empty/unavailable returned ID is a failed schema rehearsal:
+the condition routes to recovery; do not proceed with an invented value.
+Sibling Condition_ApprovalPersisted requires Save_ApprovalID Succeeded and a
+nonempty ID, then enters Scope_AwaitDecision. No connector call separates save
+from Wait; these two shallow conditions avoid excessive designer nesting.
+There is no intervening notification, delay, processing-note write, or second
+approval. Set Save_ApprovalID retry policy None for a clear ambiguous-failure
+reconciliation boundary; never resubmit the whole run as an automatic repair.
+
+Wait_Approval: Standard approvals > Wait for an approval; Approval ID varApprovalId;
+Settings Timeout P7D. Use PT2M only in a rehearsal copy, then restore P7D.
+No Start and wait for an approval and no Apply to each per approver.
+The service sends its own email. Teams adaptive cards are not the decision path.
+Create/save/wait can miss an immediate response. A delay makes this worse, not
+better. A saved ID must be reconciled, not cleared/recreated. See 52.
+
+SUCCESS PATH: VERIFY BEFORE TRANSITION
+Get_Request_Decision runs only after Wait_Approval SUCCEEDED. Re-read LEAP
+Requests by varRequestId. Condition_DecisionCorrelation requires Pending and the
+same nonempty Approval ID. Otherwise set the static issue and investigate;
+do not overwrite a terminal row or a different approval's state.
+Condition_ResponseEnvelope requires exactly one response and an outcome; inspect
+synthetic raw outputs to confirm the connector's response schema (51).
+Compose_Response uses first() only INSIDE that validated YES branch.
+Condition_ResponderIdPresent chooses the identity method:
+  ID present: Filter_ResponderById matches responder.id to the saved selected
+  Users' azureactivedirectoryobjectid. Require exactly ONE match. Do not fall
+  back to email if a present ID does not match.
+  ID absent: Filter_ResponderByEmail requires a nonempty responder.email exactly
+  matching one saved selected user's internalemailaddress, case-insensitive.
+  Require ONE match. Ambiguous email and missing identity are operational errors.
+Set_DecidedBy_FromId / Set_DecidedBy_FromEmail stores that row's systemuserid,
+NOT responder.id (which is an Entra GUID).
+Condition_ResponderMembership independently checks that mapped systemuserid is
+in Compose_SelectedApproverGuids, the original saved choices.
+Never map against every User, accept reassignment/forwarding to an unrelated user,
+or use an unverified response display name/UPN.
+
+Switch_Outcome: Control > Switch; On is the exact native outcome. Cases are
+case-sensitive Approve and Reject. Default sets a recovery issue, NOT Denied.
+Update_Approved and Update_Denied: Dataverse > Update a row, Table LEAP Requests,
+Row ID varRequestId; include ONLY:
+  Request Status: integer 100000001 for Approved, 100000002 for Denied
+  Decided By (Users): systemusers(<mapped systemuserid>) using 51
+  Decision Comments: response comments per 51 (empty is permitted)
+Use custom Request Status (leap_status), never statecode/statuscode.
+No Decided On: the server stamps it. No Processing Note or Approval ID in either
+transition; mixed workflow fields cause the guard to reject the update.
+Set_Terminal_Approved / Set_Terminal_Denied follows only the matching successful
+update and stores "Approved" / "Denied" in varTerminalStatus.
+These reads/checks are not atomic transition concurrency protection. The export
+and tests do not justify a general race-safe-backend claim.
+
+EXPIRY, NOTIFICATION AND RECOVERY
+Build Scope_Expire as the PARALLEL branch directly after Wait_Approval, at the
+same containment level as Get_Request_Decision, with timed-out-only run-after.
+It must not run after a skipped Wait or a failed preparation scope. Get the
+current row, check Pending/same Approval ID, update status ONLY to 100000003,
+then set varTerminalStatus = "Expired". No note/Decided By/Decided On in expiry.
+Compose_ExpiryNotApplied contains a static diagnostic string, not a row write.
+
+Build Scope_Notify after Scope_Process and Scope_Recovery after Scope_Notify,
+both configured for all four predecessor statuses. Details/expressions in 51/52.
+Scope_Notify emails ONLY if this run successfully wrote a terminal status and a
+fresh row still matches that status and this run's Approval ID. To is the saved
+requester's Users email. Body is request ID, status, app link only.
+Scope_Recovery handles controlled validation issues and failed/timed-out actions.
+It reads the current row and writes a static, <=500-character Processing Note
+ONLY while Pending. Send_Admin_Alert runs even if the read/note branch failed.
+Alert contains ONLY request ID, run ID and app URL, never action outputs or
+exception dumps. If terminal, leave the row entirely unchanged and log operational
+details in the approved external support record. A terminal notification failure
+does not create an approval, reopen the row, or append a row note.
+Terminate_RecoveryRequired uses Failed status and a static recovery code/message.
+Terminate_Completed uses Succeeded only after Scope_Recovery finishes without
+terminating for recovery. A replay no-op is not evidence of a new decision.
+
+OPTIONAL ALTERNATIVE: INDIVIDUAL USERS GETS (DO NOT MIX IMPLEMENTATIONS)
+The List rows / Select path above is the baseline and all expressions target it.
+If local training requires individual Get a row actions, use a separate rehearsed
+copy: Get_Approver1 uses required saved _leap_approver1id_value. Add
+Condition_HasApprover2 before Get_Approver2, and Condition_HasApprover3 before
+Get_Approver3. Never Get a row with an empty optional Row ID. Initialize
+varApproverEntraIds and varApproverUsers as arrays at TOP LEVEL. In each branch,
+validate that fetched systemuserid equals the original slot, check enabled/
+internal cohort/Entra ID, then append the ID and User sequentially. Exact names:
+  Initialize_ApproverEntraIds -> varApproverEntraIds, Array, []
+  Initialize_ApproverUsers -> varApproverUsers, Array, []
+  Get_Approver1 -> required saved _leap_approver1id_value
+  Append_Approver1_EntraId -> append to varApproverEntraIds
+  Append_Approver1_User -> append to varApproverUsers
+  Condition_HasApprover2 -> not(empty(body('Get_Request')?['_leap_approver2id_value']))
+    YES: Get_Approver2 -> saved _leap_approver2id_value
+         Append_Approver2_EntraId -> append to varApproverEntraIds
+         Append_Approver2_User -> append to varApproverUsers
+  Condition_HasApprover3 -> not(empty(body('Get_Request')?['_leap_approver3id_value']))
+    YES: Get_Approver3 -> saved _leap_approver3id_value
+         Append_Approver3_EntraId -> append to varApproverEntraIds
+         Append_Approver3_User -> append to varApproverUsers
+All three Gets use Table Users and the same Select columns as the baseline.
+Each Entra append Value is toLower(string(body('Get_Approver1')?['azureactivedirectoryobjectid']))
+or the corresponding exact Get_Approver2 / Get_Approver3 expression. Each User
+append Value is body('Get_Approver1'), body('Get_Approver2'), or
+body('Get_Approver3') respectively. Execute the branches in slot order, NOT in
+parallel. Every append must be gated on its successful validated Get.
+Do not use a self-referencing Set variable,
+parallel variable appends, client recipient strings, or an unconstrained directory
+search. Validate exact original membership/count, then join the Entra array.
+Adapt every responder filter to that saved varApproverUsers array and re-run all
+UAT. Merely renaming these alternative actions will not make 51 interchangeable.
+
+SAVE/CHECKPOINT
+Save, run Flow checker, inspect connection references, turn on only in the
+authorized rehearsal window, then execute 60. This file itself performs no sends.
+Save exact observed connector tokens with synthetic evidence. Do not silently
+claim tests, imports, exports or cloud support that have not been performed.

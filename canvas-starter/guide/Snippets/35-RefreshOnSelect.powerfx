@@ -1,0 +1,2 @@
+Refresh('LEAP Requests');
+Notify("Requests refreshed. Reload annual totals separately.", NotificationType.Information)

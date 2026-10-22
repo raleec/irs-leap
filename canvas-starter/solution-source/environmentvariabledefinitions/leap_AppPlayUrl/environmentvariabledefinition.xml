@@ -1,0 +1,13 @@
+<environmentvariabledefinition schemaname="leap_AppPlayUrl">
+  <description default="Target-specific LEAP configuration. Intentionally blank in development until configured.">
+    <label description="Target-specific LEAP configuration. Intentionally blank in development until configured." languagecode="1033" />
+  </description>
+  <displayname default="App Play URL">
+    <label description="App Play URL" languagecode="1033" />
+  </displayname>
+  <introducedversion>1.0</introducedversion>
+  <iscustomizable>1</iscustomizable>
+  <isrequired>0</isrequired>
+  <secretstore>0</secretstore>
+  <type>100000000</type>
+</environmentvariabledefinition>

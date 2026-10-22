@@ -1,0 +1,8 @@
+<customapiresponseproperty uniquename="MissingHours">
+  <displayname default="MissingHours">
+    <label description="MissingHours" languagecode="1033" />
+  </displayname>
+  <iscustomizable>1</iscustomizable>
+  <name>MissingHours</name>
+  <type>7</type>
+</customapiresponseproperty>

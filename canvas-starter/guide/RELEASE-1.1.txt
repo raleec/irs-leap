@@ -1,0 +1,137 @@
+IRS LEAP - RELEASE 1.1.0.0 HANDOFF
+Complete component package; target configuration and rehearsal required
+
+WHAT IS INCLUDED
+----------------
+Solution unique name: IRSLEAPCanvasStarter
+Publisher: IRSLEAP / leap
+Version: 1.1.0.0
+
+Included in BOTH actual managed/unmanaged solution exports:
+- Native Canvas app "IRS LEAP", with calendar, new request, details and totals.
+- Cloud flow "IRS LEAP - First response approval", exported OFF/Stopped.
+- LEAP Request table and all13category choices.
+- IRS LEAP Participant and IRS LEAP Automation roles.
+- Signed validation/sharing plug-in,4steps and leap_GetAnnualTotal custom API.
+- Three portable connection references.
+- Two consumed Text environment-variable definitions.
+
+Use IRSLEAPCanvasStarter_1_1_0_0_unmanaged.zip for isolated workshop authoring.
+Use IRSLEAPCanvasStarter_1_1_0_0_managed.zip for a DIFFERENT downstream target.
+Do not import both flavors of this same solution into one environment.
+The outer IRS-LEAP-Canvas-Hackathon-Kit.zip is not a solution-import file.
+Version1.0.0.0 was the backend-only baseline; use1.1for the short workshop.
+
+SOURCE APPLICATION
+------------------
+App ID: 723c5182-ea2c-4c3f-9627-6c6015698c4e
+Logical name: leap_irsleap_e1c7a
+Source development URL: https://YOUR-DEVELOPMENT-ORG.crm.dynamics.com
+Source player (authorized source users only):
+[TARGET-APP-PLAY-URL]
+
+Do NOT use that source URL as a target environment-variable value. After import,
+copy the TARGET app's actual published Web link from its Details page.
+
+The app uses native Dataverse as the signed-in user, native Users lookups and
+the caller-bound Environment annual-total action. The packaged implementation
+uses a guarded create Patch and modern searchable approver pickers with explicit
+Full Name rendering. Older CORE-LAB construction examples use an Edit form and
+classic pickers; those remain reference exercises, not instructions to rebuild
+or overwrite the already packaged app.
+
+Screens: scrCalendar, scrNew, scrDetails, scrTotals.
+Safe workshop customization: lblWorkshopHeading.Text on scrCalendar.
+Initial heading: "IRS LEAP".
+Do not customize security/formulas while teaching the short deployment lab.
+
+TARGET CONNECTION REFERENCES - ACTUAL LOGICAL NAMES
+--------------------------------------------------
+leap_LEAPDataverse -> Microsoft Dataverse (shared_commondataserviceforapps)
+leap_LEAPApprovals -> Standard approvals (shared_approvals)
+leap_LEAPOutlook   -> Office365Outlook (shared_office365)
+
+All three are intentionally UNBOUND in the portable source release. Importing
+does not transport authenticated connections or OAuth credentials. Create/bind
+approved target-owned connections and verify their owners can use them.
+Keep the target flow OFF until configuration,roles,recipients and message
+templates are approved. Target native flow-save/connection validation must
+succeed before activation. No source activation or notification sends occurred.
+
+TARGET ENVIRONMENT VARIABLES - ACTUAL SCHEMA NAMES
+------------------------------------------------
+leap_AppPlayUrl           Text; target published app's actual Web link.
+leap_OperationsMailbox    Text; approved target operations/support mailbox.
+
+Both definitions are consumed by the cloud-flow parameters/actions.
+Source default/current values are deliberately blank. Set target CURRENT values,
+not copied source values; refresh/save consumers if required by the platform.
+An empty app URL is a fail-closed preparation error before approval creation.
+
+APPROVAL FLOW
+-------------
+Display name: IRS LEAP - First response approval
+Unique name: leap_IRSLEAPFirstResponseApproval
+Source workflow ID: 4033f29c-15ce-f111-a05b-6045bd094f74
+Source state: Draft0/status1, Flow service Stopped.
+Trigger: Added only, LEAP Request, organization scope, Pending filter.
+Operation: ONE native Approve/Reject First-to-respond approval, P7D timeout,
+notifications enabled in the definition BUT flow stopped, reassignment disabled.
+Original selected recipients are resolved from stored Users lookups; response
+identity is mapped back to the selected Dataverse user. Fresh Pending checks
+precede protected final writes. Unexpected output is not a denial.
+No app-side approval Patch; requester outcome mail contains only request ID,
+status and app link. No medical description/category/date in mail templates.
+The app's Approval ID remains blank in the native Start-and-wait core path.
+This is not an exactly-once dispatch/outbox or a full HR/payroll product.
+
+TARGET SETUP - RECOMMENDED ORDER
+------------------------------
+1. Verify approved tenant/cloud/environment and correct package flavor.
+2. Import1.1and resolve actual dependencies/reference prompts. Inspect flow state
+   immediately: keep it OFF while configuration is incomplete.
+3. Bind all3target connections using the approved automation identity.
+4. Publish/share the imported app; copy the actual target player URL.
+5. Set both target current environment-variable values; verify consumed values.
+6. Assign Basic User + IRS LEAP Participant to ordinary requesters/approvers.
+   Assign Basic User + IRS LEAP Automation to the approved automation identity.
+   Standard Basic User supplies callback-registration privileges in the source;
+   verify equivalent privileges in the target if trigger activation fails.
+7. Confirm all selected users are enabled,licensed,provisioned internal users.
+   App sharing and environment membership are separate from security roles.
+8. With flow stillOFF, open the app as ordinary users and check data access.
+9. Obtain approval for exact synthetic recipients/templates before enabling the
+   flow for native approval/mail rehearsal. Then enable only the intended flow.
+10. Rehearse request/decision/outcome/calendar/totals and unrelated-user denial
+    in the actual GCC target before the customer event.
+
+EVIDENCE BOUNDARY
+-----------------
+The native authoring service compiled all6YAML files and reported no app-checker
+or accessibility issues at final preparation. In Studio, owner identity, all13
+categories, the real approver picker, synthetic form save,details and annual API
+were exercised. A simulated SDK-approved2+3overlap with0andblank rendered5hours,
+4approved requests,1missing-hours row. Four synthetic records were removed.
+This simulated decision is NOT a native approval/email execution test.
+
+The cloud flow is actually persisted/readable through Dataverse and the Flow
+service. Its connector operation names,record bindings,consumed parameters and
+definition dependencies were reviewed. Because all3references are unbound, full
+native flow-save/runtime validation still requires target bindings.
+
+The source owner has no current Power Apps runtime plan. Standalone source player
+launch was blocked by the license gate. No trial was started and no licenses
+were changed. Studio results do not replace published ordinary-user validation.
+
+Not completed here: clean-target import,assigned licensed ordinary-user player
+tests,real native approval responses,actual email/Teams sends,elapsed7day
+timeout,or customer GCC validation. These are pre-event gates,not implicit passes.
+
+WHERE TO START
+--------------
+SOLUTIONS-FIRST.txt is the150-minute participant agenda.
+COMPLETE-SOLUTION-PREPARATION.txt is now rebuild/maintenance reference.
+Snippets60UAT and61GCC-Deployment provide additional rehearsal checks.
+runtime-canvas/ contains actual app YAML,.msapp and observed-runtime report.
+runtime-flow/ contains the actual disabled definition,configuration mapping and
+validation reports. Do not enable or send merely by reading these files.

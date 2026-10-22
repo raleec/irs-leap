@@ -1,0 +1,252 @@
+IRS LEAP Dataverse plug-in registration and offline validation
+============================================================
+
+Scope and evidence
+------------------
+This file describes the implementation in Plugins\*.cs and its required
+registration. It is not evidence that a particular environment, Power Automate
+flow, canvas UI, or live Dataverse integration test has passed.
+The authoritative logical names and choice values are in Plugins\Schema.cs.
+
+Assembly
+--------
+Register artifacts\IrsLeap.Plugins.dll in Dataverse as a database-stored,
+sandbox-isolated assembly, synchronously executing the steps below.
+Assembly name: IrsLeap.Plugins
+Version: 1.0.0.0
+Target framework: .NET Framework 4.6.2 (net462)
+Packaged public-key token: 99e8033ddd1c8dc5 (also in manifest.json)
+Types: IrsLeap.Plugins.RequestGuard, IrsLeap.Plugins.RequestShare,
+       IrsLeap.Plugins.AnnualTotal
+Do not register the net9.0 offline validation executable as a plug-in.
+Do not register dependencies from .packages as plug-in assemblies.
+
+Required SDK message processing steps
+-------------------------------------
+All steps are synchronous (Mode 0), primary entity leap_request.
+Use Calling User for the step's execution user. The implementation obtains its
+own elevated service for explicit validation, role checks, grants, and totals;
+authorization is checked against InitiatingUserId, not an impersonated user.
+
+Type                         Message  Stage                Image
+IrsLeap.Plugins.RequestGuard  Create   PreOperation (20)     none
+IrsLeap.Plugins.RequestGuard  Update   PreOperation (20)     Before (all columns)
+IrsLeap.Plugins.RequestGuard  Assign   PreOperation (20)     none
+IrsLeap.Plugins.RequestShare  Create   PostOperation (40)    none
+
+For the Update step create a PRE-IMAGE with BOTH name and alias exactly Before,
+and select all columns. Do not use filtering attributes: every Update,
+including same-value protected-field writes, must be inspected. Do not select
+only workflow fields as filtering attributes. Schema.BeforeColumns lists the
+business columns used by the guard, including optional decision fields.
+Execution order can be 10 for these steps; stage, not rank, separates the
+Create guard from the share operation. Ensure other registered customizations
+do not alter protected values after RequestGuard runs.
+
+RequestShare MUST remain in the synchronous Create transaction. It retrieves
+the newly created row and grants each validated selected approver ReadAccess
+only. A share failure must roll back Create; moving it to asynchronous mode or
+outside the transaction defeats this guarantee. Update/Assign are not share
+maintenance paths because ownership and selected approvers are immutable.
+
+Custom API main operation
+-------------------------
+UniqueName: leap_GetAnnualTotal
+BindingType: Global (0), not entity-bound or entity-collection-bound
+IsFunction: false (invoke as an action/POST)
+IsPrivate: false for discoverability by supported clients
+AllowedCustomProcessingStepType: None (0)
+PluginTypeId: IrsLeap.Plugins.AnnualTotal
+The plug-in runs as the Custom API MainOperation, stage 30, synchronous.
+Configure CustomAPI.PluginTypeId; do not try to add a normal SDK processing
+step at stage 30. Do not also attach AnnualTotal at pre/post-operation stages.
+
+Required request parameters (IsOptional false):
+  RequesterId    String (type 10); non-empty systemuser GUID formatted as text
+  CalendarYear   Integer (type 7); inclusive range 1900..2100
+
+Response properties:
+  TotalHours        Integer (type 7)
+  MissingHours      Integer (type 7)
+  ApprovedRequests  Integer (type 7)
+  RequesterName     String (type 10)
+
+Example Web API request:
+  POST <organization-url>/api/data/v9.2/leap_GetAnnualTotal
+  Content-Type: application/json
+  {"RequesterId":"<systemuser-guid>","CalendarYear":2026}
+
+The provisioned API ExecutePrivilegeName is the table's existing Read privilege,
+discovered from metadata (prvReadleap_Request in this export). Participant and
+automation roles include it. Do not invent an unprovisioned privilege.
+The API always enforces its own caller authorization before reading the
+requester profile or aggregate, regardless of caller table-read privileges.
+
+Schema contract
+---------------
+Create leap_request as a user-owned table (not organization-owned).
+Use the exact logical names below; do not replace systemuser lookups with
+contacts, Entra display names, email text, teams, or unconstrained GUID text.
+
+  leap_requestid        primary GUID
+  leap_name             primary text, maximum 120
+  leap_description      optional multiline text, maximum 1000
+  leap_leavedate         required DateOnly behavior, date-only format
+  leap_startminute       required whole number, 0..1439
+  leap_endminute         required whole number, 1..1440 and greater than start
+  leap_hours             optional whole number, 0..24; NULL is not zero
+  leap_category          required choice: all 13 values 100000000..100000012
+  leap_status            required choice:
+                           100000000 Pending
+                           100000001 Approved
+                           100000002 Denied
+                           100000003 Expired
+  leap_year              server-derived whole number, 1900..2100
+  leap_requesterid        required lookup to systemuser, server-derived
+  leap_approver1id        required lookup to systemuser
+  leap_approver2id        optional lookup to systemuser
+  leap_approver3id        optional lookup to systemuser
+  leap_decidedbyid        optional lookup to systemuser, workflow-managed
+  leap_decidedon          optional date/time (UTC instant), server-derived
+  leap_decisioncomments   optional multiline text, maximum 1000
+  leap_approvalid         optional text, maximum 100
+  leap_processingnote     optional text, maximum 500
+  ownerid                built-in owner; guard sets requester systemuser
+
+The source validates category numeric values, not their display labels.
+Provision the intended 13 business labels against these exact values.
+Do not use a decimal-hours column or substitute a duration-derived value.
+DateOnly is a local wall-calendar date: the guard strips the time and sets
+DateTimeKind.Unspecified without UTC/local timezone conversion.
+
+Security and immutable workflow contract
+----------------------------------------
+Requesters and every selected approver must be enabled internal Dataverse
+systemusers with an Entra object ID, a nonblank non-guest domain name, no
+application ID, and an interactive access mode (0, 1, or 2). Self-approval and
+duplicate selected users are rejected. Approver 1 is required; 2/3 are optional.
+
+On Create, the guard derives requester and owner from the initiating caller,
+forces Pending, derives the year, and clears workflow-managed fields. Supplying
+non-null workflow-managed fields on Create is rejected. Submitted requester
+and owner values are not trusted; they are overwritten.
+
+Content, date, hours, approvers, ownership, requester, and derived year are
+immutable after save, including while Pending. Even same-value attribute
+writes are rejected. Assign is blocked. Finalized requests (Approved, Denied,
+Expired) are immutable in their entirety: no approval ID, processing-note,
+comment, or status changes are accepted afterward. Correct data before
+submission; this source does not implement amendments or reopening.
+
+Pending workflow updates require the initiating caller to have a direct or
+team-inherited role named exactly IRS LEAP Automation or System Administrator.
+This is a TRUSTED AUTOMATION boundary. A normal selected approver cannot update
+a request directly merely because they received a read share. The trusted flow
+must authenticate its approval response and submit the selected approver in
+leap_decidedbyid. The plug-in validates selection and user eligibility, but it
+does not independently verify an external approval response or prove that the
+attributed approver personally submitted that response.
+
+While Pending, automation can write leap_approvalid and leap_processingnote.
+A final Approved/Denied update requires leap_decidedbyid to identify a selected
+approver, accepts optional decision comments, and stamps leap_decidedon in UTC.
+Do not send leap_approvalid or leap_processingnote alongside finalization;
+persist those earlier while still Pending. Expired clears decision attribution.
+Never submit leap_decidedon or leap_year from the flow; they are server-managed.
+
+Use least-privilege Dataverse roles in addition to plug-in validation:
+employees need request Create, own-row Read, and necessary lookup Append/
+AppendTo and internal-user directory Read privileges; approvers need table Read
+privilege for their explicitly shared rows. Do not give ordinary users table
+Delete, Assign, Share, or organization-wide request Read/Write. Automation needs
+the workflow access it uses and the trusted automation role, not an employee's
+interactive session. The plug-ins do not guard Delete, so deny Delete through
+roles. Restrict who can assign the trusted role or modify/disable registration.
+Validate actual security-role depth and lookup privileges in the target tenant.
+
+Annual totals and privacy scope
+------------------------------
+The requester can obtain their own totals. A selected approver on ANY saved
+request for that requester can obtain that requester's totals for ANY accepted
+year (1900..2100). This is lifetime selected-approver authorization: the
+authorization query intentionally has no year or status filter and no expiry.
+A current-year selection is not required. Do not describe it as authorization
+only for one request, one year, or currently Pending requests. If that lifetime
+scope is unacceptable, change the design and retest before deployment.
+
+The elevated aggregate includes only Approved rows for the requested requester
+and derived calendar year, across rows the caller may not otherwise read.
+It counts approved requests, sums explicitly recorded leap_hours, and counts
+non-null hours. MissingHours = ApprovedRequests - non-null-hours count.
+An explicit zero is recorded; blank is missing. No approved hours are inferred
+from interval duration, and overlapping requests are allowed.
+Dataverse aggregate errors/record-limit faults fail the operation rather than
+returning a partial sum or paging ordinary records. The normal aggregate query
+record limit is 50,000 matching rows and is an environment/service constraint.
+
+Reliability boundaries
+----------------------
+The Create guard and approver sharing are transactional in Dataverse. There is
+NO atomic outbox linking Dataverse Create to Power Automate or external approval
+creation, and NO concurrent compare-and-swap guarantee in these plug-ins.
+An immutable finalized-row check does not by itself prove first-response-wins
+under concurrent final updates. A stored approval ID also does not close the
+crash window between creating an external approval and saving that ID.
+Use appropriate flow serialization/idempotency/reconciliation and platform
+conditional writes where required; prove the complete orchestration separately.
+Do not claim exactly-once delivery, guaranteed CAS, or external atomicity.
+
+Build, signing, and artifact handling
+-------------------------------------
+From this backend directory in PowerShell with the .NET SDK installed:
+
+  .\New-SigningKey.ps1
+  dotnet restore .\IrsLeap.Plugins.csproj
+  dotnet build .\IrsLeap.Plugins.csproj --configuration Release --no-restore
+  Copy-Item .\bin\Release\net462\IrsLeap.Plugins.dll .\artifacts\IrsLeap.Plugins.dll
+  [Reflection.AssemblyName]::GetAssemblyName(
+      (Resolve-Path .\artifacts\IrsLeap.Plugins.dll)).FullName
+
+New-SigningKey.ps1 preserves an existing .keys\IrsLeap.Plugins.snk. Keep that
+private key securely outside public distribution; do not regenerate it for
+an update to an already registered assembly. A newly generated key changes the
+public-key token and requires checking/updating manifest.json and the intended
+assembly identity/registration. The packaged token above applies to the
+provided artifact, not automatically to every locally rebuilt artifact.
+
+.gitignore excludes .keys, *.snk, *.pfx, package caches, and build outputs.
+When making a public ZIP, explicitly exclude those files/directories plus
+Validation\bin and Validation\obj; .gitignore alone does not filter ZIP input.
+Ship the intended signed artifact and manifest, not private key material,
+credentials, environment tokens, or the local package/build caches.
+
+Offline source validation
+--------------------------
+Validation\IrsLeap.Validation.csproj is a dependency-light native console
+harness, NOT xUnit/NUnit/MSTest and not a live Dataverse test suite.
+It compiles the actual Plugins\*.cs files into an unsigned net9.0 console
+program so internal rules can be exercised without modifying plug-in visibility.
+It uses the same Microsoft.CrmSdk.CoreAssemblies 9.0.2.60 and WCF compatibility
+assemblies; no test-framework packages or real service connections are used.
+The stub rejects unexpected organization-service/context operations.
+
+With .NET SDK 9:
+  dotnet restore .\Validation\IrsLeap.Validation.csproj
+  dotnet run --project .\Validation\IrsLeap.Validation.csproj --configuration Release --no-restore
+
+After dependency restore, that run is offline; use --no-build as well when
+re-running an already built harness. A failed assertion sets a nonzero exit.
+Dependencies restore to backend\.packages, not into the plug-in artifact.
+
+Covered checks include invalid/trimmed/max-length titles, optional descriptions,
+blank/omitted/zero/integer hours, decimal rejection, minute bounds, date years
+1900..2100, all 13 categories, overlaps allowed, user eligibility, distinct/
+non-self approvers, role queries, immutable content/finalization, required image,
+trusted workflow attribution, transactional read-only sharing, Custom API input
+validation/authorization, aggregate query shape, null-versus-zero, aggregate
+range/consistency errors and aggregate-limit failure without partial results.
+
+This harness does NOT establish that registration/schema/roles are deployed,
+that real Dataverse returns the stubbed aggregate shapes, that sharing rolls
+back on the service, that flows/canvas screens work, or that concurrent updates
+are serialized. Run target-environment integration and UI checks separately.

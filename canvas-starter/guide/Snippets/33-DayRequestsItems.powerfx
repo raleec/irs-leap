@@ -1,0 +1,41 @@
+Switch(
+    ddRequestView.Selected.Value,
+    "My requests",
+    Sort(
+        Filter(
+            [@'LEAP Requests'],
+            'Leave Date' >= varMonth,
+            'Leave Date' < DateAdd(varMonth, 1, TimeUnit.Months),
+            'Leave Date' = varSelectedDate,
+            !IsBlank(varMe.User),
+            Requester.User = varMe.User
+        ),
+        'Start Minute',
+        SortOrder.Ascending
+    ),
+    "My approvals",
+    Sort(
+        Filter(
+            [@'LEAP Requests'],
+            'Leave Date' >= varMonth,
+            'Leave Date' < DateAdd(varMonth, 1, TimeUnit.Months),
+            'Leave Date' = varSelectedDate,
+            !IsBlank(varMe.User),
+            'Approver 1'.User = varMe.User ||
+            'Approver 2'.User = varMe.User ||
+            'Approver 3'.User = varMe.User
+        ),
+        'Start Minute',
+        SortOrder.Ascending
+    ),
+    Sort(
+        Filter(
+            [@'LEAP Requests'],
+            'Leave Date' >= varMonth,
+            'Leave Date' < DateAdd(varMonth, 1, TimeUnit.Months),
+            'Leave Date' = varSelectedDate
+        ),
+        'Start Minute',
+        SortOrder.Ascending
+    )
+)

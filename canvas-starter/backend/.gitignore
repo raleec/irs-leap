@@ -1,0 +1,11 @@
+.keys/
+.packages/
+.nuget-http-cache/
+.nuget-scratch/
+.dotnet-home/
+bin/
+obj/
+Validation/bin/
+Validation/obj/
+*.snk
+*.pfx

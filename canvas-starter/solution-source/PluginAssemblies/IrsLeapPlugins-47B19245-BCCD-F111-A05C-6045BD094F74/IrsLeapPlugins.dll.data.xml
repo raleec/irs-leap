@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PluginAssembly FullName="IrsLeap.Plugins, Version=1.0.0.0, Culture=neutral, PublicKeyToken=99e8033ddd1c8dc5" PluginAssemblyId="47b19245-bccd-f111-a05c-6045bd094f74" CustomizationLevel="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <IsolationMode>2</IsolationMode>
+  <SourceType>0</SourceType>
+  <IntroducedVersion>1.0</IntroducedVersion>
+  <FileName>/PluginAssemblies/IrsLeapPlugins-47B19245-BCCD-F111-A05C-6045BD094F74/IrsLeapPlugins.dll</FileName>
+  <PluginTypes>
+    <PluginType AssemblyQualifiedName="IrsLeap.Plugins.AnnualTotal, IrsLeap.Plugins, Version=1.0.0.0, Culture=neutral, PublicKeyToken=99e8033ddd1c8dc5" PluginTypeId="4eb19245-bccd-f111-a05c-6045bd094f74" Name="IrsLeap.Plugins.AnnualTotal">
+      <FriendlyName>IRS LEAP AnnualTotal</FriendlyName>
+    </PluginType>
+    <PluginType AssemblyQualifiedName="IrsLeap.Plugins.RequestGuard, IrsLeap.Plugins, Version=1.0.0.0, Culture=neutral, PublicKeyToken=99e8033ddd1c8dc5" PluginTypeId="4ab19245-bccd-f111-a05c-6045bd094f74" Name="IrsLeap.Plugins.RequestGuard">
+      <FriendlyName>IRS LEAP RequestGuard</FriendlyName>
+    </PluginType>
+    <PluginType AssemblyQualifiedName="IrsLeap.Plugins.RequestShare, IrsLeap.Plugins, Version=1.0.0.0, Culture=neutral, PublicKeyToken=99e8033ddd1c8dc5" PluginTypeId="4db19245-bccd-f111-a05c-6045bd094f74" Name="IrsLeap.Plugins.RequestShare">
+      <FriendlyName>IRS LEAP RequestShare</FriendlyName>
+    </PluginType>
+  </PluginTypes>
+</PluginAssembly>

@@ -1,0 +1,12 @@
+IRS LEAP deployed OFF flow: independent review
+Workflow 4033f29c-15ce-f111-a05b-6045bd094f74 remains Draft state 0/status 1; actual clientdata matches source.
+No new high-confidence security/logic defects; no runtime-definition edits or deployment update required.
+24 actions are intentional: compound guards, expanded user lookup read, and Select/Query avoid per-user variables/loops.
+Required approver 1, optional null approvers 2/3, disabled/internal-user guards, original Entra responder mapping, known outcome, fresh Pending/selection, ETag and restricted write fields checked.
+49 nested action references are reachable through runAfter/ancestor scopes. Three negative scope/cycle regression checks correctly reject invalid definitions.
+Dataverse required-dependency records confirm all three connection references, both environment variables and the request table; all flow/config components already belong to the solution.
+P7D webhook timeout has a distinct TimedOut branch: fresh Pending -> status-only Expired. Failed connector follows Failed termination, never Denied.
+Actual elapsed timeout and underlying approval cancellation/cleanup cannot be verified without activation. The source has no explicit cancellation action; do not claim verified cancellation.
+Backend alone enforces optional hours as integer 0..24; flow never writes hours/content/year.
+Portable environment variables remain blank. Native save validation remains blocked by unbound references. No cloud writes, activations, approvals or sends during this review.
+Detailed evidence: independent-review.json, independent-review-live-evidence.json and syntax-validation.json.

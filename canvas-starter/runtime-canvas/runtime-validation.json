@@ -1,0 +1,31 @@
+{
+  "appId": "723c5182-ea2c-4c3f-9627-6c6015698c4e",
+  "appName": "IRS LEAP",
+  "sourceEnvironment": "commercial development; not customer GCC",
+  "authoring": "Official Microsoft Canvas authoring service, saved Studio coauthoring session",
+  "screens": ["scrCalendar", "scrNew", "scrDetails", "scrTotals"],
+  "observedInStudio": [
+    "Authenticated owner identity resolved from Entra GUID to Dataverse user",
+    "Request category picker rendered all 13 supplied labels",
+    "Native modern approver picker displayed an enabled provisioned internal user",
+    "Form submitted a synthetic request to Dataverse with 2 hours and one approver",
+    "Details displayed Pending status, entered category/hours/date and actual request ID",
+    "Caller-bound annual API rendered an empty year as 0 hours, 0 requests, 0 missing",
+    "Caller-bound annual API rendered overlapping 2+3 hours plus explicit zero and blank as 5 hours, 4 approved requests, 1 missing"
+  ],
+  "decisionSimulation": "Synthetic decisions were written through administrator SDK only; native approval response was not exercised",
+  "syntheticRecordsRemoved": 4,
+  "notificationsSent": false,
+  "publishedPlayer": {
+    "status": "Blocked by source owner lacking current Power Apps runtime plan",
+    "trialStarted": false,
+    "licensesChanged": false
+  },
+  "remainingGates": [
+    "Target Power Apps premium entitlement and ordinary-user roles/sharing",
+    "Target Dataverse/Approvals/Outlook authenticated connection bindings",
+    "Target app URL and operations-mailbox current configuration",
+    "Explicitly authorized native approval/email rehearsal",
+    "Clean-target solution import and customer GCC compatibility"
+  ]
+}

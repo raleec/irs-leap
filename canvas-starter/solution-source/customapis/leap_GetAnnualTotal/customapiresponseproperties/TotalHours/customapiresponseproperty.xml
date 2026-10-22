@@ -1,0 +1,8 @@
+<customapiresponseproperty uniquename="TotalHours">
+  <displayname default="TotalHours">
+    <label description="TotalHours" languagecode="1033" />
+  </displayname>
+  <iscustomizable>1</iscustomizable>
+  <name>TotalHours</name>
+  <type>7</type>
+</customapiresponseproperty>

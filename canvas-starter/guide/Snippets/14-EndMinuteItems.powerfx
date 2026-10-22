@@ -1,0 +1,5 @@
+If(
+    ddEndHour.Selected.Value = 24,
+    Table({Value: 0, Label: "00"}),
+    AddColumns(Sequence(60, 0, 1), Label, Text(Value, "00"))
+)

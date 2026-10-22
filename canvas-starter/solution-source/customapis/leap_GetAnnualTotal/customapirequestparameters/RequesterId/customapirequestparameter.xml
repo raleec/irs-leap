@@ -1,0 +1,9 @@
+<customapirequestparameter uniquename="RequesterId">
+  <displayname default="RequesterId">
+    <label description="RequesterId" languagecode="1033" />
+  </displayname>
+  <iscustomizable>1</iscustomizable>
+  <isoptional>0</isoptional>
+  <name>RequesterId</name>
+  <type>10</type>
+</customapirequestparameter>

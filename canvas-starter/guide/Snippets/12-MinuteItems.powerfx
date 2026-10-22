@@ -1,0 +1,1 @@
+AddColumns(Sequence(60, 0, 1), Label, Text(Value, "00"))

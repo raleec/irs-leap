@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<EntityRelationships xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <EntityRelationship Name="business_unit_leap_request" />
+  <EntityRelationship Name="leap_request_leap_approver1id" />
+  <EntityRelationship Name="leap_request_leap_approver2id" />
+  <EntityRelationship Name="leap_request_leap_approver3id" />
+  <EntityRelationship Name="leap_request_leap_decidedbyid" />
+  <EntityRelationship Name="leap_request_leap_requesterid" />
+  <EntityRelationship Name="lk_leap_request_createdby" />
+  <EntityRelationship Name="lk_leap_request_modifiedby" />
+  <EntityRelationship Name="owner_leap_request" />
+  <EntityRelationship Name="team_leap_request" />
+  <EntityRelationship Name="user_leap_request" />
+</EntityRelationships>

@@ -1,0 +1,73 @@
+{
+  "environment": "commercial development only",
+  "cases": [
+    {
+      "case": "Caller-derived requester",
+      "result": "PASS"
+    },
+    {
+      "case": "Year of leave",
+      "result": "PASS"
+    },
+    {
+      "case": "Explicit zero retained",
+      "result": "PASS"
+    },
+    {
+      "case": "Blank hours retained",
+      "result": "PASS"
+    },
+    {
+      "case": "Immutable title",
+      "result": "PASS"
+    },
+    {
+      "case": "Duplicate approvers",
+      "result": "PASS"
+    },
+    {
+      "case": "Self approver",
+      "result": "PASS"
+    },
+    {
+      "case": "End before start",
+      "result": "PASS"
+    },
+    {
+      "case": "Invalid selected category",
+      "result": "PASS"
+    },
+    {
+      "case": "Approved hours include independent overlapping requests",
+      "result": "PASS"
+    },
+    {
+      "case": "Missing hours counted separately",
+      "result": "PASS"
+    },
+    {
+      "case": "Approved request count",
+      "result": "PASS"
+    },
+    {
+      "case": "Terminal request cannot be changed",
+      "result": "PASS"
+    },
+    {
+      "case": "Empty year returns zero",
+      "result": "PASS"
+    },
+    {
+      "case": "Selected approver receives explicit Read share",
+      "result": "PASS"
+    }
+  ],
+  "syntheticRowsRemoved": 4,
+  "notCovered": [
+    "Actual Canvas Studio formula execution",
+    "Actual email/Teams flow sends",
+    "GCC import and connector behavior",
+    "Clean-target solution import",
+    "Published app under ordinary users"
+  ]
+}

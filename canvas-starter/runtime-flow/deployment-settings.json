@@ -1,0 +1,29 @@
+{
+  "EnvironmentVariables": [
+    {
+      "SchemaName": "leap_AppPlayUrl",
+      "Value": ""
+    },
+    {
+      "SchemaName": "leap_OperationsMailbox",
+      "Value": ""
+    }
+  ],
+  "ConnectionReferences": [
+    {
+      "LogicalName": "leap_LEAPDataverse",
+      "ConnectionId": "",
+      "ConnectorId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps"
+    },
+    {
+      "LogicalName": "leap_LEAPApprovals",
+      "ConnectionId": "",
+      "ConnectorId": "/providers/Microsoft.PowerApps/apis/shared_approvals"
+    },
+    {
+      "LogicalName": "leap_LEAPOutlook",
+      "ConnectionId": "",
+      "ConnectorId": "/providers/Microsoft.PowerApps/apis/shared_office365"
+    }
+  ]
+}

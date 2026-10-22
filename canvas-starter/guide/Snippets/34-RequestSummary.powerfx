@@ -1,0 +1,8 @@
+ThisItem.Title & " | " &
+Text(ThisItem.'Leave Date', "[$-en-US]yyyy-mm-dd") & " | " &
+Text(RoundDown(ThisItem.'Start Minute' / 60, 0), "00") & ":" &
+Text(Mod(ThisItem.'Start Minute', 60), "00") & "-" &
+Text(RoundDown(ThisItem.'End Minute' / 60, 0), "00") & ":" &
+Text(Mod(ThisItem.'End Minute', 60), "00") & " | " &
+Text(ThisItem.'Request Status') & " | " &
+If(IsBlank(ThisItem.'Leave Hours'), "hours not entered", Text(ThisItem.'Leave Hours') & " hours")

@@ -1,0 +1,82 @@
+Screens:
+  scrDetails:
+    Properties:
+      Fill: =RGBA(247, 249, 252, 1)
+    Children:
+      - lblDetailsHeading:
+          Control: Label
+          Properties:
+            FocusedBorderThickness: =2
+            FontWeight: =FontWeight.Bold
+            Height: =50
+            Size: =26
+            TabIndex: =0
+            Text: ="Request details"
+            Width: =900
+            X: =24
+            Y: =12
+      - lblRequestDetails:
+          Control: Label
+          Properties:
+            FocusedBorderThickness: =2
+            Height: =430
+            Size: =16
+            TabIndex: =0
+            Text: |-
+              ="Title: " & varSelectedRequest.Title & Char(10) &
+              "Requester: " & varSelectedRequest.Requester.'Full Name' & Char(10) &
+              "Date: " & Text(varSelectedRequest.'Leave Date', "dddd, mmmm d, yyyy") & Char(10) &
+              "Time: " & Text(Int(varSelectedRequest.'Start Minute' / 60), "00") & ":" & Text(Mod(varSelectedRequest.'Start Minute', 60), "00") &
+              " - " & Text(Int(varSelectedRequest.'End Minute' / 60), "00") & ":" & Text(Mod(varSelectedRequest.'End Minute', 60), "00") & Char(10) &
+              "Category: " & Text(varSelectedRequest.'Leave Category') & Char(10) &
+              "Hours: " & If(IsBlank(varSelectedRequest.'Leave Hours'), "Not entered", Text(varSelectedRequest.'Leave Hours')) & Char(10) &
+              "Status: " & Text(varSelectedRequest.'Request Status') & Char(10) &
+              "Approver 1: " & varSelectedRequest.'Approver 1'.'Full Name' & Char(10) &
+              "Approver 2: " & Coalesce(varSelectedRequest.'Approver 2'.'Full Name', "Not selected") & Char(10) &
+              "Approver 3: " & Coalesce(varSelectedRequest.'Approver 3'.'Full Name', "Not selected") & Char(10) &
+              "Decision by: " & Coalesce(varSelectedRequest.'Decided By'.'Full Name', "Awaiting decision") & Char(10) &
+              "Decision on: " & If(IsBlank(varSelectedRequest.'Decided On'), "Not decided", Text(varSelectedRequest.'Decided On')) & Char(10) &
+              "Request ID: " & Text(varSelectedRequest.'LEAP Request')
+            Width: =1280
+            X: =24
+            Y: =84
+      - lblPrivateDescription:
+          Control: Label
+          Properties:
+            FocusedBorderThickness: =2
+            Height: =100
+            Size: =14
+            TabIndex: =0
+            Text: |-
+              ="Description: " & Coalesce(varSelectedRequest.Description, "Not entered") & Char(10) &
+              "Decision comments: " & Coalesce(varSelectedRequest.'Decision Comments', "None")
+            Width: =1280
+            X: =24
+            Y: =520
+      - btnRefreshDetails:
+          Control: Classic/Button
+          Properties:
+            Height: =44
+            OnSelect: =Refresh('LEAP Requests'); Set(varSelectedRequest, LookUp('LEAP Requests', 'LEAP Request' = varSelectedRequest.'LEAP Request'))
+            Text: ="Refresh this request"
+            Width: =270
+            X: =24
+            Y: =650
+      - btnRequesterTotals:
+          Control: Classic/Button
+          Properties:
+            Height: =44
+            OnSelect: =Set(varTotalsRequester, varSelectedRequest.Requester); Set(varAnnualTotal, Blank()); Set(varTotalError, ""); Set(varReloadTotals, true); Navigate(scrTotals)
+            Text: ="Requester annual totals"
+            Width: =300
+            X: =340
+            Y: =650
+      - btnDetailsBack:
+          Control: Classic/Button
+          Properties:
+            Height: =44
+            OnSelect: =Navigate(scrCalendar)
+            Text: ="Back to calendar"
+            Width: =300
+            X: =1020
+            Y: =650

@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Workflow WorkflowId="{4033f29c-15ce-f111-a05b-6045bd094f74}" Name="IRS LEAP - First response approval" Description="DISABLED development draft. First selected internal approver to respond wins. Configure connection references and LEAP app URL before any authorized enablement. No production/GCC deployment." xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <JsonFileName>/Workflows/IRSLEAP-Firstresponseapproval-4033F29C-15CE-F111-A05B-6045BD094F74.json</JsonFileName>
+  <Type>1</Type>
+  <Subprocess>0</Subprocess>
+  <Category>5</Category>
+  <Mode>0</Mode>
+  <Scope>4</Scope>
+  <OnDemand>0</OnDemand>
+  <TriggerOnCreate>0</TriggerOnCreate>
+  <TriggerOnDelete>0</TriggerOnDelete>
+  <AsyncAutodelete>0</AsyncAutodelete>
+  <SyncWorkflowLogOnFailure>0</SyncWorkflowLogOnFailure>
+  <StateCode>0</StateCode>
+  <StatusCode>1</StatusCode>
+  <RunAs>1</RunAs>
+  <UniqueName>leap_IRSLEAPFirstResponseApproval</UniqueName>
+  <IsTransacted>1</IsTransacted>
+  <IntroducedVersion>1.0</IntroducedVersion>
+  <IsCustomizable>1</IsCustomizable>
+  <BusinessProcessType>0</BusinessProcessType>
+  <IsCustomProcessingStepAllowedForOtherPublishers>1</IsCustomProcessingStepAllowedForOtherPublishers>
+  <ModernFlowType>0</ModernFlowType>
+  <PrimaryEntity>none</PrimaryEntity>
+  <LocalizedNames>
+    <LocalizedName languagecode="1033" description="IRS LEAP - First response approval" />
+  </LocalizedNames>
+  <Descriptions>
+    <Description languagecode="1033" description="DISABLED development draft. First selected internal approver to respond wins. Configure connection references and LEAP app URL before any authorized enablement. No production/GCC deployment." />
+  </Descriptions>
+</Workflow>

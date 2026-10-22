@@ -1,0 +1,23 @@
+Set(varAnnualTotal, Blank());
+Set(varTotalError, "");
+If(
+    IsBlank(varTotalsRequester.User),
+    Set(varTotalError, "Choose yourself or a requester from an authorized request."),
+    !IsMatch(Trim(txtYear.Text), "[1-9][0-9]{3}", MatchOptions.Complete),
+    Set(varTotalError, "Enter a four-digit calendar year."),
+    Value(Trim(txtYear.Text)) < 1900 || Value(Trim(txtYear.Text)) > 2100,
+    Set(varTotalError, "Choose a calendar year from 1900 through 2100."),
+    IfError(
+        Set(
+            varAnnualTotal,
+            Environment.leap_GetAnnualTotal(
+                {
+                    RequesterId: Text(varTotalsRequester.User),
+                    CalendarYear: Value(Trim(txtYear.Text))
+                }
+            )
+        ),
+        Set(varAnnualTotal, Blank());
+        Set(varTotalError, Coalesce(FirstError.Message, "Annual total could not be retrieved."))
+    )
+)

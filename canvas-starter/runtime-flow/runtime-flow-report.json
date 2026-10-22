@@ -1,0 +1,245 @@
+{
+  "target": "https://YOUR-DEVELOPMENT-ORG.crm.dynamics.com",
+  "solution": {
+    "solutionid": "954f7e33-b6cd-f111-a05c-6045bd094f74",
+    "uniquename": "IRSLEAPCanvasStarter"
+  },
+  "timestamp": "2026-10-22T12:45:01.506206+00:00",
+  "referenceRecords": [
+    {
+      "id": "22aaa48f-15ce-f111-a05b-6045bd094f74",
+      "logicalName": "leap_LEAPDataverse",
+      "api": "shared_commondataserviceforapps",
+      "connectionId": null
+    },
+    {
+      "id": "29aaa48f-15ce-f111-a05b-6045bd094f74",
+      "logicalName": "leap_LEAPApprovals",
+      "api": "shared_approvals",
+      "connectionId": null
+    },
+    {
+      "id": "2daaa48f-15ce-f111-a05b-6045bd094f74",
+      "logicalName": "leap_LEAPOutlook",
+      "api": "shared_office365",
+      "connectionId": null
+    }
+  ],
+  "environmentVariableRecords": [
+    {
+      "id": "2917d995-15ce-f111-a05b-6045bd094f74",
+      "schemaName": "leap_AppPlayUrl",
+      "type": "Text",
+      "defaultValue": null,
+      "currentValues": []
+    },
+    {
+      "id": "2e17d995-15ce-f111-a05b-6045bd094f74",
+      "schemaName": "leap_OperationsMailbox",
+      "type": "Text",
+      "defaultValue": null,
+      "currentValues": []
+    }
+  ],
+  "workflow": {
+    "category": 5,
+    "statuscode": 1,
+    "name": "IRS LEAP - First response approval",
+    "type": 1,
+    "workflowid": "4033f29c-15ce-f111-a05b-6045bd094f74",
+    "statecode": 0,
+    "uniquename": "leap_IRSLEAPFirstResponseApproval",
+    "clientdataMatchesSource": true,
+    "clientdataSHA256": "4f8383650fb602e9baf9b71baee72e6e69ac7f36f877e00723a59ce64a7ec733"
+  },
+  "validation": {
+    "localValidation": "passed",
+    "actionCount": 24,
+    "expressionDelimiterChecks": 40,
+    "sameScopeRunAfterDependencies": "passed",
+    "connectorChecks": [
+      {
+        "action": "When_a_LEAP_request_is_added",
+        "api": "shared_commondataserviceforapps",
+        "operationId": "SubscribeWebhookTrigger",
+        "cachedSwaggerOperationExists": true
+      },
+      {
+        "action": "Read_saved_request",
+        "api": "shared_commondataserviceforapps",
+        "operationId": "GetItem",
+        "cachedSwaggerOperationExists": true
+      },
+      {
+        "action": "Start_and_wait_for_first_response",
+        "api": "shared_approvals",
+        "operationId": "StartAndWaitForAnApproval",
+        "cachedSwaggerOperationExists": true
+      },
+      {
+        "action": "Read_fresh_pending_request",
+        "api": "shared_commondataserviceforapps",
+        "operationId": "GetItem",
+        "cachedSwaggerOperationExists": true
+      },
+      {
+        "action": "Commit_final_decision",
+        "api": "shared_commondataserviceforapps",
+        "operationId": "UpdateOnlyRecord",
+        "cachedSwaggerOperationExists": true
+      },
+      {
+        "action": "Send_generic_decision_result",
+        "api": "shared_office365",
+        "operationId": "SendEmailV2",
+        "cachedSwaggerOperationExists": true
+      },
+      {
+        "action": "Read_pending_after_timeout",
+        "api": "shared_commondataserviceforapps",
+        "operationId": "GetItem",
+        "cachedSwaggerOperationExists": true
+      },
+      {
+        "action": "Commit_expired_status_only",
+        "api": "shared_commondataserviceforapps",
+        "operationId": "UpdateOnlyRecord",
+        "cachedSwaggerOperationExists": true
+      },
+      {
+        "action": "Send_generic_expired_result",
+        "api": "shared_office365",
+        "operationId": "SendEmailV2",
+        "cachedSwaggerOperationExists": true
+      }
+    ],
+    "checks": [
+      "one Added Dataverse trigger; Organization scope; Pending filter",
+      "saved typed lookups expanded to systemusers; original Entra GUID snapshot",
+      "single native First-to-respond approval; P7D; reassignment disabled",
+      "recognized single response and original Entra responder mapping required",
+      "fresh Pending and unchanged selection; optimistic-concurrency ETag",
+      "final update fields restricted; timeout status-only; generic result emails",
+      "no activation, sends, approval creation, request writes or account provisioning executed"
+    ],
+    "platformRuntimeValidation": "Not performed: connector references are intentionally unbound and workflow must remain OFF.",
+    "dynamicApprovalMetadataValidation": "The cached connector explicitly declares dynamic inputs/outputs for StartAndWaitForAnApproval. Operation ID and top-level parameter names are verified. Per-type runtime schema and credentials require a bound Approvals connection; no binding or approval operation was attempted."
+  },
+  "createdOrUpdatedRecords": [
+    {
+      "table": "workflow",
+      "id": "4033f29c-15ce-f111-a05b-6045bd094f74",
+      "operation": "unchanged; exact draft already persisted"
+    }
+  ],
+  "activationAttempted": false,
+  "sendsAttempted": false,
+  "requestWritesAttempted": false,
+  "blockers": [
+    "Dataverse, Approvals and Outlook references are intentionally unbound; no matching approved connections exist.",
+    "leap_AppPlayUrl and leap_OperationsMailbox are intentionally blank; configure target values after app creation.",
+    "No trigger registration, runtime approval/mail test, or flow activation has been performed or authorized.",
+    "A repeat SDK update was rejected by the platform because connection references have no connections; the original exact source draft remains saved and OFF. Full native save/runtime validation awaits authorized bindings."
+  ],
+  "solutionComponentMembership": [
+    {
+      "componenttype": 10165,
+      "objectid": "22aaa48f-15ce-f111-a05b-6045bd094f74",
+      "solutioncomponentid": "24aaa48f-15ce-f111-a05b-6045bd094f74"
+    },
+    {
+      "componenttype": 10165,
+      "objectid": "29aaa48f-15ce-f111-a05b-6045bd094f74",
+      "solutioncomponentid": "2caaa48f-15ce-f111-a05b-6045bd094f74"
+    },
+    {
+      "componenttype": 10165,
+      "objectid": "2daaa48f-15ce-f111-a05b-6045bd094f74",
+      "solutioncomponentid": "2faaa48f-15ce-f111-a05b-6045bd094f74"
+    },
+    {
+      "componenttype": 380,
+      "objectid": "2917d995-15ce-f111-a05b-6045bd094f74",
+      "solutioncomponentid": "2d17d995-15ce-f111-a05b-6045bd094f74"
+    },
+    {
+      "componenttype": 380,
+      "objectid": "2e17d995-15ce-f111-a05b-6045bd094f74",
+      "solutioncomponentid": "3217d995-15ce-f111-a05b-6045bd094f74"
+    },
+    {
+      "componenttype": 29,
+      "objectid": "4033f29c-15ce-f111-a05b-6045bd094f74",
+      "solutioncomponentid": "5033f29c-15ce-f111-a05b-6045bd094f74"
+    }
+  ],
+  "connectionReferenceReadback": [
+    {
+      "connectionid": null,
+      "connectorid": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
+      "connectionreferenceid": "22aaa48f-15ce-f111-a05b-6045bd094f74",
+      "connectionreferencelogicalname": "leap_LEAPDataverse"
+    },
+    {
+      "connectionid": null,
+      "connectorid": "/providers/Microsoft.PowerApps/apis/shared_approvals",
+      "connectionreferenceid": "29aaa48f-15ce-f111-a05b-6045bd094f74",
+      "connectionreferencelogicalname": "leap_LEAPApprovals"
+    },
+    {
+      "connectionid": null,
+      "connectorid": "/providers/Microsoft.PowerApps/apis/shared_office365",
+      "connectionreferenceid": "2daaa48f-15ce-f111-a05b-6045bd094f74",
+      "connectionreferencelogicalname": "leap_LEAPOutlook"
+    }
+  ],
+  "environmentVariableDefinitionReadback": [
+    {
+      "defaultvalue": null,
+      "type": 100000000,
+      "schemaname": "leap_AppPlayUrl",
+      "environmentvariabledefinitionid": "2917d995-15ce-f111-a05b-6045bd094f74"
+    },
+    {
+      "defaultvalue": null,
+      "type": 100000000,
+      "schemaname": "leap_OperationsMailbox",
+      "environmentvariabledefinitionid": "2e17d995-15ce-f111-a05b-6045bd094f74"
+    }
+  ],
+  "controlPlaneVerification": {
+    "httpStatus": 200,
+    "environment": "Default-YOUR-TENANT-ID",
+    "state": "Stopped",
+    "workflowEntityId": "4033f29c-15ce-f111-a05b-6045bd094f74",
+    "parsedDefinitionMatchesSource": true,
+    "allReferencesUnbound": true,
+    "componentState": "Published",
+    "note": "Published solution component is not activated: workflow remains Draft/0 and engine Stopped.",
+    "runtimeExecutionTested": false
+  },
+  "platformSaveValidationEvidence": {
+    "flowGetStatus": 200,
+    "controlPlaneState": "Stopped",
+    "initialSdkDraftCreate": "Succeeded; workflow 4033f29c-15ce-f111-a05b-6045bd094f74 persisted with statecode 0, statuscode 1 and exact clientdata.",
+    "repeatSdkDraftUpdate": {
+      "result": "Rejected by native connection-reference validation",
+      "message": "A connector was imported, however the related connection references need connections created and then any dependent flows can be started.",
+      "sourceChanged": false,
+      "effect": "Original draft remains persisted and OFF; idempotent script now skips identical writes.",
+      "limitation": "Full native save and runtime validation require approved connection bindings, which were intentionally not created."
+    },
+    "validationHttpStatus": 404,
+    "validationResponse": {
+      "message": "No HTTP resource was found that matches the request URI '/providers/Microsoft.ProcessSimple/environments/Default-YOUR-TENANT-ID/flows/4033f29c-15ce-f111-a05b-6045bd094f74/validate'"
+    }
+  },
+  "persistentVerification": "passed",
+  "finalOffVerification": [
+    {
+      "statuscode": 1,
+      "workflowid": "4033f29c-15ce-f111-a05b-6045bd094f74",
+      "statecode": 0
+    }
+  ]
+}

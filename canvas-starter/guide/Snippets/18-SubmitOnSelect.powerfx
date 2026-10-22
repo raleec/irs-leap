@@ -1,0 +1,31 @@
+If(
+    varSubmitting,
+    Notify("A submission is already in progress.", NotificationType.Information),
+    With(
+        {
+            hoursText: Trim(txtHours.Text),
+            startMinute: ddStartHour.Selected.Value * 60 + ddStartMinute.Selected.Value,
+            endMinute: If(ddEndHour.Selected.Value = 24, 1440, ddEndHour.Selected.Value * 60 + ddEndMinute.Selected.Value)
+        },
+        If(
+            IsBlank(varMe.User),
+            Notify("Your Dataverse user is not provisioned. Contact support.", NotificationType.Error),
+            IsBlank(Trim(txtTitle.Text)),
+            Notify("Enter a title.", NotificationType.Error),
+            IsBlank(dpLeave.SelectedDate),
+            Notify("Choose one leave date.", NotificationType.Error),
+            IsBlank(ddCategory.Selected.Value),
+            Notify("Choose one leave category.", NotificationType.Error),
+            IsBlank(cbApprover1.Selected.User),
+            Notify("Choose Approver 1.", NotificationType.Error),
+            !IsBlank(hoursText) && !IsMatch(hoursText, "([0-9]|1[0-9]|2[0-4])", MatchOptions.Complete),
+            Notify("Hours must be blank or a whole number from 0 to 24.", NotificationType.Error),
+            endMinute <= startMinute,
+            Notify("End time must be later on the same date. Use separate requests across days.", NotificationType.Error),
+            !frmRequest.Valid,
+            Notify("Correct the required fields and form errors.", NotificationType.Error),
+            Set(varSubmitting, true);
+            SubmitForm(frmRequest)
+        )
+    )
+)

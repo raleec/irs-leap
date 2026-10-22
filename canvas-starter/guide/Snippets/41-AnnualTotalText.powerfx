@@ -1,0 +1,9 @@
+If(
+    IsBlank(varAnnualTotal),
+    "No annual total loaded.",
+    Text(varAnnualTotal.RequesterName) & " | " & Trim(txtYear.Text) &
+    " | Approved hours: " & Text(Value(varAnnualTotal.TotalHours), "0") &
+    " | Approved requests: " & Text(Value(varAnnualTotal.ApprovedRequests), "0") &
+    " | Missing hours: " & Text(Value(varAnnualTotal.MissingHours), "0") &
+    If(Value(varAnnualTotal.MissingHours) > 0, " (known hours only; incomplete)", "")
+)

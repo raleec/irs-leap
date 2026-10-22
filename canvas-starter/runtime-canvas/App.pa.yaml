@@ -1,0 +1,16 @@
+App:
+  Properties:
+    OnStart: |-
+      =Set(varMe, LookUp(Users, 'Azure AD Object ID' = GUID(User().EntraObjectId)));
+      Set(varMonth, Date(Year(Today()), Month(Today()), 1));
+      Set(varSelectedDate, Today());
+      Set(varGridStart, DateAdd(varMonth, 1 - Weekday(varMonth, StartOfWeek.Monday), TimeUnit.Days));
+      Set(varSubmitting, false);
+      Set(varRequestError, "");
+      Set(varNewRequest, false);
+      Set(varReloadTotals, false);
+      Set(varAnnualTotal, Blank());
+      Set(varTotalError, "");
+      Set(varTotalsRequester, varMe)
+    StartScreen: =scrCalendar
+    Theme: =PowerAppsTheme

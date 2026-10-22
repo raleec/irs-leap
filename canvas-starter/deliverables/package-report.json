@@ -1,0 +1,58 @@
+{
+  "solution": "IRSLEAPCanvasStarter",
+  "workshopMode": "solutions-first; target configuration and rehearsal required",
+  "exports": [
+    {
+      "file": "IRSLEAPCanvasStarter_1_1_0_0_unmanaged.zip",
+      "version": "1.1.0.0",
+      "entries": 17,
+      "plugins": [
+        "PluginAssemblies/IrsLeapPlugins-47B19245-BCCD-F111-A05C-6045BD094F74/IrsLeapPlugins.dll"
+      ],
+      "canvasApps": [
+        "CanvasApps/leap_irsleap_e1c7a_DocumentUri.msapp"
+      ],
+      "cloudFlows": [
+        "Workflows/IRSLEAP-Firstresponseapproval-4033F29C-15CE-F111-A05B-6045BD094F74.json"
+      ],
+      "connectionReferences": [
+        "leap_LEAPApprovals",
+        "leap_LEAPDataverse",
+        "leap_LEAPOutlook"
+      ],
+      "environmentVariables": [
+        "leap_AppPlayUrl",
+        "leap_OperationsMailbox"
+      ],
+      "missingRuntimeComponents": [],
+      "containsAppAndFlow": true,
+      "preEventRehearsalRequired": true
+    },
+    {
+      "file": "IRSLEAPCanvasStarter_1_1_0_0_managed.zip",
+      "version": "1.1.0.0",
+      "entries": 17,
+      "plugins": [
+        "PluginAssemblies/IrsLeapPlugins-47B19245-BCCD-F111-A05C-6045BD094F74/IrsLeapPlugins.dll"
+      ],
+      "canvasApps": [
+        "CanvasApps/leap_irsleap_e1c7a_DocumentUri.msapp"
+      ],
+      "cloudFlows": [
+        "Workflows/IRSLEAP-Firstresponseapproval-4033F29C-15CE-F111-A05B-6045BD094F74.json"
+      ],
+      "connectionReferences": [
+        "leap_LEAPApprovals",
+        "leap_LEAPDataverse",
+        "leap_LEAPOutlook"
+      ],
+      "environmentVariables": [
+        "leap_AppPlayUrl",
+        "leap_OperationsMailbox"
+      ],
+      "missingRuntimeComponents": [],
+      "containsAppAndFlow": true,
+      "preEventRehearsalRequired": true
+    }
+  ]
+}

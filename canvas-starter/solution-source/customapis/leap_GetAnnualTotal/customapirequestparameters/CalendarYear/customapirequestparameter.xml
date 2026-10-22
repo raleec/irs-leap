@@ -1,0 +1,9 @@
+<customapirequestparameter uniquename="CalendarYear">
+  <displayname default="CalendarYear">
+    <label description="CalendarYear" languagecode="1033" />
+  </displayname>
+  <iscustomizable>1</iscustomizable>
+  <isoptional>0</isoptional>
+  <name>CalendarYear</name>
+  <type>7</type>
+</customapirequestparameter>

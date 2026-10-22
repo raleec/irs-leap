@@ -1,0 +1,522 @@
+IRS LEAP - CORE ONE-DAY CANVAS WORKSHOP
+Build-once facilitator prework | 2026-10-21 | Synthetic data only
+
+START HERE
+For the shortened participant session use SOLUTIONS-FIRST.txt.
+Complete this construction guide BEFORE that session, package the actual app/
+flow and configuration, and rehearse the full release. These construction steps
+are retained as reference, not the default short-workshop agenda.
+
+Build a small Canvas app and ONE native approval flow on the EXISTING Dataverse
+foundation. Do not rebuild its schema, 13 category choices, security, plug-ins,
+or leap_GetAnnualTotal API. Use Snippets\00-Contract.txt to inspect that foundation.
+The backend source has been compiled; this document does NOT assert that a
+solution has been exported, imported, published, or rehearsed. The parent
+deployment's actual validation/export report is the authority for those gates.
+
+Use this file instead of Facilitator-Guide Stage 5 and Snippets 50/51/52 for the
+core flow. Those are advanced ALTERNATIVE reference instructions, not additional
+steps. In particular, NEVER combine their Create approval / Save Approval ID /
+Wait sequence with this lab's single Start and wait action.
+
+The aim is roughly 20-25 actions on the one-approver happy path, not an 80-action
+workflow. Optional recipients, guard branches, and timeout/failure handling add
+designer boxes; they are shown explicitly below. No custom Teams card, HTTP
+callback, recipient directory query, approval-ID persistence, or retry engine.
+Writing this handout does not create approvals or send messages.
+
+DAY PLAN (preparation is outside classroom time)
+09:00-09:20  Contract, roles, ordinary-user demonstration
+09:20-10:50  Canvas form; include a short break as needed
+10:50-12:00  Calendar, details, server annual totals
+12:00-12:30  Lunch
+12:30-13:50  Core approval flow (80 minutes; use the action names below)
+13:50-14:05  Break
+14:05-15:15  Ordinary-user tests, failures and timeout rehearsal
+15:15-16:00  Fix/retest, publish/share, record handoff evidence
+
+ADMIN GATE - COMPLETE BEFORE THE DAY
+Confirm the actual starter import and plug-in registrations, DateOnly leave
+date, choice values, roles/sharing, trusted automation caller, and custom API.
+Use full Dataverse, not Dataverse for Teams. Use the same government cloud and
+environment for the app, flow, connections, and internal users.
+Have enabled internal licensed/provisioned E (employee), A/B/C (approvers),
+U (unrelated user), E2 (second employee), and F (automation identity). Verify
+internal Entra membership, mailbox, connector entitlement, and approval access
+for this finite workshop cohort; a lookup or enabled flag is NOT a license.
+The server checks enabled human Users, distinct approvers and no self-approval.
+Do not infer internal membership from an email suffix. F needs the actual
+automation role and least privileges, not permanent System Administrator.
+Ordinary-user tests must NOT use maker/admin accounts.
+
+Confirm DLP permits native Dataverse + Standard approvals + Office 365 Outlook,
+initialize the environment's Approvals capability if needed, and rehearse F's
+connections. Record the approved same-cloud APP_PLAY_URL and ADMIN_MAILBOX;
+replace those two placeholders in the flow fields below. Do not use a maker URL.
+Use https://make.gov.powerapps.us and https://make.gov.powerautomate.us for GCC;
+other clouds require their own endpoints. See Snippets\61-GCC-Deployment.txt.
+Rehearse Environment.leap_GetAnnualTotal under the ordinary caller in the
+ACTUAL customer GCC tenant. Any missing cloud/connector/security gate blocks
+the workshop; a commercial-tenant demo or successful import is not proof.
+
+CANVAS - COPY THE EXISTING FORMULAS, NOT A SECOND VERSION
+Use classic controls and US-English formula separators. Paste each complete
+Snippets\*.powerfx file into the indicated property's formula bar. Names matter.
+Use generated native lookup/choice cards and IntelliSense for actual display
+names. A systemuserid (Dataverse User) is NOT an Entra object GUID.
+
+1. Create a blank Canvas app in the workshop solution. Add native Dataverse
+   LEAP Requests and Users, plus the Environment language object for actions.
+   Create scrCalendar, scrNew, scrDetails, scrTotals.
+   App.StartScreen = scrCalendar; App.OnStart <- 10-OnStart.powerfx.
+   Run OnStart. Show varMe.'Full Name'; if varMe.User is blank, stop and provision
+   the user, never fall back to First(Users).
+
+2. On scrNew add Edit form frmRequest:
+   DataSource = [@'LEAP Requests']
+   Item = Defaults([@'LEAP Requests'])
+   DefaultMode = FormMode.New
+   Keep ONLY Title, Description, Leave Date, Start Minute, End Minute, Leave
+   Hours, Leave Category, Approver 1/2/3. Keep generated DataField/required/error
+   bindings. No requester, owner, year, status, decision, Approval ID or note cards.
+   Title input txtTitle; its card Update = Trim(txtTitle.Text).
+   Date picker dpLeave; DefaultDate = Today(); its card Update =
+   dpLeave.SelectedDate. Keep Description's generated binding; synthetic text only.
+
+3. Unlock the indicated cards; insert classic controls INSIDE their cards:
+   Property                         Paste file / literal setting
+   ddStartHour.Items                11-HourItems.powerfx
+   ddStartMinute.Items              12-MinuteItems.powerfx
+   ddEndHour.Items                  13-EndHourItems.powerfx
+   ddEndMinute.Items                14-EndMinuteItems.powerfx
+   dcStartMinute.Update             15-StartMinuteUpdate.powerfx
+   dcEndMinute.Update               16-EndMinuteUpdate.powerfx
+   dcHours.Update                   17-HoursUpdate.powerfx
+   All four dropdowns: Value = "Label"; AllowEmptySelection = false.
+   Start defaults "09"/"00"; end defaults "10"/"00".
+   dcHours contains txtHours: Default = ""; Format = TextFormat.Number;
+   DelayOutput = false; HintText = "Optional whole number, 0-24".
+   End 24:00 is the END of this date. Separate requests for different dates.
+   Hours are independently entered: blank means unknown, zero means zero.
+
+4. Category card dcCategory contains ddCategory:
+   Items <- 21-CategoryItems.powerfx; Value = "Value";
+   AllowEmptySelection = true; Default = Blank();
+   dcCategory.Update = ddCategory.Selected.Value. Keep required true.
+   Verify all 13 labels against 00-Contract.txt; do not build a text collection.
+   KEEP the three native Users lookup Combo boxes; rename cbApprover1/2/3.
+   cbApprover1.Items <- 22-Approver1Items.powerfx.
+   cbApprover2.Items <- 23-Approver2Items.powerfx.
+   cbApprover3.Items <- 24-Approver3Items.powerfx.
+   SelectMultiple = false; IsSearchable = true. Preserve generated native
+   DisplayFields, SearchFields, and DefaultSelectedItems = Parent.Default.
+   Each card Update = its cbApproverN.Selected. Approver 1 required; 2/3 optional.
+   Choose only the admin-verified workshop cohort; never Office365Users records.
+
+5. btnSubmit.OnSelect <- 18-SubmitOnSelect.powerfx.
+   frmRequest.OnSuccess <- 19-FormOnSuccess.powerfx.
+   frmRequest.OnFailure <- 20-FormOnFailure.powerfx.
+   btnSubmit.DisplayMode =
+     If(varSubmitting || IsBlank(varMe.User), DisplayMode.Disabled, DisplayMode.Edit)
+   Show a label Text = frmRequest.Error.
+   Calendar New button OnSelect =
+     NewForm(frmRequest); Set(varSubmitting, false);
+     Navigate(scrNew, ScreenTransition.None)
+   Disable New when IsBlank(varMe.User).
+   scrNew Cancel.OnSelect =
+     ResetForm(frmRequest); Set(varSubmitting, false);
+     Navigate(scrCalendar, ScreenTransition.None)
+   Disable Cancel while varSubmitting. The flow must still be OFF for form-only
+   tests unless the administrator has explicitly authorized synthetic sends.
+
+6. On scrCalendar add galMonth, a blank vertical gallery: WrapCount = 7;
+   size height/TemplateSize for six rows. Items <- 30-CalendarItems.powerfx.
+   Its label Text = Text(ThisItem.CellDate, "d").
+   Gallery and day label OnSelect = Set(varSelectedDate, ThisItem.CellDate).
+   Add Monday..Sunday headings and month label Text =
+     Text(varMonth, "[$-en-US]mmmm yyyy")
+   btnPrevious.OnSelect <- 31-CalendarPrevious.powerfx.
+   btnNext.OnSelect <- 32-CalendarNext.powerfx.
+   Highlight ThisItem.CellDate = varSelectedDate. This is 42 local dates, NOT
+   a collection of employee requests.
+
+7. Add ddRequestView: Items = ["Authorized day", "My requests", "My approvals"];
+   Value = "Value"; Default = "Authorized day"; AllowEmptySelection = false.
+   galRequests.Items <- 33-DayRequestsItems.powerfx.
+   A label inside galRequests.Text <- 34-RequestSummary.powerfx.
+   galRequests.OnSelect =
+     Set(varSelectedRequest, ThisItem);
+     Navigate(scrDetails, ScreenTransition.None)
+   Child labels OnSelect = Select(Parent).
+   btnRefresh.OnSelect <- 35-RefreshOnSelect.powerfx.
+   After refreshing, select the row again to reload the details record; reload
+   annual totals separately.
+   Label: "Only requests you are authorized to read are shown."
+   Inspect delegation warnings; do not ClearCollect requests or raise the row
+   limit as a correctness fix. Navigate to a trailing day's month to list it.
+
+8. scrDetails: Display form frmDetails, DataSource = [@'LEAP Requests'],
+   Item = varSelectedRequest. Show ID, request fields, requester/approvers,
+   status and decision fields. No edit/approve controls or decision Patch.
+   Add hours label Text =
+     If(IsBlank(varSelectedRequest.'Leave Hours'), "Hours: not entered",
+        "Hours: " & Text(varSelectedRequest.'Leave Hours'))
+   Back.OnSelect = Navigate(scrCalendar, ScreenTransition.None).
+   Requester totals button OnSelect =
+     Set(varTotalsRequester, varSelectedRequest.Requester);
+     Set(varAnnualTotal, Blank()); Set(varTotalError, "");
+     Navigate(scrTotals, ScreenTransition.None)
+   Disable when varSelectedRequest.Requester.User is blank.
+   Calendar My totals button uses the same formula with varMe instead of
+   varSelectedRequest.Requester; disable when varMe.User is blank.
+
+9. scrTotals: txtYear.Default = Text(Year(varSelectedDate), "0");
+   txtYear.DelayOutput = false.
+   btnLoadTotals.OnSelect <- 40-AnnualTotalOnSelect.powerfx.
+   lblAnnualTotal.Text <- 41-AnnualTotalText.powerfx.
+   lblTotalError.Text = varTotalError; add Back to scrCalendar.
+   This calls Environment.leap_GetAnnualTotal with RequesterId =
+   Text(varTotalsRequester.User) and integer CalendarYear. It returns TotalHours,
+   MissingHours, ApprovedRequests, RequesterName under the SIGNED-IN caller.
+   No privileged owner-connected totals flow; never sum visible gallery rows.
+   Self is authorized. A selected approver on ANY saved request for that
+   requester is authorized for that requester's totals in OTHER years too.
+   This is lifetime requester-level authorization, not year-scoped permission.
+
+CORE FLOW - BUILD LIVE AFTER THE ADMIN GATE
+Create a solution-aware automated cloud flow, LEAP - Core request approval,
+using F's same-cloud Dataverse, Standard approvals, and Outlook connections.
+Rename every action BEFORE pasting expressions. fx expressions below have
+NO leading @ or @{...}; JSON Value objects explicitly use @{...} interpolation.
+Do not paste angle-bracket placeholders as IDs. Keep trigger OFF while building.
+
+Exact layout (indentation = containment; YES/NO are branches, not actions):
+Trigger_RequestAdded
+Initialize_RequestId
+Initialize_Approvers
+ScopePrepare
+  Get_Request
+  Condition_Pending
+    YES: empty
+    NO: Terminate_NotPending (Succeeded)
+  Get_Approver1
+  Append_Approver1
+  Condition_HasApprover2
+    YES: Get_Approver2; Append_Approver2
+    NO: empty
+  Condition_HasApprover3
+    YES: Get_Approver3; Append_Approver3
+    NO: empty
+  Get_Requester
+  Select_EntraIds
+  Condition_IdentityGate
+    YES: empty
+    NO: Terminate_IdentityReview (Failed)
+Wait_Approval
+PARALLEL BRANCHES immediately after Wait_Approval:
+  ScopeDecision                       [run after Wait_Approval SUCCEEDED only]
+    Condition_ResponseEnvelope
+      YES: empty
+      NO: Terminate_ResponseReview (Failed)
+    Compose_Response
+    Filter_Responder
+    Condition_OneResponder
+      YES: empty
+      NO: Terminate_ResponderReview (Failed)
+    Compose_SelectedSystemUserId
+    Get_Request_Decision
+    Condition_StillPending
+      YES: empty
+      NO: Terminate_AlreadyFinal (Succeeded)
+    Switch_Outcome
+      Approve: Update_Approved
+      Reject:  Update_Denied
+      Default: Terminate_OutcomeReview (Failed)
+    Send_Requester_Result
+  ScopeTimeout                        [run after Wait_Approval TIMED OUT only]
+    Get_Request_Expiry
+    Condition_ExpiryPending
+      YES: Update_Expired
+      NO: empty
+  ScopeWaitFailure                    [run after Wait_Approval FAILED only]
+    Send_Admin_Review
+    Terminate_WaitReview (Failed)
+
+Use Control > Scope/Condition/Switch/Terminate and Data Operations > Compose,
+Select/Filter array. Initialize the TWO variables at top level, not in a scope.
+Everything else defaults to predecessor SUCCEEDED. Wait_Approval follows
+successful ScopePrepare. The three result scopes are SIBLING parallel branches, not a
+chain: a skipped decision must not prevent the timeout/failure branch running.
+Keep the one wait action at top level so run-after tests its ACTUAL status, not
+a containing scope's aggregate status. No scope is nested inside another here;
+deepest branches are far below
+Power Automate's eight-level limit. No Apply to each or per-recipient approval.
+
+10. Trigger_RequestAdded: Dataverse "When a row is added, modified or deleted".
+    Change type = Added; Table = LEAP Requests; Scope = Organization.
+    Do NOT choose the combined "Added or Modified" option. No global trigger concurrency = 1: leaving
+    concurrency control OFF lets another request run while one waits seven days.
+    Initialize_RequestId: String variable varRequestId; Value via fx:
+      toLower(string(triggerOutputs()?['body/leap_requestid']))
+    Initialize_Approvers: Array variable varApprovers; Value via fx:
+      json('[]')
+    No additional status/approval-ID/error variables are needed.
+
+11. Get_Request: Dataverse Get a row by ID; Table = LEAP Requests;
+    Row ID = variables('varRequestId'). Leave Select columns blank for the lab.
+    Condition_Pending: fx expression equals Boolean true:
+      equals(body('Get_Request')?['leap_status'], 100000000)
+    NO terminates Succeeded without sending. This is a snapshot guard, NOT a
+    duplicate-dispatch lock. Fields below come from the actual SAVED lookups.
+
+12. Get_Approver1: Table = Users; Row ID via fx:
+      body('Get_Request')?['_leap_approver1id_value']
+    Leave Select columns blank. This action ALWAYS runs.
+    Append_Approver1: Variables > Append to array variable, Name = varApprovers.
+    Value is this OBJECT (not a quoted/serialized JSON string):
+    {
+      "systemuserId": "@{toLower(string(body('Get_Approver1')?['systemuserid']))}",
+      "entraId": "@{toLower(string(body('Get_Approver1')?['azureactivedirectoryobjectid']))}",
+      "email": "@{toLower(trim(string(body('Get_Approver1')?['internalemailaddress'])))}"
+    }
+    If your designer shows a text editor, enter the object there and confirm in
+    a synthetic run that varApprovers contains objects, not JSON text strings.
+
+13. Condition_HasApprover2: expression equals Boolean true:
+      not(empty(body('Get_Request')?['_leap_approver2id_value']))
+    YES: Get_Approver2, Table Users, Row ID =
+      body('Get_Request')?['_leap_approver2id_value']
+    Then Append_Approver2 to varApprovers: copy the object in step 12, replacing
+    ALL three Get_Approver1 references with Get_Approver2.
+    Condition_HasApprover3 is the separate next sibling condition, using
+    _leap_approver3id_value; YES gets Get_Approver3 and Append_Approver3 with all
+    object references changed to Get_Approver3. NO branches stay empty.
+    Never Get a row using a blank optional GUID. Optional 3 does not require 2.
+
+14. Get_Requester: Table Users; Row ID =
+      body('Get_Request')?['_leap_requesterid_value']
+    The server stamped this requester; do NOT use a Canvas email parameter.
+    Select_EntraIds: From = variables('varApprovers').
+    Switch Map to TEXT MODE; its single fx expression is:
+      item()?['entraId']
+    Expected output: ["<entra-guid-A>","<entra-guid-B>"], not [{"Value":"..."}].
+    Condition_IdentityGate: expression equals Boolean true:
+      and(
+        greaterOrEquals(length(variables('varApprovers')), 1),
+        lessOrEquals(length(variables('varApprovers')), 3),
+        not(contains(body('Select_EntraIds'), '')),
+        not(contains(body('Select_EntraIds'), '00000000-0000-0000-0000-000000000000')),
+        equals(length(union(body('Select_EntraIds'), body('Select_EntraIds'))), length(variables('varApprovers'))),
+        equals(body('Get_Approver1')?['isdisabled'], false),
+        or(
+          empty(body('Get_Request')?['_leap_approver2id_value']),
+          equals(actions('Get_Approver2')?['outputs']?['body']?['isdisabled'], false)
+        ),
+        or(
+          empty(body('Get_Request')?['_leap_approver3id_value']),
+          equals(actions('Get_Approver3')?['outputs']?['body']?['isdisabled'], false)
+        ),
+        equals(body('Get_Requester')?['isdisabled'], false),
+        not(empty(trim(string(body('Get_Requester')?['internalemailaddress']))))
+      )
+    Missing/skipped optional actions are read safely through actions(...)?.
+    NO -> Terminate Failed, Code LEAP_REVIEW_REQUIRED, generic Message:
+      Identity review required; inspect this request and restricted flow run.
+    This rechecks enabled recipients and unambiguous Entra IDs. Human identity
+    validation at creation and the admin's internal/licensed cohort gate remain
+    required; this is not an identity-governance implementation.
+
+15. After ScopePrepare add ONE Standard approvals "Start and wait for an approval";
+    rename Wait_Approval. Do NOT add separate Create/Wait actions.
+    Approval type = Approve/Reject - First to respond
+    Title via fx = concat('LEAP request ', variables('varRequestId'))
+    Assigned to via fx = join(body('Select_EntraIds'), ';')
+    Details = Open the authorized LEAP app to review this synthetic request.
+    Item link = APP_PLAY_URL (replace with the actual approved play URL)
+    Item link description = Open LEAP
+    Enable notifications = Yes; Enable reassignment = No.
+    Settings: Timeout = P7D; Retry policy = None.
+    If the designer labels a setting differently, verify its actual equivalent
+    during GCC rehearsal; do not omit reassignment control silently.
+    Assigned to is a semicolon-joined string of native Entra GUIDs, never User
+    GUIDs, display names or client-entered emails. All selected recipients share
+    ONE approval. Native Start-and-wait avoids the immediate-response gap in
+    split Create / save ID / Wait. Native email is the baseline; no Teams card.
+
+16. ScopeDecision: Configure run after Wait_Approval = is successful ONLY.
+    Condition_ResponseEnvelope: expression equals Boolean true:
+      and(
+        equals(length(coalesce(body('Wait_Approval')?['responses'], json('[]'))), 1),
+        not(empty(trim(string(body('Wait_Approval')?['outcome']))))
+      )
+    NO -> Terminate Failed, Code LEAP_REVIEW_REQUIRED, Message =
+    Unexpected native response; administrator review required.
+    YES stays empty; next sibling Compose_Response:
+      first(body('Wait_Approval')?['responses'])
+    Never evaluate first() before the response-count guard has succeeded.
+    Verify raw outputs on the first synthetic run. Expected native paths are
+    responses[0].responder.id, responses[0].comments, and outcome. A missing or
+    differently shaped value is a rehearsal blocker, NOT a reason to infer Reject.
+
+17. Filter_Responder: Data Operations Filter array.
+    From = variables('varApprovers'); predicate via fx:
+      and(
+        not(empty(outputs('Compose_Response')?['responder']?['id'])),
+        not(empty(item()?['systemuserId'])),
+        not(empty(item()?['entraId'])),
+        equals(
+          item()?['entraId'],
+          toLower(string(outputs('Compose_Response')?['responder']?['id']))
+        )
+      )
+    In the advanced editor the designer may display @and(...); fx needs no @.
+    Condition_OneResponder: expression equals Boolean true:
+      equals(length(body('Filter_Responder')), 1)
+    NO -> Terminate Failed, LEAP_REVIEW_REQUIRED, generic responder-review message.
+    Only after that guard, Compose_SelectedSystemUserId:
+      first(body('Filter_Responder'))?['systemuserId']
+    This maps the native Entra responder ID to ONE ORIGINAL selected Dataverse
+    user. There is deliberately no email/name fallback. A missing, blank,
+    unexpected or nonselected responder fails closed for administrator review.
+
+18. Get_Request_Decision: LEAP Requests, Row ID = variables('varRequestId').
+    Condition_StillPending: expression equals Boolean true:
+      equals(body('Get_Request_Decision')?['leap_status'], 100000000)
+    NO -> Terminate_AlreadyFinal Succeeded; no update or result email.
+    Next sibling Switch_Outcome, On via fx:
+      body('Wait_Approval')?['outcome']
+    Literal cases: Approve and Reject (exact native values, not Approved/Denied).
+    Default -> Terminate Failed, LEAP_REVIEW_REQUIRED, generic outcome-review
+    message. Unknown or blank outcome must NEVER default to Denied.
+
+    Approve case: Update_Approved, Dataverse Update a row, LEAP Requests,
+    Row ID = variables('varRequestId'). Set ONLY:
+      Request Status (leap_status) = Approved / integer 100000001
+      Decided By (Users) via fx =
+        concat('/systemusers(', outputs('Compose_SelectedSystemUserId'), ')')
+      Decision Comments via fx =
+        substring(
+          string(coalesce(outputs('Compose_Response')?['comments'], '')),
+          0,
+          min(1000, length(string(coalesce(outputs('Compose_Response')?['comments'], ''))))
+        )
+    Reject case: Update_Denied, identical fields/expressions except:
+      Request Status (leap_status) = Denied / integer 100000002.
+    systemusers is the actual Users entity set; the GUID is systemuserid, NOT
+    Entra ID. Equivalent raw Web API binding is /systemusers(<systemuserid>).
+    Choose the CUSTOM Request Status, not built-in statecode/statuscode.
+    Do not set Decided On: the server stamps it. Omit Approval ID, Processing
+    Note, owner, requester, year and all request content; OMIT, not blank/null.
+    Safe substring handles empty/short comments and enforces the 1000-char limit.
+    The plug-in rechecks selected responder/enabled human and rejects terminal
+    rewrites. These reads are not an atomic concurrency lock.
+
+19. Send_Requester_Result is AFTER the Switch, default successful run-after.
+    Office 365 Outlook Send an email (V2), To via fx:
+      body('Get_Requester')?['internalemailaddress']
+    Subject via fx:
+      concat('LEAP request ', variables('varRequestId'), ': ',
+        if(equals(body('Wait_Approval')?['outcome'], 'Approve'), 'Approved', 'Denied'))
+    Body via fx (replace APP_PLAY_URL inside the expression before use):
+      concat(
+        '<p>Request ID: ', variables('varRequestId'), '</p><p>Status: ',
+        if(equals(body('Wait_Approval')?['outcome'], 'Approve'), 'Approved', 'Denied'),
+        '</p><p>Open the authorized LEAP app: APP_PLAY_URL</p>'
+      )
+    Retry policy None. The Default Switch branch terminates, so the if() here
+    formats only a previously validated Approve/Reject; it does NOT decide status.
+    Send ONLY after the Dataverse transition succeeds. No title, dates, category,
+    hours, comments, health/RA narrative, or other employees in outbound content.
+    An email failure never reverses the saved decision or triggers a new approval.
+
+20. Add the two sibling error branches directly after Wait_Approval:
+    ScopeTimeout: Configure run after Wait_Approval = has timed out ONLY.
+      Get_Request_Expiry: LEAP Requests; Row ID = variables('varRequestId').
+      Condition_ExpiryPending: expression equals Boolean true:
+        equals(body('Get_Request_Expiry')?['leap_status'], 100000000)
+      YES -> Update_Expired, LEAP Requests, same Row ID, set ONLY:
+        Request Status (leap_status) = Expired / integer 100000003.
+      NO stays empty. NO Decided By/On, comments, Approval ID or Processing Note.
+      No requester expiry email is required in the core; refresh shows Expired.
+      A timeout can leave a native approval visible; it is not cancellation.
+      Operations reconciles late responses; never reopen/overwrite a terminal row.
+    ScopeWaitFailure: Configure run after Wait_Approval = has failed ONLY.
+      Send_Admin_Review: Outlook Send an email (V2); To = ADMIN_MAILBOX.
+      Subject via fx = concat('LEAP review: ', variables('varRequestId'))
+      Body via fx =
+        concat('<p>Request ID: ', variables('varRequestId'),
+          '</p><p>Run ID: ', workflow()?['run']?['name'],
+          '</p><p>Open the authorized LEAP app: APP_PLAY_URL</p>')
+      Retry policy None. Then Terminate_WaitReview Failed,
+      Code LEAP_REVIEW_REQUIRED; Message = Inspect the saved row and native approval.
+      Configure this Terminate after the mail action for ALL four statuses so
+      mail failure cannot masquerade as successful handling.
+    Failed Start-and-wait leaves Pending unchanged. It is NOT a rejection or an
+    expiry. Do not route failed/skipped approval actions into ScopeDecision.
+
+OPERATIONS LIMITS - READ BEFORE ENABLING
+Approval ID deliberately remains EMPTY in this core path. Start-and-wait does
+not return its result until the wait completes, so the core cannot persist an
+ID before responses. The current guard does NOT require Approval ID for a
+selected-user decision. No core action writes it or Processing Note. Do not add
+a late "Save Approval ID" to a terminal update; the guard rejects that payload.
+The advanced split pattern offers different correlation/recovery tradeoffs;
+its immediate-response risk and extra actions are not part of this core lab.
+
+The Added trigger targets one flow run per create in the normal path, NOT an
+exactly-once delivery guarantee. Duplicate trigger deliveries, ambiguous connector
+dispatch failures, manual resubmission, and retries can create duplicate native
+approvals. Retry None reduces automatic redispatch; it does not prove no send.
+Pending checks and server terminal guards do NOT prevent duplicate dispatch or
+provide an atomic first-writer claim across runs. Do not claim production safety.
+Native First to respond arbitrates the single approval's result, not duplicates.
+
+Have the authorized operator monitor FAILED/TIMED-OUT runs during the lab.
+Explicit guard Terminate actions stop the whole run; they do not automatically
+send the ScopeWaitFailure email. Preparation, decision-write and notification
+failures also require run-history review, even if no administrator email arrives.
+Use request ID + run ID to inspect restricted run history and native Approvals.
+The generic admin email contains no raw errors or serialized connector outputs.
+If approval creation is ambiguous, confirm whether it exists/responded BEFORE
+any retry; never blindly Resubmit the flow or create another approval.
+If only the result mail failed, inspect saved status and resend only that generic
+notice under the approved operations process. Do not rerun the approval.
+If a response is invalid or an update fails, leave Pending for authorized review;
+do not fabricate Denied, write exception text into the request, or bypass security.
+
+ADMIN CONFIRMATION AND VERIFICATION (NO SENDS UNTIL THIS POINT)
+The administrator explicitly confirms it is permitted to enable the flow and
+submit synthetic requests to the named licensed cohort. Creating/running native
+approvals SENDS approval notifications; the result/operator actions send email.
+This handout itself performs none of those actions.
+
+In the actual customer GCC environment, record request IDs, run IDs, accounts,
+statuses and API outputs for these tests; use Snippets\60-UAT.txt for more cases:
+- E creates a valid row: requester/owner are E; status Pending; leave year is
+  correct; form cannot write protected fields. One native approval in normal run.
+- One, two, and three selected approvers; test Approver 3 with Approver 2 blank.
+  First valid native response wins. Other recipients cannot overwrite final data.
+  Verify assignment GUIDs and responder.id against actual raw connector outputs.
+- Reject maps to Denied, Approve to Approved; correct original selected Decided
+  By and server Decided On. Approval ID stays empty; comments >1000 are truncated.
+- Invalid/missing response or unknown outcome produces failed review, not Denied
+  (use a facilitator-controlled rehearsal copy/test fixture, never spoof live
+  approval identity). Zero/multiple responder matches cannot reach the update.
+- In a rehearsal COPY change Wait timeout to PT2M, do not respond: ONLY Pending
+  becomes Expired with no decision attribution/comments. Restore P7D afterward.
+  A native card remaining visible is an operations issue, not authority to decide.
+- E and selected A can read their authorized rows; U cannot. Employee/approver
+  direct decision/edit/delete attempts fail. Do not "fix" by granting broad Read.
+- Same date and overlapping rows are accepted. Approve hours blank, 0, 2, 3:
+  TotalHours = 5, ApprovedRequests = 4, MissingHours = 1 for that leave year.
+  Approval in another year still counts in the leave year. API denies unrelated U.
+  For E2 hidden detail rows, selected A receives authorized aggregate only.
+- Test safe failure/mail recovery with the administrator in a rehearsal copy;
+  document inspection evidence, not a blind resubmit. Restore normal connections.
+
+Save and publish Canvas only after tests pass; share the APP and assign the
+actual Dataverse roles (app sharing alone grants no row rights). Record app URL,
+environment, solution versions, connections, operator owner and unresolved limits.
+Do not label an unexported package "ready". Actual CUSTOMER GCC ORDINARY-USER
+REHEARSAL, including security, connector outputs, native email and server totals,
+is mandatory before the workshop, regardless of local compile or import success.

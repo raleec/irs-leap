@@ -1,0 +1,17 @@
+IRS LEAP DISABLED DEVELOPMENT CLOUD FLOW
+Target: https://YOUR-DEVELOPMENT-ORG.crm.dynamics.com
+Solution: IRSLEAPCanvasStarter (954f7e33-b6cd-f111-a05c-6045bd094f74)
+Workflow: 4033f29c-15ce-f111-a05b-6045bd094f74
+Name: IRS LEAP - First response approval
+Final state: [{"statuscode": 1, "workflowid": "4033f29c-15ce-f111-a05b-6045bd094f74", "statecode": 0}]
+Source/read-back/membership: passed
+Flow service read-back: {"httpStatus": 200, "environment": "Default-YOUR-TENANT-ID", "state": "Stopped", "workflowEntityId": "4033f29c-15ce-f111-a05b-6045bd094f74", "parsedDefinitionMatchesSource": true, "allReferencesUnbound": true, "componentState": "Published", "note": "Published solution component is not activated: workflow remains Draft/0 and engine Stopped.", "runtimeExecutionTested": false}
+References: [{"id": "22aaa48f-15ce-f111-a05b-6045bd094f74", "logicalName": "leap_LEAPDataverse", "api": "shared_commondataserviceforapps", "connectionId": null}, {"id": "29aaa48f-15ce-f111-a05b-6045bd094f74", "logicalName": "leap_LEAPApprovals", "api": "shared_approvals", "connectionId": null}, {"id": "2daaa48f-15ce-f111-a05b-6045bd094f74", "logicalName": "leap_LEAPOutlook", "api": "shared_office365", "connectionId": null}]
+Environment variables: [{"id": "2917d995-15ce-f111-a05b-6045bd094f74", "schemaName": "leap_AppPlayUrl", "type": "Text", "defaultValue": null, "currentValues": []}, {"id": "2e17d995-15ce-f111-a05b-6045bd094f74", "schemaName": "leap_OperationsMailbox", "type": "Text", "defaultValue": null, "currentValues": []}]
+Validation: local connector operation/schema and semantic assertions; actual Dataverse draft save/read-back.
+Not validated: bound connector credentials, trigger registration, execution, approvals or email.
+No activation; no sends; no request data writes; no account provisioning; commercial dev only.
+Dataverse, Approvals and Outlook references are intentionally unbound; no matching approved connections exist.
+leap_AppPlayUrl and leap_OperationsMailbox are intentionally blank; configure target values after app creation.
+No trigger registration, runtime approval/mail test, or flow activation has been performed or authorized.
+A repeat SDK update was rejected by the platform because connection references have no connections; the original exact source draft remains saved and OFF. Full native save/runtime validation awaits authorized bindings.

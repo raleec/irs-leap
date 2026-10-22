@@ -1,0 +1,449 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_commondataserviceforapps": {
+        "runtimeSource": "embedded",
+        "connection": {
+          "connectionReferenceLogicalName": "leap_LEAPDataverse"
+        },
+        "api": {
+          "name": "shared_commondataserviceforapps"
+        }
+      },
+      "shared_approvals": {
+        "runtimeSource": "embedded",
+        "connection": {
+          "connectionReferenceLogicalName": "leap_LEAPApprovals"
+        },
+        "api": {
+          "name": "shared_approvals"
+        }
+      },
+      "shared_office365": {
+        "runtimeSource": "embedded",
+        "connection": {
+          "connectionReferenceLogicalName": "leap_LEAPOutlook"
+        },
+        "api": {
+          "name": "shared_office365"
+        }
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        },
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        },
+        "App Play URL (leap_AppPlayUrl)": {
+          "defaultValue": "",
+          "type": "String",
+          "metadata": {
+            "schemaName": "leap_AppPlayUrl"
+          }
+        },
+        "Operations Mailbox (leap_OperationsMailbox)": {
+          "defaultValue": "",
+          "type": "String",
+          "metadata": {
+            "schemaName": "leap_OperationsMailbox"
+          }
+        }
+      },
+      "triggers": {
+        "When_a_LEAP_request_is_added": {
+          "type": "OpenApiConnectionWebhook",
+          "inputs": {
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
+              "connectionName": "shared_commondataserviceforapps",
+              "operationId": "SubscribeWebhookTrigger"
+            },
+            "parameters": {
+              "subscriptionRequest/message": 1,
+              "subscriptionRequest/entityname": "leap_request",
+              "subscriptionRequest/scope": 4,
+              "subscriptionRequest/filterexpression": "leap_status eq 100000000"
+            },
+            "authentication": "@parameters('$authentication')"
+          },
+          "conditions": [
+            {
+              "expression": "@equals(triggerOutputs()?['body/leap_status'],100000000)"
+            }
+          ]
+        }
+      },
+      "actions": {
+        "Read_saved_request": {
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
+              "connectionName": "shared_commondataserviceforapps",
+              "operationId": "GetItem"
+            },
+            "parameters": {
+              "entityName": "leap_requests",
+              "recordId": "@triggerOutputs()?['body/leap_requestid']",
+              "$select": "leap_requestid,leap_status,_leap_requesterid_value,_leap_approver1id_value,_leap_approver2id_value,_leap_approver3id_value",
+              "$expand": "leap_RequesterId($select=systemuserid,azureactivedirectoryobjectid,internalemailaddress,isdisabled,applicationid,accessmode,domainname),leap_Approver1Id($select=systemuserid,azureactivedirectoryobjectid,internalemailaddress,isdisabled,applicationid,accessmode,domainname),leap_Approver2Id($select=systemuserid,azureactivedirectoryobjectid,internalemailaddress,isdisabled,applicationid,accessmode,domainname),leap_Approver3Id($select=systemuserid,azureactivedirectoryobjectid,internalemailaddress,isdisabled,applicationid,accessmode,domainname)"
+            },
+            "authentication": "@parameters('$authentication')"
+          },
+          "runAfter": {}
+        },
+        "Selected_user_snapshots": {
+          "type": "Compose",
+          "inputs": "@createArray(body('Read_saved_request')?['leap_Approver1Id'],body('Read_saved_request')?['leap_Approver2Id'],body('Read_saved_request')?['leap_Approver3Id'])",
+          "runAfter": {
+            "Read_saved_request": [
+              "Succeeded"
+            ]
+          }
+        },
+        "Valid_selected_users": {
+          "type": "Query",
+          "inputs": {
+            "from": "@outputs('Selected_user_snapshots')",
+            "where": "@and(not(empty(item()?['systemuserid'])),not(empty(item()?['azureactivedirectoryobjectid'])),not(equals(string(item()?['azureactivedirectoryobjectid']),'00000000-0000-0000-0000-000000000000')),equals(item()?['isdisabled'],false),empty(item()?['applicationid']),contains(createArray(0,1,2),item()?['accessmode']),not(empty(item()?['domainname'])),not(contains(toLower(coalesce(item()?['domainname'],'')),'#ext#')),not(equals(item()?['systemuserid'],body('Read_saved_request')?['_leap_requesterid_value'])))"
+          },
+          "runAfter": {
+            "Selected_user_snapshots": [
+              "Succeeded"
+            ]
+          }
+        },
+        "Require_pending_complete_saved_selection_and_app": {
+          "type": "If",
+          "expression": "@and(equals(body('Read_saved_request')?['leap_status'],100000000),not(empty(body('Read_saved_request')?['_leap_requesterid_value'])),not(empty(body('Read_saved_request')?['_leap_approver1id_value'])),not(empty(body('Read_saved_request')?['leap_RequesterId']?['internalemailaddress'])),not(empty(parameters('App Play URL (leap_AppPlayUrl)'))),greaterOrEquals(length(body('Valid_selected_users')),1),lessOrEquals(length(body('Valid_selected_users')),3),equals(length(body('Valid_selected_users')),add(add(if(empty(body('Read_saved_request')?['_leap_approver1id_value']),0,1),if(empty(body('Read_saved_request')?['_leap_approver2id_value']),0,1)),if(empty(body('Read_saved_request')?['_leap_approver3id_value']),0,1))),equals(length(union(body('Valid_selected_users'),body('Valid_selected_users'))),length(body('Valid_selected_users'))))",
+          "actions": {
+            "Select_approver_Entra_GUIDs": {
+              "type": "Select",
+              "inputs": {
+                "from": "@body('Valid_selected_users')",
+                "select": "@item()?['azureactivedirectoryobjectid']"
+              },
+              "runAfter": {}
+            },
+            "Start_and_wait_for_first_response": {
+              "type": "OpenApiConnectionWebhook",
+              "inputs": {
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_approvals",
+                  "connectionName": "shared_approvals",
+                  "operationId": "StartAndWaitForAnApproval"
+                },
+                "parameters": {
+                  "approvalType": "ApproveRejectFirstToRespond",
+                  "WebhookApprovalCreationInput/title": "IRS LEAP request @{triggerOutputs()?['body/leap_requestid']}",
+                  "WebhookApprovalCreationInput/assignedTo": "@join(body('Select_approver_Entra_GUIDs'),';')",
+                  "WebhookApprovalCreationInput/details": "Review the request in the secured IRS LEAP app. Request ID: @{triggerOutputs()?['body/leap_requestid']}",
+                  "WebhookApprovalCreationInput/itemLink": "@parameters('App Play URL (leap_AppPlayUrl)')",
+                  "WebhookApprovalCreationInput/itemLinkDescription": "Open IRS LEAP",
+                  "WebhookApprovalCreationInput/requestor": "@body('Read_saved_request')?['leap_RequesterId']?['internalemailaddress']",
+                  "WebhookApprovalCreationInput/enableNotifications": true,
+                  "WebhookApprovalCreationInput/enableReassignment": false
+                },
+                "authentication": "@parameters('$authentication')"
+              },
+              "runAfter": {
+                "Select_approver_Entra_GUIDs": [
+                  "Succeeded"
+                ]
+              },
+              "limit": {
+                "timeout": "P7D"
+              }
+            },
+            "Approval_responses": {
+              "type": "Compose",
+              "inputs": "@coalesce(body('Start_and_wait_for_first_response')?['responses'],json('[]'))",
+              "runAfter": {
+                "Start_and_wait_for_first_response": [
+                  "Succeeded"
+                ]
+              }
+            },
+            "Require_known_single_response": {
+              "type": "If",
+              "expression": "@and(equals(length(outputs('Approval_responses')),1),or(equals(body('Start_and_wait_for_first_response')?['outcome'],'Approve'),equals(body('Start_and_wait_for_first_response')?['outcome'],'Reject')))",
+              "actions": {
+                "Match_original_selected_responder": {
+                  "type": "Query",
+                  "inputs": {
+                    "from": "@body('Valid_selected_users')",
+                    "where": "@equals(toLower(string(item()?['azureactivedirectoryobjectid'])),toLower(string(first(outputs('Approval_responses'))?['responder']?['id'])))"
+                  },
+                  "runAfter": {}
+                },
+                "Require_original_selected_responder": {
+                  "type": "If",
+                  "expression": "@and(equals(length(body('Match_original_selected_responder')),1),equals(first(outputs('Approval_responses'))?['approverResponse'],body('Start_and_wait_for_first_response')?['outcome']))",
+                  "actions": {
+                    "Read_fresh_pending_request": {
+                      "type": "OpenApiConnection",
+                      "inputs": {
+                        "host": {
+                          "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
+                          "connectionName": "shared_commondataserviceforapps",
+                          "operationId": "GetItem"
+                        },
+                        "parameters": {
+                          "entityName": "leap_requests",
+                          "recordId": "@triggerOutputs()?['body/leap_requestid']",
+                          "$select": "leap_requestid,leap_status,_leap_requesterid_value,_leap_approver1id_value,_leap_approver2id_value,_leap_approver3id_value"
+                        },
+                        "authentication": "@parameters('$authentication')"
+                      },
+                      "runAfter": {}
+                    },
+                    "Commit_only_if_still_pending": {
+                      "type": "If",
+                      "expression": "@and(equals(body('Read_fresh_pending_request')?['leap_status'],100000000),equals(body('Read_fresh_pending_request')?['_leap_requesterid_value'],body('Read_saved_request')?['_leap_requesterid_value']),equals(body('Read_fresh_pending_request')?['_leap_approver1id_value'],body('Read_saved_request')?['_leap_approver1id_value']),equals(body('Read_fresh_pending_request')?['_leap_approver2id_value'],body('Read_saved_request')?['_leap_approver2id_value']),equals(body('Read_fresh_pending_request')?['_leap_approver3id_value'],body('Read_saved_request')?['_leap_approver3id_value']))",
+                      "actions": {
+                        "Commit_final_decision": {
+                          "type": "OpenApiConnection",
+                          "inputs": {
+                            "host": {
+                              "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
+                              "connectionName": "shared_commondataserviceforapps",
+                              "operationId": "UpdateOnlyRecord"
+                            },
+                            "parameters": {
+                              "entityName": "leap_requests",
+                              "recordId": "@triggerOutputs()?['body/leap_requestid']",
+                              "If-Match": "@body('Read_fresh_pending_request')?['@odata.etag']",
+                              "item/leap_status": "@if(equals(body('Start_and_wait_for_first_response')?['outcome'],'Approve'),100000001,100000002)",
+                              "item/leap_DecidedById@odata.bind": "@concat('/systemusers(',first(body('Match_original_selected_responder'))?['systemuserid'],')')",
+                              "item/leap_decisioncomments": "@take(coalesce(first(outputs('Approval_responses'))?['comments'],''),1000)"
+                            },
+                            "authentication": "@parameters('$authentication')"
+                          },
+                          "runAfter": {}
+                        },
+                        "Send_generic_decision_result": {
+                          "type": "OpenApiConnection",
+                          "inputs": {
+                            "host": {
+                              "apiId": "/providers/Microsoft.PowerApps/apis/shared_office365",
+                              "connectionName": "shared_office365",
+                              "operationId": "SendEmailV2"
+                            },
+                            "parameters": {
+                              "emailMessage/To": "@body('Read_saved_request')?['leap_RequesterId']?['internalemailaddress']",
+                              "emailMessage/Cc": "@parameters('Operations Mailbox (leap_OperationsMailbox)')",
+                              "emailMessage/Subject": "IRS LEAP request @{triggerOutputs()?['body/leap_requestid']}: @{if(equals(body('Start_and_wait_for_first_response')?['outcome'],'Approve'),'Approved','Denied')}",
+                              "emailMessage/Body": "<p>Request ID: @{triggerOutputs()?['body/leap_requestid']}</p><p>Status: @{if(equals(body('Start_and_wait_for_first_response')?['outcome'],'Approve'),'Approved','Denied')}</p><p>App: @{parameters('App Play URL (leap_AppPlayUrl)')}</p>",
+                              "emailMessage/Importance": "Normal"
+                            },
+                            "authentication": "@parameters('$authentication')"
+                          },
+                          "runAfter": {
+                            "Commit_final_decision": [
+                              "Succeeded"
+                            ]
+                          }
+                        }
+                      },
+                      "else": {
+                        "actions": {
+                          "Fail_stale_decision": {
+                            "type": "Terminate",
+                            "inputs": {
+                              "runStatus": "Failed",
+                              "runError": {
+                                "code": "StaleRequest",
+                                "message": "The request is no longer Pending or its selected users changed."
+                              }
+                            },
+                            "runAfter": {}
+                          }
+                        }
+                      },
+                      "runAfter": {
+                        "Read_fresh_pending_request": [
+                          "Succeeded"
+                        ]
+                      }
+                    }
+                  },
+                  "else": {
+                    "actions": {
+                      "Fail_unknown_responder": {
+                        "type": "Terminate",
+                        "inputs": {
+                          "runStatus": "Failed",
+                          "runError": {
+                            "code": "UnknownResponder",
+                            "message": "The response is not from exactly one originally selected Entra user, or its outcome is inconsistent."
+                          }
+                        },
+                        "runAfter": {}
+                      }
+                    }
+                  },
+                  "runAfter": {
+                    "Match_original_selected_responder": [
+                      "Succeeded"
+                    ]
+                  }
+                }
+              },
+              "else": {
+                "actions": {
+                  "Fail_unknown_outcome": {
+                    "type": "Terminate",
+                    "inputs": {
+                      "runStatus": "Failed",
+                      "runError": {
+                        "code": "UnknownOutcome",
+                        "message": "Approval returned no single, recognized Approve or Reject response; no status was changed."
+                      }
+                    },
+                    "runAfter": {}
+                  }
+                }
+              },
+              "runAfter": {
+                "Approval_responses": [
+                  "Succeeded"
+                ]
+              }
+            },
+            "Read_pending_after_timeout": {
+              "type": "OpenApiConnection",
+              "inputs": {
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
+                  "connectionName": "shared_commondataserviceforapps",
+                  "operationId": "GetItem"
+                },
+                "parameters": {
+                  "entityName": "leap_requests",
+                  "recordId": "@triggerOutputs()?['body/leap_requestid']",
+                  "$select": "leap_requestid,leap_status,_leap_requesterid_value,_leap_approver1id_value,_leap_approver2id_value,_leap_approver3id_value"
+                },
+                "authentication": "@parameters('$authentication')"
+              },
+              "runAfter": {
+                "Start_and_wait_for_first_response": [
+                  "TimedOut"
+                ]
+              }
+            },
+            "Expire_only_if_still_pending": {
+              "type": "If",
+              "expression": "@equals(body('Read_pending_after_timeout')?['leap_status'],100000000)",
+              "actions": {
+                "Commit_expired_status_only": {
+                  "type": "OpenApiConnection",
+                  "inputs": {
+                    "host": {
+                      "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
+                      "connectionName": "shared_commondataserviceforapps",
+                      "operationId": "UpdateOnlyRecord"
+                    },
+                    "parameters": {
+                      "entityName": "leap_requests",
+                      "recordId": "@triggerOutputs()?['body/leap_requestid']",
+                      "If-Match": "@body('Read_pending_after_timeout')?['@odata.etag']",
+                      "item/leap_status": 100000003
+                    },
+                    "authentication": "@parameters('$authentication')"
+                  },
+                  "runAfter": {}
+                },
+                "Send_generic_expired_result": {
+                  "type": "OpenApiConnection",
+                  "inputs": {
+                    "host": {
+                      "apiId": "/providers/Microsoft.PowerApps/apis/shared_office365",
+                      "connectionName": "shared_office365",
+                      "operationId": "SendEmailV2"
+                    },
+                    "parameters": {
+                      "emailMessage/To": "@body('Read_saved_request')?['leap_RequesterId']?['internalemailaddress']",
+                      "emailMessage/Cc": "@parameters('Operations Mailbox (leap_OperationsMailbox)')",
+                      "emailMessage/Subject": "IRS LEAP request @{triggerOutputs()?['body/leap_requestid']}: Expired",
+                      "emailMessage/Body": "<p>Request ID: @{triggerOutputs()?['body/leap_requestid']}</p><p>Status: Expired</p><p>App: @{parameters('App Play URL (leap_AppPlayUrl)')}</p>",
+                      "emailMessage/Importance": "Normal"
+                    },
+                    "authentication": "@parameters('$authentication')"
+                  },
+                  "runAfter": {
+                    "Commit_expired_status_only": [
+                      "Succeeded"
+                    ]
+                  }
+                }
+              },
+              "else": {
+                "actions": {
+                  "Fail_stale_timeout": {
+                    "type": "Terminate",
+                    "inputs": {
+                      "runStatus": "Failed",
+                      "runError": {
+                        "code": "StaleTimeout",
+                        "message": "The timed-out request is no longer Pending; no status was changed."
+                      }
+                    },
+                    "runAfter": {}
+                  }
+                }
+              },
+              "runAfter": {
+                "Read_pending_after_timeout": [
+                  "Succeeded"
+                ]
+              }
+            },
+            "Fail_approval_connector_error": {
+              "type": "Terminate",
+              "inputs": {
+                "runStatus": "Failed",
+                "runError": {
+                  "code": "ApprovalConnectorFailure",
+                  "message": "The approval connector failed; the request remains unchanged."
+                }
+              },
+              "runAfter": {
+                "Start_and_wait_for_first_response": [
+                  "Failed"
+                ]
+              }
+            }
+          },
+          "else": {
+            "actions": {
+              "Fail_invalid_configuration_or_selection": {
+                "type": "Terminate",
+                "inputs": {
+                  "runStatus": "Failed",
+                  "runError": {
+                    "code": "InvalidPrerequisites",
+                    "message": "A Pending request, valid saved requester/selected internal approvers and configured app URL are required. No approval was created."
+                  }
+                },
+                "runAfter": {}
+              }
+            }
+          },
+          "runAfter": {
+            "Valid_selected_users": [
+              "Succeeded"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "schemaVersion": "1.0.0.0"
+}

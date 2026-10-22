@@ -1,0 +1,3 @@
+Set(varMonth, DateAdd(varMonth, 1, TimeUnit.Months));
+Set(varSelectedDate, varMonth);
+Set(varGridStart, DateAdd(varMonth, 1 - Weekday(varMonth, StartOfWeek.Monday), TimeUnit.Days))

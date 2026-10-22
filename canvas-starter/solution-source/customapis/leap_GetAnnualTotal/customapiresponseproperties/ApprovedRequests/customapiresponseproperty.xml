@@ -1,0 +1,8 @@
+<customapiresponseproperty uniquename="ApprovedRequests">
+  <displayname default="ApprovedRequests">
+    <label description="ApprovedRequests" languagecode="1033" />
+  </displayname>
+  <iscustomizable>1</iscustomizable>
+  <name>ApprovedRequests</name>
+  <type>7</type>
+</customapiresponseproperty>

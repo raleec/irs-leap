@@ -1,0 +1,154 @@
+IRS LEAP - COMPLETE RELEASE PREPARATION
+Administrator/facilitator prework for SOLUTIONS-FIRST.txt
+
+STATUS
+------
+Version1.1.0.0 now includes the actual native Canvas app,stopped approval flow,
+3connection references and2consumed variable definitions. Read RELEASE-1.1.txt.
+This file remains rebuild/maintenance reference,not a requirement to recreate
+the prepared components. Version1.0.0.0 was the backend-only baseline.
+Examples below use construction-guide names; the packaged flow's exact action
+names and reference/parameter bindings are in runtime-flow source and RELEASE-1.1.
+
+TARGET RELEASE
+--------------
+Use the approved IRSLEAP publisher/leap prefix and existing unique solution name
+IRSLEAPCanvasStarter. For changes to the included1.1.0.0release,increment
+to an appropriate new release version, for example1.1.0.1. Do not label
+the unchanged backend1.0 ZIP as a full solution. Keep the baseline artifacts.
+
+For this workshop one solution is simpler than a managed foundation plus an
+extension. A layered foundation/extension design can be a later ALM exercise.
+Source is unmanaged. The managed export goes to a DIFFERENT environment.
+
+1. BUILD ONCE, OUTSIDE CLASS
+--------------------------
+Follow CORE-LAB.txt in the approved development environment to build the
+four-screen Canvas app and ONE solution-aware core Start-and-wait flow.
+Use the existing Dataverse table, roles and leap_GetAnnualTotal API.
+Do not recreate the schema or start a Code App.
+Use native current-environment Canvas Dataverse and caller-bound Environment
+actions. Do not substitute the flow owner's identity for employee data access.
+
+Add an existing/static Canvas heading named lblWorkshopHeading so the short
+workshop has a predictable safe customization. Initial Text:
+"IRS LEAP"
+
+Keep the optional advanced split-approval flow absent or OFF and excluded from
+the release. Only one Added-trigger approval flow may be active for the lab.
+No actual sends until the workshop owner approves recipients and exact templates.
+
+2. MAKE THE FLOW PORTABLE
+------------------------
+Create/reuse solution connection references for the flow's Dataverse, Standard
+approvals and Office365Outlook connectors. Use target-approved names such as:
+LEAP Dataverse; LEAP Approvals; LEAP Outlook.
+Record the ACTUAL logical reference names from the environment. Names in this
+document are construction descriptions; actual reference logical names for the
+included release are leap_LEAPDataverse,leap_LEAPApprovals,leap_LEAPOutlook.
+References are pointers; their authenticated connections are target configuration.
+
+Confirm every relevant trigger/action uses the intended reference, not a
+leftover personal direct connection. Inspect the solution component inventory.
+Canvas OAuth/native Dataverse differs from the flow: keep employee identity,
+not a privileged shared connection. See Microsoft connection-reference guidance.
+
+In the same solution create Text environment-variable definitions:
+  Display name                  Proposed schema name
+  LEAP App Play URL             leap_AppPlayUrl
+  LEAP Operations Mailbox       leap_OperationsMailbox
+
+Publisher may normalize the proposed names; record actual saved schema names.
+These definitions are included in1.1,not in the historical backend1.0 export.
+No source-specific default URLs, test-recipient addresses or secrets in exports.
+Target administrators supply current values. Validate required values before
+enabling the flow. Blank configuration must stop processing before sends.
+
+Edit the core flow to CONSUME the actual environment-variable dynamic tokens:
+- Wait_Approval Item link uses LEAP App Play URL.
+- Requester-result link text uses LEAP App Play URL.
+- Send_Admin_Review To uses LEAP Operations Mailbox.
+- Admin-result link text uses LEAP App Play URL.
+Replace all literal APP_PLAY_URL/ADMIN_MAILBOX placeholders and all old source
+values. Use the definition tokens from Dynamic content, not a string containing
+the variable's display name. For expressions use a Compose token or the actual
+generated definition parameter, not an invented parameters() identifier.
+Rehearse that changing target values affects consumers as expected.
+
+Leave P7D timeout fixed for the short workshop; making every property a setting
+is unnecessary. If a temporary PT2M rehearsal is used, restore P7D before release.
+Current values and user GUIDs are deployment configuration, not portable secrets.
+
+App-link bootstrapping: with flow OFF, import the app, obtain its actual target
+published play URL, set that target current value, refresh/save consumers where
+required, and only then enable the flow. Never construct a cloud URL by guessing.
+
+3. REVIEW THE SOLUTION INVENTORY
+-------------------------------
+Actual complete release must contain:
+[ ] LEAP Request table, all13choices and required metadata.
+[ ] IRS LEAP Participant and IRS LEAP Automation roles.
+[ ] Signed plug-in assembly,4registered steps/images and annual-total custom API.
+[ ] The actual Canvas app, saved/published, with current-environment data binding.
+[ ] ONE intended solution-aware approval cloud flow, exported OFF.
+[ ] Actual connection references used by that flow.
+[ ] Actual environment-variable definitions consumed by the flow.
+[ ] Dependencies resolved without adding unrelated solutions or real data.
+
+Adding an app/flow name to a guide is not adding that component to a solution.
+Ordinary-user roles, app sharing, licenses, user provisioning and connections
+remain target setup even if security-role definitions were exported.
+
+4. EXPORT BOTH FLAVORS
+---------------------
+Have an authorized administrator/maker verify target URL, solution unique name,
+version and publisher. Publish relevant changes. Use a controlled idle synthetic
+source lab, turn the approval flow OFF and export from Solutions.
+Choose unmanaged for workshop authoring and managed for the downstream target.
+Do not include source current values that the receiving administrator should set.
+Verify exported app, flow and configuration are ACTUALLY present.
+Restore source flow state only when expressly approved; never resume arbitrary
+pending requests just because a packaging step finished.
+
+The supplied package.py can inventory the existing solution and refuse a
+full-runtime claim if the exported app/flow files are missing:
+  python package.py --pac "C:\APPROVED\PATH\pac.exe" --environment https://APPROVED-ORG --require-app-and-flow
+That gate checks component PRESENCE, not functionality or licensing. Reference/
+variable wiring, flow state, user security and rehearsal remain mandatory.
+Use the actual approved URL in a local .env; do not paste placeholders literally.
+
+5. REHEARSE IN THE ACTUAL CLOUD
+------------------------------
+Import the COMPLETE release into a clean, approved same-cloud rehearsal target.
+Inspect flow state immediately; import/connection authorization can affect
+activation. Do not create records while connections, recipients and configuration
+are unreviewed. Set target values; bind target-owned connections; share app;
+assign/provision licensed ordinary users and the restricted automation identity.
+Native email baseline only. No Flow Bot dependency in GCC.
+
+Execute CORE-LAB functional checkpoints plus Snippets60UAT applicable to core:
+ordinary requester save; selected approver reads/decides; unrelated user denied;
+blank versus0; overlapping2+3sum5; year-of-leave; denied request excluded;
+authorized aggregate without unrelated request details; timeout and stale-state
+protection; published app under ordinary identities; safe presentation change;
+managed downstream deployment with destination-specific configuration.
+Native approval tests involve sends: obtain exact recipient/template approval
+first. Approval dispatch is not claimed exactly-once; retain operational recovery.
+
+Commercial source success does not establish GCC support. Customer authorizes
+the actual GCC sandbox and identities. Do not move agency data across clouds.
+
+RELEASE GATE
+------------
+The150-minute end-to-end lesson is ready ONLY when the complete app/flow
+release and target prerequisites pass rehearsal. Until then, deliver the actual
+backend1.0 starter honestly and label the shortened full-system workshop as
+pending complete-release preparation. Do not fill the gap with a silent mock,
+disabled validation, extra admin privileges or a foundation ZIP relabeled1.1.
+
+OFFICIAL REFERENCES
+-------------------
+Connection references:
+https://learn.microsoft.com/en-us/power-apps/maker/data-platform/create-connection-reference
+Environment variables:
+https://learn.microsoft.com/en-us/power-apps/maker/data-platform/environmentvariables

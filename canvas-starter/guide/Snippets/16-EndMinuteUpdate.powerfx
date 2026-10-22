@@ -1,0 +1,1 @@
+If(ddEndHour.Selected.Value = 24, 1440, ddEndHour.Selected.Value * 60 + ddEndMinute.Selected.Value)

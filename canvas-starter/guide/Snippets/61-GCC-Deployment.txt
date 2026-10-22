@@ -1,0 +1,223 @@
+61 - GOVERNMENT CLOUD DEPLOYMENT / PUBLISH / HANDOFF CHECKLIST
+
+STATUS BOUNDARY
+For the shortened participant workshop use guide\SOLUTIONS-FIRST.txt and finish
+guide\RELEASE-1.1.txt BEFORE the event. The included1.1contains app/flow/config
+components but still needs target bindings/licensing and rehearsal. The older
+backend1.0does not contain those runtime components.
+
+This is a deployment checklist, not an executed deployment or an importable
+Canvas app/flow. Use the actual completed backend export and inspect its contents.
+The parent provisioning work reports final environment/export status separately.
+Do not describe a partially provisioned table as a complete solution, and do not
+infer tenant readiness from this guide. No operations or sends occur here.
+Only authorized administrators/makers perform the later steps in the approved
+environment. Use synthetic data; this workshop is not IRS production accreditation.
+
+1. IDENTIFY CLOUD, TENANT AND ENVIRONMENT
+Record actual tenant ID, environment ID, environment type, region, Dataverse URL
+and current platform version in approved deployment configuration. Confirm full
+Dataverse, not Dataverse for Teams. App, data, flow, connections and approval/
+mail endpoints must target the intended same cloud/environment.
+Do not move government data to a commercial environment to bypass availability.
+
+Maker URLs from Microsoft's government service documentation:
+  GCC Power Apps:       https://make.gov.powerapps.us
+  GCC Power Automate:   https://make.gov.powerautomate.us
+  GCC High Automate:    https://make.high.powerautomate.us
+  DoD Automate:         https://make.powerautomate.appsplatform.us
+Legacy Automate entry points may redirect:
+  GCC: https://gov.flow.microsoft.us
+  GCC High: https://high.flow.microsoft.us
+  DoD: https://flow.appsplatform.us
+For other maker/admin/play endpoints, use the current service documentation and
+the tenant administrator's actual links. Do not construct a government play URL
+by changing suffixes in a commercial link. Copy app Details > Web link in target.
+GCC and GCC High/DoD have different identity/cloud boundaries. A commercial
+developer-tenant test does not establish government-cloud support.
+
+2. LICENSE, POLICY AND IDENTITY PREREQUISITES
+[ ] Administrator verifies current Power Apps/full Dataverse entitlements for
+    each user, and appropriate Power Automate licensing for F/flow/process.
+    Microsoft 365 entitlement alone is not blanket full-Dataverse licensing.
+[ ] Environment capacity, allowed plug-in execution, backups, audit policy,
+    environment security-group membership and conditional access are ready.
+[ ] E/E2/A/B/C/U/F are enabled/provisioned licensed internal users. No guest/
+    external identities in this lab. Mailbox/approvals permissions tested.
+[ ] F has actual deployed automation authorization and least-privilege role,
+    not permanent System Administrator. Credentials and flow-edit access restricted.
+[ ] App users have ordinary request roles; makers use separate maker privileges.
+    No participant broad request Write/Delete/Read, broad Share or F credentials.
+[ ] Administrator attests the eligible internal member Entra GUID allow-list.
+    Saved Users lookups use systemuserid; Assigned to uses verified Entra GUIDs.
+    Maintain the allow-list and deprovisioning process as controlled configuration.
+[ ] DLP permits Dataverse + Standard approvals + Office 365 Outlook together.
+    Check actual action availability, not just a connector tile/catalog listing.
+[ ] Approvals capability initialized through approved environment setup if needed.
+    Native approval mail and same-cloud Approvals portal fallback tested.
+    Quarantine/actionable-mail policies are understood. Email is the baseline.
+[ ] Teams is optional only; no adaptive-card or Flow Bot approval dependency.
+    Government Flow Bot limitation means a separately tested optional channel
+    post uses Post as User in an authorized standard channel. Untested = omit.
+
+3. INSPECT THE ACTUAL BACKEND EXPORT BEFORE APP/FLOW BUILD
+Record artifact file name/version, managed/unmanaged flavor, publisher and
+dependencies; retain approved hash/inventory evidence where agency practice
+requires it. No specific filename in this guide proves an artifact exists.
+[ ] Exactly the intended leap_request table and thirteen native category values.
+[ ] Custom leap_status values: Pending 100000000, Approved 100000001,
+    Denied 100000002, Expired 100000003. Not statecode/statuscode.
+[ ] Date Only format AND behavior; minute ranges and optional integer Hours.
+[ ] Required User lookup Approver 1, optional 2/3, server-derived Requester/
+    Owner/Calendar Year. Users lookups are not Contact/email text columns.
+[ ] Processing Note is Single Line Text max 500, not multiline/memo.
+[ ] Plug-in assembly/steps/images and API implementation present as required by
+    actual deployment design. Creation security, sharing and update guard active.
+[ ] Workflow-only writes while Pending; terminal transitions exclude Approval ID
+    and Processing Note. Finalized rows reject note edits. Decided On server stamp.
+[ ] Native unbound action leap_GetAnnualTotal with exact 00 inputs/outputs.
+    Authorizes current caller: self OR selected on ANY saved request for that
+    requester in ANY year/status, then aggregates requested leave year.
+    This lifetime requester-level authorization is a deliberate disclosure
+    boundary and must be accepted by the business/privacy owner, not concealed.
+[ ] Employee/approver/automation roles inspected and assigned separately from
+    app sharing. Ordinary user security/API tests in 60 pass.
+
+If actual metadata differs, resolve the export/contract mismatch with the parent
+deployment owner. Do not create an insecure lookalike or disable the guard just
+to continue the workshop. Parent final status determines what was provisioned.
+
+4. IMPORT / BUILD BOUNDARIES
+For workshop development use the appropriate actual UNMANAGED foundation in an
+isolated development environment. Managed backend foundations may instead be
+referenced by a separate unmanaged extension solution for app/flow development.
+Preserve the publisher/dependency; do not make a second similarly named table.
+For downstream test/production-style delivery use a rehearsed MANAGED release.
+Never import both flavors into one target as an experiment. Do not uninstall a
+managed solution as casual rollback: it can remove dependent components/data.
+
+Authorized import sequence:
+1. Power Apps > correct environment > Solutions > Import solution. Select actual
+   exported artifact; inspect dependency/import history and resolve actual errors.
+2. Verify backend metadata/guard/API and assign/provision users/roles separately.
+3. Use the app/flow already included in1.1for the short solutions-first lesson.
+   Facilitator-Guide/CORE-LAB remain optional construction references.
+   Do not rebuild an extra trigger flow alongside the packaged one.
+4. Bind actual connection references under F; set governed configuration. Keep
+   imported/duplicate flows OFF until references, guard and identities are checked.
+5. Add native LEAP Requests, Users and Environment to Canvas. Refresh generated
+   API/choice/lookup metadata as required; use actual IntelliSense names.
+6. Run ordinary-user tests before opening to the cohort. Import success alone
+   establishes neither connector operation nor correct security.
+
+5. CONNECTION AND CONFIGURATION MANIFEST (NO SECRETS)
+Record actual target value and evidence for each, not literal example strings:
+  Dataverse reference       F connection to intended target environment
+  Standard approvals ref   F same-cloud approvals connection
+  Office 365 Outlook ref   F same-cloud mailbox connection
+  varAppUrl                Published target app's actual web play URL
+  varAdminMailbox          Approved operations mailbox
+  varInternalApproverEntraIds Admin-verified lowercase internal Entra GUID array
+  F systemuserid           Actual target Dataverse automation user GUID
+  F authorization          Actual export's mechanism/configuration, verified
+  Roles/cohort              Actual role names + approved target security group
+  API                       leap_GetAnnualTotal native caller-bound action
+
+These are runbook names, not a claim that preexisting environment variables of
+those schema names were shipped. If you introduce solution environment variables,
+create/use governed definitions and actual target values and bind the initializers.
+Never invent a deployment-settings file with unknown connection logical names.
+Use the target's connection-reference prompts/approved ALM tooling and inventory.
+Connections, credentials, role assignments, Entra membership and user onboarding
+are not transported merely by solution export. User/Entra GUIDs differ by tenant;
+rebuild allow-lists/mappings for the target rather than copying source identities.
+Do not distribute OAuth secrets or F's connection to participants.
+
+6. FLOW REVIEW - ADVANCED REFERENCE BRANCH
+The Create/save-ID/Wait entries below apply ONLY to the advanced construction
+alternative. Packaged1.1uses native Start-and-wait and leaves Approval ID blank;
+review its actual24-action definition and RELEASE-1.1instead. Do not add the
+advanced flow on top of the prepared flow or enable two Added triggers.
+[ ] Trigger_RequestAdded: Added only, Organization scope, concurrency OFF.
+    Never global degree 1 behind long waits. Scope is event coverage, not access.
+[ ] Selected GUID array from saved _leap_approverNid_value; remove blank optional
+    IDs before OData. Users List rows filter systemuserid eq GUID OR clauses.
+    Text-mode Select returns Entra GUID strings; no arbitrary app recipient text.
+[ ] Exact selected-set count/membership, enabled human users, trusted internal
+    allow-list and unique response identity mapping; no silent recipient omission.
+[ ] One Create_Approval, first-to-respond, notifications Yes, reassignment No.
+    Create retry None. Immediately persist its ID, then Wait_Approval P7D.
+[ ] Exact 52 run-after matrix: only Wait TimedOut expires, never skipped/failed.
+[ ] Fresh Pending/same-ID decision and expiry guards; transition fields exact.
+    Processing Note not combined with any terminal transition.
+[ ] Generic requester/admin message templates only. Notification failure cannot
+    restart approval. Pending-only generic note max500; no terminal note update.
+[ ] Immediate-response create/save/wait race explicitly recorded and saved-ID
+    reconciliation owner assigned. Do not imply all response timings are safe.
+[ ] Sequential replay guard documented as non-atomic; ambiguous create and
+    simultaneous dispatch require reconciliation. Backend is not proven race safe.
+[ ] Fault-injection copies/optional Teams tests identified and excluded from
+    active deployment. No production data in snippets or support screenshots.
+
+7. CANVAS PUBLISH AND SHARE
+1. In Studio, App checker: correct actual schema/type references, errors,
+   unexpected delegation warnings and accessibility issues. 42-date local
+   calendar is allowed; request dataset collection/Sum is not.
+2. Confirm ddRequestView and 33 use native Requester.User / Approver N.User GUID
+   equality; direct Dataverse delegation, no all-employee cache. User limit
+   increases do not replace delegation or secured server totals.
+3. Save, then Publish this version. Record version/time.
+4. Apps > app menu > Share: approved cohort/group as user, not every employee
+   as co-owner. Assign data roles and environment membership separately.
+5. Copy actual Web link from Details. Update target flow varAppUrl and save.
+   No maker edit URL or foreign-cloud play URL in mail.
+6. Open published link as ordinary E/A/U in separate profiles. Verify direct
+   native Dataverse/API connections use the signed-in user, never F.
+7. Turn on the authorized target flow after references/checks are complete.
+   A normal E save must trigger it without giving E flow-edit privilege.
+8. Execute 60 with actual published version and capture results. Reconfirm P7D
+   after PT2M test. Maker preview/admin success is not ordinary-user UAT.
+
+8. EXPORT WHAT WAS ACTUALLY BUILT
+[ ] Publish relevant customizations; add actual Canvas app, solution-aware cloud
+    flow, connection references, governed configuration and dependencies to the
+    appropriate solution. If extension, preserve actual foundation dependency.
+[ ] Increment solution version; export UNMANAGED for development/source handoff,
+    then appropriately rehearsed MANAGED artifact for downstream release.
+[ ] Inspect exported component inventory. Backend-only artifact, built app/flow
+    export and guide-only snippets must be distinguished explicitly.
+[ ] Record actual files, versions, target requirements and import order.
+    Never call .powerfx/.txt files an importable .msapp or flow package.
+[ ] Authorized target import/rebind/publish/smoke test recorded separately.
+    If not executed, state NOT PERFORMED rather than assuming source parity.
+[ ] Handoff retains audit/UAT evidence, run IDs, known limitations, support owner,
+    approved retention/cleanup plan and external recovery-case location.
+
+9. OPERATIONS / ROLLBACK / ACCEPTANCE
+Monitor actual failed/timed-out runs, connection expiry, pending age, ambiguous
+creation and native-service vs request-state discrepancies through approved
+restricted tools. Flow off prevents future dispatch but does not itself cancel
+existing runs/native approvals; inventory and coordinate those explicitly.
+For fault, stop unsafe dispatch/writers through the approved change procedure,
+preserve request/approval/run IDs and audit evidence, reconcile via 52, and fix/
+redeploy a versioned solution. Terminal rows are immutable; no note edits,
+reopening, casual delete, or resetting Approval ID to force another approval.
+Business corrections require approved separate audit procedures.
+
+Do not declare production readiness from a workshop completion. Require agency
+privacy/security/accessibility/records review, accepted lifetime aggregate-access
+policy, ALM rollback rehearsal, capacity/load/concurrency tests, monitored
+reconciliation/atomic dispatch and transition design, ownership/continuity and
+formal authorization. Normal first-response tests are not race-safety proof.
+Final handoff must distinguish documented instructions, built/exported components,
+executed tests and unresolved limitations. Parent supplies final deployment status.
+
+PUBLIC REFERENCES (RECHECK AGAINST THE ACTUAL TARGET)
+https://learn.microsoft.com/en-us/power-automate/us-govt
+https://learn.microsoft.com/en-us/power-platform/admin/powerapps-us-government
+https://learn.microsoft.com/en-us/connectors/approvals/
+https://learn.microsoft.com/en-us/connectors/teams/
+https://learn.microsoft.com/en-us/power-apps/maker/canvas-apps/share-app
+https://learn.microsoft.com/en-us/power-platform/alm/connection-references-alm
+https://learn.microsoft.com/en-us/power-platform/alm/environment-variables
+Public documentation is not proof that a tenant-specific action was exercised.

@@ -1,0 +1,623 @@
+{
+  "version": "1.1.0.0",
+  "visibility": "private",
+  "originalHistoryIncluded": false,
+  "nativeArtifactsRetainNonSecretDeploymentMetadata": true,
+  "files": [
+    {
+      "path": ".gitignore",
+      "bytes": 451,
+      "sha256": "5d8d786469fee16168522fb2b76aad507e52534d1ba3065afc1c45049e0890d7"
+    },
+    {
+      "path": "canvas-starter/ADMIN-HANDOFF.txt",
+      "bytes": 12133,
+      "sha256": "4e5e7c90ef70a700d407a29f0fa06075ca945a8217a41c23d11347367e41d0c9"
+    },
+    {
+      "path": "canvas-starter/backend/.gitignore",
+      "bytes": 132,
+      "sha256": "30a1877cd5ce8e7274fd32884403b5219dd251c14a38dedc70daf0b41812307e"
+    },
+    {
+      "path": "canvas-starter/backend/artifacts/IrsLeap.Plugins.dll",
+      "bytes": 24576,
+      "sha256": "9259e54a4f3eee56a19881bbc64ae0c392c729d78a09eaefee300752cc719999"
+    },
+    {
+      "path": "canvas-starter/backend/IrsLeap.Plugins.csproj",
+      "bytes": 1134,
+      "sha256": "60f1217ccf9b0d5ac0e2780f764bd83b1ad5847670bf5f3769cfe5d9b8d19f87"
+    },
+    {
+      "path": "canvas-starter/backend/manifest.json",
+      "bytes": 223,
+      "sha256": "f086655ffff6f654011a2101024196f08a799df9b9ed050e4452898fd2be41e8"
+    },
+    {
+      "path": "canvas-starter/backend/New-SigningKey.ps1",
+      "bytes": 742,
+      "sha256": "30480e1d36d875f7daeaa358bfb5dba6e71e650ae9414caff14780c3f326bbc2"
+    },
+    {
+      "path": "canvas-starter/backend/Plugins/AnnualTotal.cs",
+      "bytes": 5847,
+      "sha256": "520cd9c55ecbae7e3f2e08eaba7e077275e429d46b24d0b6e12d0b68cb4c049a"
+    },
+    {
+      "path": "canvas-starter/backend/Plugins/RequestGuard.cs",
+      "bytes": 6971,
+      "sha256": "39624063cdffe26fbaa09aed7a812593037acbe20b4587a5bd17f5d13a633f57"
+    },
+    {
+      "path": "canvas-starter/backend/Plugins/RequestShare.cs",
+      "bytes": 1901,
+      "sha256": "eba60ffdfd5fc4142490fedbcfe3e9e5337399bae8d3a44ac38e52d34e59bb5d"
+    },
+    {
+      "path": "canvas-starter/backend/Plugins/Rules.cs",
+      "bytes": 6191,
+      "sha256": "58ed9aefc83c1ba9337e112180a3b3e8d3eeb069a2508a139f78d266b8f4b5ba"
+    },
+    {
+      "path": "canvas-starter/backend/Plugins/Runtime.cs",
+      "bytes": 2409,
+      "sha256": "0cc6d0ff7e28db33a853cdaaa1d4958b47ae6b349105af26bbb055c41230cf43"
+    },
+    {
+      "path": "canvas-starter/backend/Plugins/Schema.cs",
+      "bytes": 3228,
+      "sha256": "83f4163c8785955127590e8d3222582c960b573fec528a624b4d380a87a5b36f"
+    },
+    {
+      "path": "canvas-starter/backend/REGISTRATION.txt",
+      "bytes": 14557,
+      "sha256": "8e87270c1c0e85293a327b7c7a4545e7e4798edf2241c2ecab6d5573855a7f66"
+    },
+    {
+      "path": "canvas-starter/backend/Validation/IrsLeap.Validation.csproj",
+      "bytes": 762,
+      "sha256": "dae3f751b21e0a62159df1b5fb314006ac454134766c950215ffb591ea455db3"
+    },
+    {
+      "path": "canvas-starter/backend/Validation/Program.cs",
+      "bytes": 40067,
+      "sha256": "7790a1cea4b32afc0d505bd7f7fec7486f625103e5d3eaa46f565706d22b5222"
+    },
+    {
+      "path": "canvas-starter/backend-validation.json",
+      "bytes": 1581,
+      "sha256": "71ba385c93bfe4455f013ddd3ad43573b1665de04f60703396eaed301dcc50c9"
+    },
+    {
+      "path": "canvas-starter/deliverables/IRS-LEAP-Canvas-Hackathon-Kit.zip",
+      "bytes": 2421443,
+      "sha256": "8bd0e30d47b82901521cc574f7bf31e5b7a9b194be419207e7d779299d0409b0"
+    },
+    {
+      "path": "canvas-starter/deliverables/IRSLEAPCanvasStarter_1_1_0_0_managed.zip",
+      "bytes": 537620,
+      "sha256": "b59634d54511e368cf458e8b460fec457bd9dce34263e77df91ab228bcb75c3a"
+    },
+    {
+      "path": "canvas-starter/deliverables/IRSLEAPCanvasStarter_1_1_0_0_unmanaged.zip",
+      "bytes": 537770,
+      "sha256": "e7cc0727b843e2e49f7b2cc5e7997e8347c692ba228a19369342dbe2fcd6250b"
+    },
+    {
+      "path": "canvas-starter/deliverables/package-report.json",
+      "bytes": 1798,
+      "sha256": "0a6cacde43895d62437b7068d65b2ff15e9fac22685b40e82cb49bf1559f85e7"
+    },
+    {
+      "path": "canvas-starter/guide/COMPLETE-SOLUTION-PREPARATION.txt",
+      "bytes": 8785,
+      "sha256": "f958a59b8cc047d0fb7c5ba9ced8be25db8787c1b3d41130029fe725fdea719b"
+    },
+    {
+      "path": "canvas-starter/guide/CORE-LAB.txt",
+      "bytes": 30552,
+      "sha256": "bcb88417fdd12abace9fff315d2489fc7a9e5fcddf35ae31b20e95af3969ad13"
+    },
+    {
+      "path": "canvas-starter/guide/Facilitator-Guide.txt",
+      "bytes": 49593,
+      "sha256": "c9c0f564eaa1ad2af1f656b32460f07e3c2334d4710480b48818266b487a16bd"
+    },
+    {
+      "path": "canvas-starter/guide/IRS-LEAP-Workshop-Guide.html",
+      "bytes": 527302,
+      "sha256": "58774acfe1be56e6b6eba7b97b74959fbc3f1b4a8953e0d33bd663288f6aa7be"
+    },
+    {
+      "path": "canvas-starter/guide/RELEASE-1.1.txt",
+      "bytes": 7702,
+      "sha256": "3c4fec31f36f01772b36b12db7b96f175a6fc856c7d759f2cc64dcf177baf946"
+    },
+    {
+      "path": "canvas-starter/guide/Snippets/00-Contract.txt",
+      "bytes": 7053,
+      "sha256": "6e00aaaa700fe8ceaa3e4724c1328690fad7ec108b0e80ad6b4919d4418c252c"
+    },
+    {
+      "path": "canvas-starter/guide/Snippets/10-OnStart.powerfx",
+      "bytes": 415,
+      "sha256": "4fbab1e8e9798e291e2af5c64b0995250a31beb4e9499a1f5a092283531c44c1"
+    },
+    {
+      "path": "canvas-starter/guide/Snippets/11-HourItems.powerfx",
+      "bytes": 58,
+      "sha256": "d1734d2c24ee6b55bbfdde08d483064eed20a908d7a64b2eba0af5e208fbb882"
+    },
+    {
+      "path": "canvas-starter/guide/Snippets/12-MinuteItems.powerfx",
+      "bytes": 58,
+      "sha256": "0dd86d2f47bec38b968dad8d14d8d816af02c5edab8ed536137fd6e3747101c3"
+    },
+    {
+      "path": "canvas-starter/guide/Snippets/13-EndHourItems.powerfx",
+      "bytes": 58,
+      "sha256": "efc7da44e94fc16ec551e121673bc7a4c304da3f9776d61a164d263c58436ecd"
+    },
+    {
+      "path": "canvas-starter/guide/Snippets/14-EndMinuteItems.powerfx",
+      "bytes": 143,
+      "sha256": "b8333bd2d9a07f58ff93e6b5346237635263d269a5d3cc73f5c5e1a39a2661d2"
+    },
+    {
+      "path": "canvas-starter/guide/Snippets/15-StartMinuteUpdate.powerfx",
+      "bytes": 64,
+      "sha256": "79b067dbed39934ce2f81a087c49a06a02465f7d6ec5a6b4937ede5d8a3a04d1"
+    },
+    {
+      "path": "canvas-starter/guide/Snippets/16-EndMinuteUpdate.powerfx",
+      "bytes": 101,
+      "sha256": "a13a03a32e7d34943b2721a9dfeb6618d86bfee37a6925fb80c09a4fea72d514"
+    },
+    {
+      "path": "canvas-starter/guide/Snippets/17-HoursUpdate.powerfx",
+      "bytes": 219,
+      "sha256": "2b489ecb7dcba5e8cdda11d1d7502c0079e996a3e24ae6a2d62c59b8b8d4a516"
+    },
+    {
+      "path": "canvas-starter/guide/Snippets/18-SubmitOnSelect.powerfx",
+      "bytes": 1603,
+      "sha256": "ceadd58c4270a1017ee1936e3a4d1b3dd085b64f61f76f018a75d20af978b13c"
+    },
+    {
+      "path": "canvas-starter/guide/Snippets/19-FormOnSuccess.powerfx",
+      "bytes": 493,
+      "sha256": "b73a50e7ca40f478d60e7cf3f8de3c3280e28193e6220381db531e7101b45a9a"
+    },
+    {
+      "path": "canvas-starter/guide/Snippets/20-FormOnFailure.powerfx",
+      "bytes": 150,
+      "sha256": "a69d2000ed6bc2707d164abf8b8cc4b477aa7f6c703532fde80abc3a0e8ade45"
+    },
+    {
+      "path": "canvas-starter/guide/Snippets/21-CategoryItems.powerfx",
+      "bytes": 46,
+      "sha256": "2cd807a220c12f7bcfcb29bd3a8e2e64f8287611229dae06ba8d6679b438bef0"
+    },
+    {
+      "path": "canvas-starter/guide/Snippets/22-Approver1Items.powerfx",
+      "bytes": 42,
+      "sha256": "81502aab7c294cc1b9ee621a7157a519ec868022e63cf2197e14f2dc19fba586"
+    },
+    {
+      "path": "canvas-starter/guide/Snippets/23-Approver2Items.powerfx",
+      "bytes": 42,
+      "sha256": "182584b441c14115d5160cd7ee605ccba9736a9517ec93c128b158686d2acce7"
+    },
+    {
+      "path": "canvas-starter/guide/Snippets/24-Approver3Items.powerfx",
+      "bytes": 42,
+      "sha256": "ac930a6accbfbad50437b5aea0cd1431460a8fae2648517a45dc7fc2ad35cad3"
+    },
+    {
+      "path": "canvas-starter/guide/Snippets/30-CalendarItems.powerfx",
+      "bytes": 87,
+      "sha256": "a3b3b233315cf856cc482713b5ebe8b83fb63c9f5c262b9c97ce8943444bacaf"
+    },
+    {
+      "path": "canvas-starter/guide/Snippets/31-CalendarPrevious.powerfx",
+      "bytes": 185,
+      "sha256": "21c25ad5297dbfafcae9bd0489b69fe1fbf9892746ef77a182630058565a2ca0"
+    },
+    {
+      "path": "canvas-starter/guide/Snippets/32-CalendarNext.powerfx",
+      "bytes": 184,
+      "sha256": "a7606d56880c0ab90804d3c01d48b02a21300fe2f57cdd11503bbbf4a59eba62"
+    },
+    {
+      "path": "canvas-starter/guide/Snippets/33-DayRequestsItems.powerfx",
+      "bytes": 1193,
+      "sha256": "13f07860b0650708895b21f9e7d693863f75b1ad05ec3c6b0907d8a46bda3c4b"
+    },
+    {
+      "path": "canvas-starter/guide/Snippets/34-RequestSummary.powerfx",
+      "bytes": 464,
+      "sha256": "b2eda9f709c85687c87a77fee1ec615710346a9cc1db280863a80080adc40e77"
+    },
+    {
+      "path": "canvas-starter/guide/Snippets/35-RefreshOnSelect.powerfx",
+      "bytes": 121,
+      "sha256": "3a35dced4e415d13c091cc5ae37a7b745304ffc526c7eff5d26fe9ebe8c43c1c"
+    },
+    {
+      "path": "canvas-starter/guide/Snippets/40-AnnualTotalOnSelect.powerfx",
+      "bytes": 915,
+      "sha256": "d88932076ae4e5184b8def2ff028a62ff070b4ac701b32bc953fe3e9798ac6c8"
+    },
+    {
+      "path": "canvas-starter/guide/Snippets/41-AnnualTotalText.powerfx",
+      "bytes": 463,
+      "sha256": "75e8a0b7c1ec48a2db43097cf7f44310848d8180f78eb5531a982b45f02b1a63"
+    },
+    {
+      "path": "canvas-starter/guide/Snippets/50-Flow-Build.txt",
+      "bytes": 21153,
+      "sha256": "5deeb3295386516602bf93b6cdffe8eaf2cb916655c30e7019708efffab60759"
+    },
+    {
+      "path": "canvas-starter/guide/Snippets/51-Flow-Expressions.txt",
+      "bytes": 19732,
+      "sha256": "af6bde11697bd5fee175f8cff226dc08e4d7a095780557e34d37675feb3b0a0f"
+    },
+    {
+      "path": "canvas-starter/guide/Snippets/52-Flow-Recovery.txt",
+      "bytes": 15954,
+      "sha256": "08aa1d48d3a1b4ae76bf5d45e80c897c5403afbc5035ee18b727bcab6b0c7562"
+    },
+    {
+      "path": "canvas-starter/guide/Snippets/60-UAT.txt",
+      "bytes": 16798,
+      "sha256": "6cbb9bd77adbdbb19c81a145d8536976e0c9479160bd17dbc7b08036711b8692"
+    },
+    {
+      "path": "canvas-starter/guide/Snippets/61-GCC-Deployment.txt",
+      "bytes": 15285,
+      "sha256": "f9b5e9a77189301648c93486e5c283c673121fb84e33d1112c007cc19f726211"
+    },
+    {
+      "path": "canvas-starter/guide/SOLUTIONS-FIRST.txt",
+      "bytes": 14964,
+      "sha256": "6407575894254f718b6de9a68fab2c5cd6583878b44651a8551fc48e1c900304"
+    },
+    {
+      "path": "canvas-starter/package.py",
+      "bytes": 10144,
+      "sha256": "d4a8ef30a823370f0fdfc38e4043ca64d4341a8c57d24f6291b6d878a09a912c"
+    },
+    {
+      "path": "canvas-starter/provision.py",
+      "bytes": 18365,
+      "sha256": "d3f4ee31e494adbc0f9bda61e406cce1b3dc536a9f195e7fa28c037b3be7aaf6"
+    },
+    {
+      "path": "canvas-starter/render_guide.py",
+      "bytes": 8759,
+      "sha256": "faa0c9c8e9e00bf7d6c23711eb713f4a53f726f2e26521455ed80f214851e0a6"
+    },
+    {
+      "path": "canvas-starter/runtime-canvas/.gitignore",
+      "bytes": 39,
+      "sha256": "15e38be5497f44f4d9b688632e216f60f7a8916ead1a07d64e85098c4391b330"
+    },
+    {
+      "path": "canvas-starter/runtime-canvas/_EditorState.pa.yaml",
+      "bytes": 99,
+      "sha256": "4fb7435c8825706e8d5117f20cc00608c0eea9b6b5e22222df3d1489b8ab3ba4"
+    },
+    {
+      "path": "canvas-starter/runtime-canvas/App.pa.yaml",
+      "bytes": 629,
+      "sha256": "332f201000398bcb6c52a492b5cdfe56a4c7dda5cdada2d6a623c2496651d6b8"
+    },
+    {
+      "path": "canvas-starter/runtime-canvas/IRS-LEAP.msapp",
+      "bytes": 497770,
+      "sha256": "2f0084caa6321e781c3d4b4b7f138e24251fb030f2c3c52972eb9b8ee594389f"
+    },
+    {
+      "path": "canvas-starter/runtime-canvas/runtime-validation.json",
+      "bytes": 1728,
+      "sha256": "7fc1af8f996b264351b5001b80bf9b665512f52bae701b9f639e9a0a082e8812"
+    },
+    {
+      "path": "canvas-starter/runtime-canvas/scrCalendar.pa.yaml",
+      "bytes": 7991,
+      "sha256": "dbcf9f862e8d9f5b41492a52a66f87db55d9c95d8fd0ba7a5f90035652448c37"
+    },
+    {
+      "path": "canvas-starter/runtime-canvas/scrDetails.pa.yaml",
+      "bytes": 3746,
+      "sha256": "f5b96a1b18d15e9fab05790a7156a4919bce50c1e0b5c2e8d025ef4d0715b956"
+    },
+    {
+      "path": "canvas-starter/runtime-canvas/scrNew.pa.yaml",
+      "bytes": 12397,
+      "sha256": "185a5cf9b99839660c12ccc78479d13e79614149015d6c68be29872918365c61"
+    },
+    {
+      "path": "canvas-starter/runtime-canvas/scrTotals.pa.yaml",
+      "bytes": 4292,
+      "sha256": "3b497b08c2f28584ca2ae7c2a378879b97b56ce1b385135d49cc65e4d053ca60"
+    },
+    {
+      "path": "canvas-starter/runtime-flow/.gitignore",
+      "bytes": 243,
+      "sha256": "291a9c94180b7fa262cfbddfb33ba5497a25d7526d20cd893ba1d1166f23b45b"
+    },
+    {
+      "path": "canvas-starter/runtime-flow/deployment-settings.json",
+      "bytes": 730,
+      "sha256": "64df07fa441733314447c9eca2731f067e867f9028aa3027f9937fb892e2a8d3"
+    },
+    {
+      "path": "canvas-starter/runtime-flow/independent-review.json",
+      "bytes": 4684,
+      "sha256": "ae3a6dd7fa97fc83d1f12d9c7084a5af707fd2f9b1574771421d2a78fb594783"
+    },
+    {
+      "path": "canvas-starter/runtime-flow/independent-review.txt",
+      "bytes": 1662,
+      "sha256": "8ba224ad9f9d6f3535ca421e0ec43024619023292303c78896d32202acb03a08"
+    },
+    {
+      "path": "canvas-starter/runtime-flow/leap-first-response.clientdata.json",
+      "bytes": 22428,
+      "sha256": "d47fd5312dc49e72ee2d5c017ee7cb70938856dbee4f293f5a6ab8a30fc5934d"
+    },
+    {
+      "path": "canvas-starter/runtime-flow/runtime-flow-report.json",
+      "bytes": 9667,
+      "sha256": "da861c9678f6da36e1eafd8c01354c68d500731ea07e64dd85aceb4eed616035"
+    },
+    {
+      "path": "canvas-starter/runtime-flow/runtime-flow-report.txt",
+      "bytes": 2398,
+      "sha256": "ab7c4ec040cf5dbe9f1e8554ebbad173177d07d8c583ec6e704834a7a3b23ab5"
+    },
+    {
+      "path": "canvas-starter/runtime-flow/syntax-validation.json",
+      "bytes": 3004,
+      "sha256": "e0b5da31ea88390c187ed6d2cfe952b793df8f308eb317439b90adad36b2cbe0"
+    },
+    {
+      "path": "canvas-starter/solution-source/CanvasApps/leap_irsleap_e1c7a.meta.xml",
+      "bytes": 2584,
+      "sha256": "6ad991616288befc2f7461526e953933b55720c2b8fa897e1869e081043db5c0"
+    },
+    {
+      "path": "canvas-starter/solution-source/CanvasApps/leap_irsleap_e1c7a_AdditionalUris0_identity.json",
+      "bytes": 3755,
+      "sha256": "9f3daf60f3db5913d8acea640dfeeac198c9932505cbc39005f515009e36ca32"
+    },
+    {
+      "path": "canvas-starter/solution-source/CanvasApps/leap_irsleap_e1c7a_BackgroundImageUri",
+      "bytes": 14684,
+      "sha256": "f14fcb6541df1028eddbd62db587c9d7518601e9b01d2e87e54627bf160c9b12"
+    },
+    {
+      "path": "canvas-starter/solution-source/CanvasApps/leap_irsleap_e1c7a_DocumentUri.msapp",
+      "bytes": 497770,
+      "sha256": "2f0084caa6321e781c3d4b4b7f138e24251fb030f2c3c52972eb9b8ee594389f"
+    },
+    {
+      "path": "canvas-starter/solution-source/customapis/leap_GetAnnualTotal/customapi.xml",
+      "bytes": 920,
+      "sha256": "4ec625e3888e98d57baf03667cc268095d74ef2f29eb49279abe614b851e0fd8"
+    },
+    {
+      "path": "canvas-starter/solution-source/customapis/leap_GetAnnualTotal/customapirequestparameters/CalendarYear/customapirequestparameter.xml",
+      "bytes": 318,
+      "sha256": "e2f02037fc0f0f23ba1528c2752a65761166728b39cceab6e99ae6bb1bce534f"
+    },
+    {
+      "path": "canvas-starter/solution-source/customapis/leap_GetAnnualTotal/customapirequestparameters/RequesterId/customapirequestparameter.xml",
+      "bytes": 315,
+      "sha256": "387f044c9545ca6535068005a14234e2ff5d27fd45e1ab032ee6bf5686da1aa3"
+    },
+    {
+      "path": "canvas-starter/solution-source/customapis/leap_GetAnnualTotal/customapiresponseproperties/ApprovedRequests/customapiresponseproperty.xml",
+      "bytes": 304,
+      "sha256": "e2106a5f44c0e90ff8c7ab90f380b4b6ad9f899e2c36d4fbc1241ad662b538de"
+    },
+    {
+      "path": "canvas-starter/solution-source/customapis/leap_GetAnnualTotal/customapiresponseproperties/MissingHours/customapiresponseproperty.xml",
+      "bytes": 288,
+      "sha256": "e26c028ffbe29f661c5bd3c948db1e8106720212f1a695c871b3843355140567"
+    },
+    {
+      "path": "canvas-starter/solution-source/customapis/leap_GetAnnualTotal/customapiresponseproperties/RequesterName/customapiresponseproperty.xml",
+      "bytes": 293,
+      "sha256": "31713259ec71585fcc846c1ed827bf09a16b78a98e093363a9f7c8f7dbdac97c"
+    },
+    {
+      "path": "canvas-starter/solution-source/customapis/leap_GetAnnualTotal/customapiresponseproperties/TotalHours/customapiresponseproperty.xml",
+      "bytes": 280,
+      "sha256": "703b4872d58269f6cf3f0262e290d6f6fff3d3179213c7d50af1f55bafbf0607"
+    },
+    {
+      "path": "canvas-starter/solution-source/Entities/leap_Request/Entity.xml",
+      "bytes": 76699,
+      "sha256": "ac31d30799ebe8cabb953d81bacbe982632a6d651208226957412936ccd301e0"
+    },
+    {
+      "path": "canvas-starter/solution-source/Entities/leap_Request/FormXml/card/{7b5807dc-bfad-4f76-a4c4-a71ea6321816}.xml",
+      "bytes": 5617,
+      "sha256": "7e52f070e8b33fd961ce4abb0cdd8c5569cbff2f0a5a243d3e7ee9c162646bfa"
+    },
+    {
+      "path": "canvas-starter/solution-source/Entities/leap_Request/FormXml/main/{afd32e8d-d7de-4e2d-a443-e9861bdbee0e}.xml",
+      "bytes": 2293,
+      "sha256": "ccb34e8e86806fee12909ddb7807bf3f1b3f2261fd06c47335d8df738585bc49"
+    },
+    {
+      "path": "canvas-starter/solution-source/Entities/leap_Request/FormXml/quick/{1b1cfae0-5f39-4541-a5d1-7f68dbaa8e35}.xml",
+      "bytes": 2164,
+      "sha256": "729e07cdf65982433229cf4059708c4e084a965d34de4db61e34c3f4f9ba4028"
+    },
+    {
+      "path": "canvas-starter/solution-source/Entities/leap_Request/RibbonDiff.xml",
+      "bytes": 398,
+      "sha256": "9ff3d2f6ac9961c88f79c029293bc9c2a8bfd301762e4d7a3bedcec29a951640"
+    },
+    {
+      "path": "canvas-starter/solution-source/Entities/leap_Request/SavedQueries/{12ca72d1-5b59-4978-87c2-8ac2ddac27f6}.xml",
+      "bytes": 1271,
+      "sha256": "daad66a8eb71767466881593a36ce25079c2b4dd1257637055b318078843516a"
+    },
+    {
+      "path": "canvas-starter/solution-source/Entities/leap_Request/SavedQueries/{41ae8289-f546-49d3-a6f9-f3288c3e1b04}.xml",
+      "bytes": 1385,
+      "sha256": "0ad8b6a7f12b27040b71af78b6fcdcf1f2201866e0764c7f35636451ed7a4f3a"
+    },
+    {
+      "path": "canvas-starter/solution-source/Entities/leap_Request/SavedQueries/{5ad59356-8b38-4f8b-b98f-5f19de028d59}.xml",
+      "bytes": 1403,
+      "sha256": "ca02a2e23dd0cd932d1af37fcdb3b381216c69dc065ec1a8e0dad1ba4c730e6c"
+    },
+    {
+      "path": "canvas-starter/solution-source/Entities/leap_Request/SavedQueries/{6e853e92-3d73-43ba-92af-aba6785ffc8f}.xml",
+      "bytes": 1387,
+      "sha256": "45f43d1f8e48ab063663c5d74942cc5df7057058bd4260a723710171c33799a2"
+    },
+    {
+      "path": "canvas-starter/solution-source/Entities/leap_Request/SavedQueries/{9a527947-4b8b-4167-9cfc-ce0edf173bb6}.xml",
+      "bytes": 1546,
+      "sha256": "2e265095bbbcc66d3f66188b84e3081a56f6785e37e443fd4608a95a2d34c2d8"
+    },
+    {
+      "path": "canvas-starter/solution-source/Entities/leap_Request/SavedQueries/{c833eebf-a344-43e0-9d99-2bcdf2b7209c}.xml",
+      "bytes": 1338,
+      "sha256": "1949b15981d6f5e8fbde6244e695b39f1dababce37953f6d7ddf9c730d285a09"
+    },
+    {
+      "path": "canvas-starter/solution-source/Entities/leap_Request/SavedQueries/{f28bab81-b9cd-f111-a05c-6045bd094f74}.xml",
+      "bytes": 1173,
+      "sha256": "28977b7c79cdbc22a90544c50fd89f3d5f17ea7d045e5d42cc515e6bf73f1979"
+    },
+    {
+      "path": "canvas-starter/solution-source/Entities/SystemUser/Entity.xml",
+      "bytes": 318,
+      "sha256": "b02b51729b3023a08cabac0d8a89375f7c07e1cba68c5ea33eb5c41166badf42"
+    },
+    {
+      "path": "canvas-starter/solution-source/Entities/SystemUser/RibbonDiff.xml",
+      "bytes": 398,
+      "sha256": "9ff3d2f6ac9961c88f79c029293bc9c2a8bfd301762e4d7a3bedcec29a951640"
+    },
+    {
+      "path": "canvas-starter/solution-source/environmentvariabledefinitions/leap_AppPlayUrl/environmentvariabledefinition.xml",
+      "bytes": 658,
+      "sha256": "6083b5ffe7e2b0b94a81fac80be87081ca7911740e4ab008498e91e6552441e9"
+    },
+    {
+      "path": "canvas-starter/solution-source/environmentvariabledefinitions/leap_OperationsMailbox/environmentvariabledefinition.xml",
+      "bytes": 677,
+      "sha256": "49521e1d4d79598e71e9e3938e3157d4726d46d0e466815aa1ef264f205949d5"
+    },
+    {
+      "path": "canvas-starter/solution-source/Other/Customizations.xml",
+      "bytes": 2389,
+      "sha256": "78a1b89a7fbf1451fbc2848f39da8695f0d8e5a0b3c310cbb3ce5abfc4adf2bf"
+    },
+    {
+      "path": "canvas-starter/solution-source/Other/Relationships/BusinessUnit.xml",
+      "bytes": 1134,
+      "sha256": "d20095cde294290000a5b043ff6599ffd39bc21d8ffdf582d6a8109ff3121a94"
+    },
+    {
+      "path": "canvas-starter/solution-source/Other/Relationships/Owner.xml",
+      "bytes": 1058,
+      "sha256": "83b2776d7dfeb88c6d44b3283090c554d7655433a5fed68eca57d4bd07adab33"
+    },
+    {
+      "path": "canvas-starter/solution-source/Other/Relationships/SystemUser.xml",
+      "bytes": 10752,
+      "sha256": "cbb89a886c3e8a092fcf153fbba4e0fba7f5af745951549b657730ac403941e0"
+    },
+    {
+      "path": "canvas-starter/solution-source/Other/Relationships/Team.xml",
+      "bytes": 1103,
+      "sha256": "8c6666240a5a6ee021af4c27bb194cff73fb1ed755160c7897b58819d2f96c3b"
+    },
+    {
+      "path": "canvas-starter/solution-source/Other/Relationships.xml",
+      "bytes": 790,
+      "sha256": "9bef9bf14849e60afdfc8e23edfa1065c979c6562e6f4548188a1658cdf8b77c"
+    },
+    {
+      "path": "canvas-starter/solution-source/Other/Solution.xml",
+      "bytes": 5712,
+      "sha256": "89d921768a1ab039ac008d554f96e13ea132099d2589eae23cb0ce32d169afe9"
+    },
+    {
+      "path": "canvas-starter/solution-source/PluginAssemblies/IrsLeapPlugins-47B19245-BCCD-F111-A05C-6045BD094F74/IrsLeapPlugins.dll",
+      "bytes": 24576,
+      "sha256": "9259e54a4f3eee56a19881bbc64ae0c392c729d78a09eaefee300752cc719999"
+    },
+    {
+      "path": "canvas-starter/solution-source/PluginAssemblies/IrsLeapPlugins-47B19245-BCCD-F111-A05C-6045BD094F74/IrsLeapPlugins.dll.data.xml",
+      "bytes": 1522,
+      "sha256": "3b6cf9e6bebe7c715ca7e37525d38fcdbe0f2f7920e2c377e933a46a0b70be91"
+    },
+    {
+      "path": "canvas-starter/solution-source/Roles/IRS LEAP Automation.xml",
+      "bytes": 1243,
+      "sha256": "b8407174ced3fd0d22712db5f56715412184d1f5b1ece3366f5288e832e7b4d2"
+    },
+    {
+      "path": "canvas-starter/solution-source/Roles/IRS LEAP Participant.xml",
+      "bytes": 1242,
+      "sha256": "e37d637dd6cfb5aa47fd84ee84d951bd269d195b1f778e2c788162f6686cc84c"
+    },
+    {
+      "path": "canvas-starter/solution-source/SdkMessageProcessingSteps/{a09fa754-bccd-f111-a05c-6045bd094f74}.xml",
+      "bytes": 1024,
+      "sha256": "a291f8779163a65453324cefce7f18bc301771236d5576a0e20705718cd9cd0b"
+    },
+    {
+      "path": "canvas-starter/solution-source/SdkMessageProcessingSteps/{a39fa754-bccd-f111-a05c-6045bd094f74}.xml",
+      "bytes": 1021,
+      "sha256": "bff9e856208e0112843fa950fac5257af78b31022693a0725084ebdd4aae3dd4"
+    },
+    {
+      "path": "canvas-starter/solution-source/SdkMessageProcessingSteps/{a49ce64d-bccd-f111-a05c-6045bd094f74}.xml",
+      "bytes": 1023,
+      "sha256": "1d2a9e814ec394f1e457e1be8803f627b114cbecf26e71e3ebc8429141e673e5"
+    },
+    {
+      "path": "canvas-starter/solution-source/SdkMessageProcessingSteps/{a79ce64d-bccd-f111-a05c-6045bd094f74}.xml",
+      "bytes": 1464,
+      "sha256": "195c72195141eed2efee820b97e2e307bb121ec584c1edc210ff66b2f62709b2"
+    },
+    {
+      "path": "canvas-starter/solution-source/Workflows/IRSLEAP-Firstresponseapproval-4033F29C-15CE-F111-A05B-6045BD094F74.json",
+      "bytes": 22453,
+      "sha256": "c928d8a0a23486c0e65b088d9166b5b2965b3cc784bf7d6104c00e6f09216bb7"
+    },
+    {
+      "path": "canvas-starter/solution-source/Workflows/IRSLEAP-Firstresponseapproval-4033F29C-15CE-F111-A05B-6045BD094F74.json.data.xml",
+      "bytes": 1753,
+      "sha256": "4112fe7e2908311164e677d9fe48d505c90e0fe3d9fa89dd7b90155f2a71e76e"
+    },
+    {
+      "path": "canvas-starter/START-HERE.txt",
+      "bytes": 5677,
+      "sha256": "03fb6d86bd7c2f27f6aaab9101f2dd42cfa091fc27ee2b3e3f567978517be06a"
+    },
+    {
+      "path": "README.rst",
+      "bytes": 4568,
+      "sha256": "feebf68ea82ac33c9c3e47c916e753d542eb6ab956fa84ba765fd7092a518c50"
+    },
+    {
+      "path": "scripts/auth.py",
+      "bytes": 7833,
+      "sha256": "f4371d8779a5aa4a2ea355911e48b8f628d546b6e6bb25b79e2a9b2c138b8fc9"
+    }
+  ]
+}

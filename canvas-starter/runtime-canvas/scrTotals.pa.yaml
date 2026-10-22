@@ -1,0 +1,114 @@
+Screens:
+  scrTotals:
+    Properties:
+      Fill: =RGBA(247, 249, 252, 1)
+      OnVisible: =If(varReloadTotals, Reset(txtYear); Set(varReloadTotals, false))
+    Children:
+      - lblTotalsHeading:
+          Control: Label
+          Properties:
+            FocusedBorderThickness: =2
+            FontWeight: =FontWeight.Bold
+            Height: =50
+            Size: =26
+            TabIndex: =0
+            Text: ="Approved calendar-year leave hours"
+            Width: =1200
+            X: =24
+            Y: =12
+      - lblTotalPerson:
+          Control: Label
+          Properties:
+            FocusedBorderThickness: =2
+            Height: =42
+            Size: =18
+            TabIndex: =0
+            Text: |-
+              ="Requester: " & varTotalsRequester.'Full Name'
+            Width: =1200
+            X: =24
+            Y: =92
+      - lblYear:
+          Control: Label
+          Properties:
+            FocusedBorderThickness: =2
+            Height: =32
+            TabIndex: =0
+            Text: ="Calendar year of the leave (1900-2100)"
+            Width: =600
+            X: =24
+            Y: =158
+      - txtYear:
+          Control: Classic/TextInput
+          Properties:
+            AccessibleLabel: ="Calendar year for approved leave totals"
+            Default: =Text(Year(varSelectedDate), "0")
+            Format: =TextFormat.Number
+            Height: =44
+            Width: =220
+            X: =24
+            Y: =204
+      - btnLoadTotals:
+          Control: Classic/Button
+          Properties:
+            Height: =44
+            OnSelect: |-
+              =Set(varAnnualTotal, Blank()); Set(varTotalError, "");
+              If(
+                IsBlank(varTotalsRequester.User), Set(varTotalError, "Select an authorized requester."),
+                !IsMatch(Trim(txtYear.Text), "[1-9][0-9]{3}", MatchOptions.Complete), Set(varTotalError, "Enter a four-digit year."),
+                Value(txtYear.Text) < 1900 || Value(txtYear.Text) > 2100, Set(varTotalError, "Choose a year from 1900 through 2100."),
+                IfError(Set(varAnnualTotal, Environment.leap_GetAnnualTotal({RequesterId: Text(varTotalsRequester.User), CalendarYear: Value(txtYear.Text)})),
+                  Set(varAnnualTotal, Blank()); Set(varTotalError, FirstError.Message))
+              )
+            Text: ="Load annual totals"
+            Width: =300
+            X: =280
+            Y: =204
+      - lblAnnualTotal:
+          Control: Label
+          Properties:
+            FocusedBorderThickness: =2
+            FontWeight: =FontWeight.Semibold
+            Height: =180
+            Size: =24
+            TabIndex: =0
+            Text: |-
+              =If(IsBlank(varAnnualTotal), "Select a year and load totals.",
+                Text(Value(varAnnualTotal.TotalHours), "0") & " approved recorded hours" & Char(10) &
+                Text(Value(varAnnualTotal.ApprovedRequests), "0") & " approved requests" & Char(10) &
+                Text(Value(varAnnualTotal.MissingHours), "0") & " approved requests with hours not entered")
+            Width: =1240
+            X: =24
+            Y: =296
+      - lblTotalError:
+          Control: Label
+          Properties:
+            Color: =RGBA(170, 25, 25, 1)
+            FocusedBorderThickness: =2
+            Height: =72
+            TabIndex: =0
+            Text: =varTotalError
+            Width: =1240
+            X: =24
+            Y: =494
+      - lblTotalsPrivacy:
+          Control: Label
+          Properties:
+            FocusedBorderThickness: =2
+            Height: =78
+            Size: =14
+            TabIndex: =0
+            Text: ="Totals use the year of the leave date, not the approval date. Separate overlapping requests each contribute their entered hours. Blank hours are not estimated. Authorized approvers can see annual aggregates without receiving access to unrelated request details."
+            Width: =1260
+            X: =24
+            Y: =572
+      - btnTotalsBack:
+          Control: Classic/Button
+          Properties:
+            Height: =44
+            OnSelect: =Navigate(scrCalendar)
+            Text: ="Back to calendar"
+            Width: =300
+            X: =24
+            Y: =682

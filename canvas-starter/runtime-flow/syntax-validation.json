@@ -1,0 +1,77 @@
+{
+  "localValidation": "passed",
+  "actionCount": 24,
+  "expressionDelimiterChecks": 40,
+  "sameScopeRunAfterDependencies": "passed",
+  "nestedScopeDataReferences": {
+    "status": "passed",
+    "checkedReferences": 49
+  },
+  "connectorChecks": [
+    {
+      "action": "When_a_LEAP_request_is_added",
+      "api": "shared_commondataserviceforapps",
+      "operationId": "SubscribeWebhookTrigger",
+      "cachedSwaggerOperationExists": true
+    },
+    {
+      "action": "Read_saved_request",
+      "api": "shared_commondataserviceforapps",
+      "operationId": "GetItem",
+      "cachedSwaggerOperationExists": true
+    },
+    {
+      "action": "Start_and_wait_for_first_response",
+      "api": "shared_approvals",
+      "operationId": "StartAndWaitForAnApproval",
+      "cachedSwaggerOperationExists": true
+    },
+    {
+      "action": "Read_fresh_pending_request",
+      "api": "shared_commondataserviceforapps",
+      "operationId": "GetItem",
+      "cachedSwaggerOperationExists": true
+    },
+    {
+      "action": "Commit_final_decision",
+      "api": "shared_commondataserviceforapps",
+      "operationId": "UpdateOnlyRecord",
+      "cachedSwaggerOperationExists": true
+    },
+    {
+      "action": "Send_generic_decision_result",
+      "api": "shared_office365",
+      "operationId": "SendEmailV2",
+      "cachedSwaggerOperationExists": true
+    },
+    {
+      "action": "Read_pending_after_timeout",
+      "api": "shared_commondataserviceforapps",
+      "operationId": "GetItem",
+      "cachedSwaggerOperationExists": true
+    },
+    {
+      "action": "Commit_expired_status_only",
+      "api": "shared_commondataserviceforapps",
+      "operationId": "UpdateOnlyRecord",
+      "cachedSwaggerOperationExists": true
+    },
+    {
+      "action": "Send_generic_expired_result",
+      "api": "shared_office365",
+      "operationId": "SendEmailV2",
+      "cachedSwaggerOperationExists": true
+    }
+  ],
+  "checks": [
+    "one Added Dataverse trigger; Organization scope; Pending filter",
+    "saved typed lookups expanded to systemusers; original Entra GUID snapshot",
+    "single native First-to-respond approval; P7D; reassignment disabled",
+    "recognized single response and original Entra responder mapping required",
+    "fresh Pending and unchanged selection; optimistic-concurrency ETag",
+    "final update fields restricted; timeout status-only; generic result emails",
+    "no activation, sends, approval creation, request writes or account provisioning executed"
+  ],
+  "platformRuntimeValidation": "Not performed: connector references are intentionally unbound and workflow must remain OFF.",
+  "dynamicApprovalMetadataValidation": "The cached connector explicitly declares dynamic inputs/outputs for StartAndWaitForAnApproval. Operation ID and top-level parameter names are verified. Per-type runtime schema and credentials require a bound Approvals connection; no binding or approval operation was attempted."
+}

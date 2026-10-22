@@ -1,0 +1,9 @@
+Set(varMe, LookUp(Users, 'Azure AD Object ID' = GUID(User().EntraObjectId)));
+Set(varMonth, Date(Year(Today()), Month(Today()), 1));
+Set(varSelectedDate, Today());
+Set(varGridStart, DateAdd(varMonth, 1 - Weekday(varMonth, StartOfWeek.Monday), TimeUnit.Days));
+Set(varSubmitting, false);
+Set(varSelectedRequest, Blank());
+Set(varTotalsRequester, varMe);
+Set(varAnnualTotal, Blank());
+Set(varTotalError, "")

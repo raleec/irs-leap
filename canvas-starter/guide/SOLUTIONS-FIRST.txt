@@ -1,0 +1,276 @@
+IRS LEAP - SOLUTIONS-FIRST WORKSHOP
+Recommended delivery | 150 minutes | Synthetic data only
+
+THE CHANGE
+----------
+Teach "import -> configure -> use -> customize -> export", not "build every
+screen and flow". Complete the Canvas app and approval flow ONCE before the
+event and distribute them as solution components. Participants should spend
+the session understanding solution deployment and making one small change.
+
+PACKAGE STATUS - DO NOT SKIP
+----------------------------
+Version1.1.0.0 is now included with the actual native Canvas app,stopped approval
+flow,3references,2consumed variable definitions and Dataverse foundation.
+Use the1.1exports for this lesson. Version1.0was the backend-only baseline.
+See RELEASE-1.1.txt for exact components,configuration and remaining gates.
+The short agenda assumes target connections,licenses,roles and GCC rehearsal
+are prepared. Import success alone is not end-to-end approval/mail evidence.
+CORE-LAB and formula snippets remain optional build/reference material.
+
+END STATE
+---------
+By the end of the workshop, an ordinary employee can submit a synthetic request,
+one selected approver can decide it, the employee can see the outcome, and both
+can use the authorized calendar and annual totals. Participants can explain which
+solution components moved and which environment-specific settings did not.
+
+KEEP THE SOLUTION DESIGN SIMPLE
+------------------------------
+For this short workshop, use ONE complete solution with the approved IRSLEAP
+publisher/leap prefix. Add the completed app, core cloud flow, required
+connection references and configuration definitions to the existing foundation.
+Preserve unique name IRSLEAPCanvasStarter. The included complete-component
+release is1.1.0.0; increment version when making and exporting workshop changes.
+Do not create a second similarly named request table.
+
+Export that complete version as:
+- UNMANAGED for an isolated authoring/workshop development environment.
+- MANAGED for a different downstream validation environment.
+
+These are two package flavors of the SAME solution, not two solutions to stack
+in one environment. Do not import a managed flavor over its unmanaged source.
+Do not uninstall a managed solution as an ordinary rollback exercise.
+
+WHAT THE SOLUTION CARRIES / DOES NOT CARRY
+----------------------------------------
+Carries: tables and choices; roles; plug-ins/API; the actual added Canvas app;
+solution-aware cloud flow; actual referenced connection references; environment
+variable DEFINITIONS and deliberately chosen non-secret defaults.
+
+Does not automatically carry: users; licenses; role assignments; app sharing;
+environment group membership; authenticated connections/OAuth credentials;
+target current configuration values; agency approval; ordinary Dataverse records.
+The 13 categories are table choice metadata, so they DO travel with this table.
+Do not export real leave records or source credentials with the workshop.
+
+Connection reference = portable pointer to a connector connection.
+Connection = the target-owned authenticated connection, created/bound in target.
+Environment variable = configuration, not a login and not an automatic
+replacement for hard-coded expressions. The consumer must actually reference it.
+Native Canvas Dataverse remains under the signed-in user's identity; never
+replace it with the automation owner's shared data connection.
+
+BEFORE THE DAY - NO PARTICIPANT WAITING TIME
+------------------------------------------
+Facilitator/admin completes COMPLETE-SOLUTION-PREPARATION.txt:
+1. Inspect the included app and ONE native Start-and-wait approval flow.
+2. Prepare target bindings and current values using RELEASE-1.1.txt actual names.
+3. Use the supplied1.1release with its flow OFF; inspect its inventory.
+4. Import into a clean same-cloud rehearsal environment; verify actual flow
+   state immediately. Target activation behavior can depend on import path and
+   connection authorization; do not assume every import leaves flows disabled.
+5. Bind target connections/configuration, share app, assign roles and rehearse
+   with ordinary users in the actual customer GCC tenant.
+6. Precreate target connections, security group and licensed user cohort.
+7. If promotion is included, prepare a SECOND approved environment.
+8. Approve the exact synthetic notification recipients/templates BEFORE any
+   flow is enabled or request submitted. No public/channel leave disclosures.
+
+Do not begin the full-system lab if the only available artifact is backend1.0.
+A backend-only solutions lesson is possible, but it does not satisfy the
+end-to-end leave-system outcome and must be described that way.
+
+150-MINUTE AGENDA
+-----------------
+00:00-00:10  Demonstrate the finished scenario and inspect the solution manifest.
+00:10-00:30  Import the COMPLETE unmanaged release into workshop development.
+00:30-00:55  Bind connections, set target configuration, share app/assign roles.
+00:55-01:20  Exercise submission, approval, calendar and annual totals.
+01:20-01:45  Make ONE safe app change and publish it.
+01:45-02:10  Export managed; import into SECOND target and explain promotion.
+02:10-02:30  Final scenario, review configuration boundaries and troubleshooting.
+
+Timing is a target AFTER prework, not a guarantee. Environment provisioning,
+licenses, access escalation, first-time approval setup and GCC troubleshooting
+are not day-of activities. For one available environment, replace promotion
+with export/inspect/handoff; do not claim a second deployment occurred.
+
+FACILITATOR SCRIPT
+==================
+
+1. SHOW A COMPLETE SOLUTION (10 MINUTES)
+SAY
+"Today we deploy and adapt a reusable solution. We will not write a request form
+or assemble a long approval flow from scratch."
+DO
+Open the rehearsed app as E. Show one synthetic request, authorized approver
+view, month/day calendar and annual totals. Then open Solutions > the complete
+release and identify the app, flow, table, roles, API, references and variables.
+EXPECT
+Participants see a full business scenario and the inventory that makes it portable.
+CHECKPOINT
+Ask: "Does the import give everyone access?" Answer: no, users/roles/sharing and
+connections remain target setup. "Will real leave rows migrate?" Answer: not by
+ordinary solution export.
+RECOVERY
+If a selected artifact does not include the app/flow, choose the actual1.1release
+or stop the complete-system lesson.
+Do not spend the short workshop building missing components.
+
+2. IMPORT INTO DEVELOPMENT (20 MINUTES)
+SAY
+"Unmanaged is our authoring package; managed is our downstream release."
+DO
+At the correct same-cloud maker portal, select the approved workshop development
+environment. Check URL/ID before import. Select Solutions > Import solution >
+Browse and choose the complete UNMANAGED release, not the outer delivery ZIP.
+Read dependency/import prompts. Bind precreated target connections where the
+wizard asks. Supply variable values only for definitions actually in this release.
+Inspect Solution history until the import is complete. Open the solution.
+Confirm the imported app and cloud flow are present and inspect flow On/Off
+state BEFORE creating any request or changing configuration.
+EXPECT
+The complete solution is present with dependencies resolved; no uncontrolled
+notification path is active.
+CHECKPOINT
+Show solution version, publisher, the native Canvas app, cloud flow and reference
+definitions. Backend-only version1.0 is not the completed package.
+RECOVERY
+Use import error/dependency details. Do not rename files, omit plug-ins, disable
+the guard, or invent a parallel table to bypass the import failure.
+
+3. CONFIGURE THE TARGET (25 MINUTES)
+SAY
+"The portable application stays the same; target identity and configuration change."
+DO
+Confirm the flow's Dataverse/Approvals/Outlook references point at the intended
+target automation identity. Verify cloud, mailbox and connection ownership.
+The Canvas app uses native Dataverse in the current environment as each user.
+Retrieve the actual published target app play URL from Apps > Details.
+Set the release's LEAP app URL and operations-mailbox environment-variable current
+values. Do not copy the source app URL, source user GUIDs or source credentials.
+Refresh/save the actual consuming flow if needed so it uses target values.
+
+Assign Basic User plus IRS LEAP Participant to the approved ordinary cohort.
+Assign Basic User plus IRS LEAP Automation to the approved flow identity.
+The latter is not a participant role and does not justify permanent System Admin.
+Share the app as User with the cohort/security group, not everyone as co-owner.
+Verify environment group membership and premium entitlements.
+
+Keep the flow OFF until exact synthetic recipients/message content have been
+approved. Show the stored templates, selected test accounts and channels.
+Only then enable the one intended core approval flow and confirm its references.
+EXPECT
+The target app and flow are configured without editing the business logic.
+CHECKPOINT
+Different source/target app URLs; target-owned connections; ordinary-user access.
+RECOVERY
+Reference binding failure: correct target connection/consent, not an emailed
+token. Changing a connection reference does not grant app sharing or data roles.
+An environment-variable definition alone does not prove the flow consumes it.
+
+4. USE THE SYSTEM (25 MINUTES)
+SAY
+"The packaged rules still matter. One category per request; optional integer hours;
+overlapping requests are independent rows."
+DO
+As E, submit a synthetic request for today with2hours and A as approver.
+As A, open the one native approval and approve. As E, refresh the app and totals.
+Submit another overlapping request with3hours. Approve it and show total5hours
+for that leave year, assuming no other approved entered hours in that year.
+Demonstrate a blank-hours approved row: known hours unchanged, MissingHours rises.
+Explicit0does not increase MissingHours. Deny another request: totals unchanged.
+Use U to demonstrate no access to an unrelated request or another person's total.
+Use an approved split-approver test to demonstrate aggregate totals do not expose
+the other request's details. If those accounts were not preprovisioned, rehearse
+this case beforehand and state which security cases were not shown live.
+EXPECT
+The imported solution operates end to end under ordinary identities.
+CHECKPOINT
+Requester identity and year derive server-side; selected approver is recorded;
+calendar shows multiple authorized same-day rows; totals use year of leave.
+RECOVERY
+Show run history or app error. Do not grant admin to fix participant access.
+Unknown/failed approval output is not a denial. Do not resend ambiguous pending
+approvals blindly or promise exactly-once dispatch.
+
+5. CUSTOMIZE ONE THING (25 MINUTES)
+SAY
+"We change a low-risk presentation detail in development, then ship it as a version."
+DO
+In the COMPLETE unmanaged solution, open the Canvas app for editing. Find the
+prepared heading lblWorkshopHeading. Change ONLY its Text property:
+PASTE
+"IRS LEAP - Workshop Edition"
+DO
+Save and publish the app. Open the published app as E and confirm the heading.
+Do not alter hours calculations, access filters, categories or plug-in rules.
+Change the solution version to the next four-part release version for this
+customization (for example1.1.0.0 ->1.1.0.1).
+EXPECT
+One visible, easily reviewed change is associated with a new release version.
+CHECKPOINT
+The published app, not just Studio preview, displays the new heading.
+RECOVERY
+If the prepared heading is not present, use a different existing static heading
+identified in prework; do not improvise multiple controls during the timed lab.
+
+6. PROMOTE OR HAND OFF (25 MINUTES)
+SAY
+"We move the same application, not our credentials or leave records."
+DO
+Publish the intended customizations. Follow the rehearsed export procedure:
+turn the source approval flow OFF during the controlled packaging window,
+export the COMPLETE solution as MANAGED, and restore the source only when
+explicitly approved. Do not interrupt another user's pending approval runs;
+preparation uses a synthetic idle lab. Export release definitions without source
+current configuration values where those should be supplied per target.
+
+In the SECOND approved same-cloud environment, import that managed release.
+Resolve actual references and target variable values. Inspect flow state before
+creating records. Assign target roles and app sharing separately. Confirm no
+unmanaged copy of the same unique solution exists there.
+
+If only one environment is available: export managed, inspect its component
+inventory and provide the receiving-admin checklist. This is a HANDOFF, not
+an import/promotion demonstration. Do not create a second environment without
+customer approval or import managed over the unmanaged source just to finish.
+EXPECT
+A managed release is delivered downstream, or a clearly labeled release handoff.
+CHECKPOINT
+Correct version and heading in destination; destination-specific app URL and
+connections; no source leave rows/credentials in the artifact.
+RECOVERY
+Use dependencies/import history/solution layers. Correct in development and
+export a new version rather than editing managed components or uninstalling
+data-bearing solutions as a casual rollback.
+
+7. WRAP UP (20 MINUTES)
+SAY
+"Solutions package the application. Governance supplies identity, connections,
+access, release discipline and the customer-specific cloud approval."
+DO
+Repeat one normal requester/approver scenario in the destination if available.
+Record solution version, target configuration, operator, flow state and remaining
+gates in the handoff. Discuss managed vs unmanaged, connection vs reference,
+definitions vs values, and app sharing vs Dataverse role assignment.
+EXPECT
+Participants can deploy the reusable solution without rebuilding the application.
+CHECKPOINT
+No unreviewed duplicate approval flows enabled; no secrets or real leave exported.
+
+OUT OF THE SHORT WORKSHOP
+------------------------
+Building Canvas controls/formulas; authoring the approval flow; compiling plug-ins;
+new security policies; licensing; new tenant/environment setup; production HR/
+payroll integration; Teams bots; data migration; a full production ALM pipeline.
+Those are facilitator preparation, reference exercises or separate sessions.
+
+REFERENCE
+---------
+COMPLETE-SOLUTION-PREPARATION.txt - required full-release preparation.
+CORE-LAB.txt - build the app/core flow once before the event.
+Facilitator-Guide.txt and Snippets - detailed construction/recovery reference.
+Snippets\60-UAT.txt - rehearsal security and functional checks.
+Snippets\61-GCC-Deployment.txt - cloud and deployment boundary checklist.

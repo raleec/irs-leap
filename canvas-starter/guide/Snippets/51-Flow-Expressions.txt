@@ -1,0 +1,435 @@
+51 - EXPRESSIONS KEYED BY EXACT ACTION NAME
+
+Paste expressions through fx, WITHOUT @ or @{...}. Constant text is entered as
+text, not as an expression. Use exactly the names/tree in 50. Connector output
+paths below are the common Standard approvals/Dataverse paths; inspect the
+synthetic run's raw output and record a verified equivalent if the tenant differs.
+Do not guess an absent ID/outcome, or convert a missing outcome to Reject.
+Get row/List rows return Web API lookup fields, not Canvas record structures.
+
+INITIALIZERS
+Initialize_RequestId -> varRequestId (String):
+toLower(string(triggerOutputs()?['body/leap_requestid']))
+
+Initialize_AppUrl -> varAppUrl (String): actual approved same-cloud play URL.
+Initialize_AdminMailbox -> varAdminMailbox (String): actual operations mailbox.
+Initialize_InternalApprovers -> varInternalApproverEntraIds (Array):
+Enter the administrator-verified array of lowercase INTERNAL Entra object GUIDs.
+Use actual trusted configuration, not client data. No sample GUID is deployable.
+Initialize_ApprovalId -> varApprovalId (String): empty string.
+Initialize_DecidedById -> varDecidedById (String): empty string.
+Initialize_TerminalStatus -> varTerminalStatus (String): empty string.
+Initialize_ReadyToCreate -> varReadyToCreate (Boolean): false.
+Initialize_Issue -> varIssue (String): empty string.
+
+Get_Request
+Table: LEAP Requests. Row ID:
+variables('varRequestId')
+Select columns (comma-separated logical column names, no $select prefix):
+leap_requestid,leap_status,leap_approvalid,_leap_requesterid_value,_leap_approver1id_value,_leap_approver2id_value,_leap_approver3id_value
+If this designer expects lookup logical names in Select columns instead of raw
+Web API properties, select leap_requesterid,leap_approver1id,leap_approver2id,
+leap_approver3id through its supported picker; inspect actual returned _..._value
+properties. Do not use the display/ formatted value annotations as GUIDs.
+
+Condition_DispatchAllowed -> Boolean expression equals true:
+and(
+  equals(body('Get_Request')?['leap_status'], 100000000),
+  empty(body('Get_Request')?['leap_approvalid'])
+)
+
+Condition_ExistingApprovalPending (NO branch of Condition_DispatchAllowed):
+and(
+  equals(body('Get_Request')?['leap_status'], 100000000),
+  not(empty(body('Get_Request')?['leap_approvalid']))
+)
+Its YES sets Set_Issue_ExistingApproval (see static issue assignments below).
+Its NO is intentionally empty. Never create a second approval from either branch.
+
+Compose_ApproverCandidates -> Inputs:
+createArray(
+  toLower(string(coalesce(body('Get_Request')?['_leap_approver1id_value'], ''))),
+  toLower(string(coalesce(body('Get_Request')?['_leap_approver2id_value'], ''))),
+  toLower(string(coalesce(body('Get_Request')?['_leap_approver3id_value'], '')))
+)
+
+Filter_ApproverGuids -> From:
+outputs('Compose_ApproverCandidates')
+Filter predicate:
+not(empty(item()))
+In an advanced condition editor that explicitly shows code with @, the designer
+may display @not(empty(item())); do not type @ into the fx editor.
+
+Compose_SelectedApproverGuids -> Inputs:
+union(body('Filter_ApproverGuids'), body('Filter_ApproverGuids'))
+
+Condition_SelectionValid (BEFORE Select_ApproverUserClauses/List rows):
+and(
+  not(empty(body('Get_Request')?['_leap_approver1id_value'])),
+  greaterOrEquals(length(outputs('Compose_SelectedApproverGuids')), 1),
+  lessOrEquals(length(outputs('Compose_SelectedApproverGuids')), 3),
+  equals(length(body('Filter_ApproverGuids')), length(outputs('Compose_SelectedApproverGuids')))
+)
+YES contains the user query and remaining preparation actions; NO sets
+Set_Issue_Selection. Never send an empty Filter rows to List_rows_ApproverUsers.
+
+Select_ApproverUserClauses -> From:
+outputs('Compose_SelectedApproverGuids')
+Map: TEXT MODE; expression:
+concat('systemuserid eq ', item())
+Output is a string array, not [{"Value":"..."}].
+
+List_rows_ApproverUsers
+Table: Users. Select columns:
+systemuserid,azureactivedirectoryobjectid,internalemailaddress,isdisabled,accessmode,applicationid
+Filter rows:
+join(body('Select_ApproverUserClauses'), ' or ')
+Row count: 4. Pagination: OFF.
+Result for two selected users MUST look like:
+systemuserid eq <guid1> or systemuserid eq <guid2>
+Angle brackets are illustrative, never literal. GUIDs are bare, without quotes.
+Blank optional IDs have already been filtered out. The row lookup GUIDs come
+from typed Dataverse fields; do not build this filter from arbitrary app inputs.
+
+Filter_ValidApproverUsers -> From:
+body('List_rows_ApproverUsers')?['value']
+Predicate:
+and(
+  contains(outputs('Compose_SelectedApproverGuids'), toLower(string(item()?['systemuserid']))),
+  equals(item()?['isdisabled'], false),
+  equals(item()?['accessmode'], 0),
+  empty(item()?['applicationid']),
+  not(empty(item()?['azureactivedirectoryobjectid'])),
+  not(equals(toLower(string(item()?['azureactivedirectoryobjectid'])), '00000000-0000-0000-0000-000000000000')),
+  contains(variables('varInternalApproverEntraIds'), toLower(string(item()?['azureactivedirectoryobjectid'])))
+)
+accessmode 0 is the rehearsed enabled interactive human-user mode. Do not change
+this to accept application/service users just to force recipient validation.
+Missing fields do not pass equals(false)/equals(0). Internal member status is
+enforced by the admin-verified allow-list, not inferred from an email suffix.
+
+Condition_ApproversValid:
+and(
+  not(empty(body('Get_Request')?['_leap_approver1id_value'])),
+  greaterOrEquals(length(outputs('Compose_SelectedApproverGuids')), 1),
+  lessOrEquals(length(outputs('Compose_SelectedApproverGuids')), 3),
+  equals(length(body('Filter_ApproverGuids')), length(outputs('Compose_SelectedApproverGuids'))),
+  equals(length(body('List_rows_ApproverUsers')?['value']), length(outputs('Compose_SelectedApproverGuids'))),
+  equals(length(body('Filter_ValidApproverUsers')), length(outputs('Compose_SelectedApproverGuids'))),
+  equals(length(union(body('Select_ApproverEntraIds'), body('Select_ApproverEntraIds'))), length(outputs('Compose_SelectedApproverGuids')))
+)
+NO -> Set_Issue_Approvers. Do not discard one disabled/guest/unresolved selection.
+Select_ApproverEntraIds is placed before this condition, per the tree in 50.
+The Select expression appears below for convenient grouping with Assigned to.
+
+Get_Requester
+Table: Users. Row ID:
+body('Get_Request')?['_leap_requesterid_value']
+Select columns:
+systemuserid,azureactivedirectoryobjectid,internalemailaddress,isdisabled,accessmode,applicationid
+
+Condition_RequesterValid:
+and(
+  equals(toLower(string(body('Get_Requester')?['systemuserid'])), toLower(string(body('Get_Request')?['_leap_requesterid_value']))),
+  equals(body('Get_Requester')?['isdisabled'], false),
+  equals(body('Get_Requester')?['accessmode'], 0),
+  empty(body('Get_Requester')?['applicationid']),
+  not(empty(body('Get_Requester')?['internalemailaddress']))
+)
+NO -> Set_Issue_Requester. The saved server-derived lookup, not a client email,
+chooses this Users row. Requester onboarding/internal status is a Stage 0 gate.
+YES -> Set_ReadyToCreate, Set variable varReadyToCreate to Boolean true.
+
+Condition_ReadyToCreate (sibling after Condition_DispatchAllowed SUCCEEDED):
+and(
+  equals(variables('varReadyToCreate'), true),
+  empty(variables('varIssue'))
+)
+YES contains Compose_AssignedTo, Create_Approval, Set_ApprovalId and
+Condition_ApprovalIdReturned. NO is empty. Do not nest this under the preparation
+conditions; the sibling layout stays within the eight-level action nesting limit.
+
+Select_ApproverEntraIds -> From:
+body('Filter_ValidApproverUsers')
+Map: TEXT MODE; expression:
+toLower(string(item()?['azureactivedirectoryobjectid']))
+
+Compose_AssignedTo -> Inputs:
+join(union(body('Select_ApproverEntraIds'), body('Select_ApproverEntraIds')), ';')
+No leading/trailing semicolon, no blank or email-display-name strings.
+
+Create_Approval
+Title:
+concat('LEAP request ', variables('varRequestId'))
+Assigned to:
+outputs('Compose_AssignedTo')
+Item link:
+variables('varAppUrl')
+Other fields/settings are specified in 50. Retry policy None.
+
+Set_ApprovalId -> Set variable varApprovalId:
+string(body('Create_Approval')?['name'])
+Use the actual Approval ID dynamic token if raw output differs. The name field
+here is the approval's durable ID, not the Dataverse request Title. Rehearsal
+must confirm it is nonempty; string(null) is empty and is NOT a valid ID.
+If this token fails inspection, do not run this example unchanged.
+
+Condition_ApprovalIdReturned:
+not(empty(variables('varApprovalId')))
+YES contains Save_ApprovalID. NO sets Set_Issue_ApprovalId
+and requires ambiguous-create/schema reconciliation, not another Create.
+
+Save_ApprovalID
+Table: LEAP Requests. Row ID:
+variables('varRequestId')
+Approval ID:
+variables('varApprovalId')
+ALL OTHER FIELDS OMITTED, not empty strings/nulls. Especially omit Request
+Status, Processing Note, Decided By/On, and Decision Comments.
+
+Condition_ApprovalPersisted (sibling after Condition_ReadyToCreate SUCCEEDED):
+and(
+  equals(actions('Save_ApprovalID')?['status'], 'Succeeded'),
+  not(empty(variables('varApprovalId')))
+)
+YES contains Scope_AwaitDecision; NO is empty. A skipped or failed ID save must
+never start Wait. No network call/delay between persistence and Wait.
+
+Wait_Approval
+Approval ID:
+variables('varApprovalId')
+Timeout action setting: P7D. This is an ISO 8601 duration, not a flow expression.
+
+Get_Request_Decision
+Table: LEAP Requests. Row ID:
+variables('varRequestId')
+Select columns:
+leap_requestid,leap_status,leap_approvalid
+
+Condition_DecisionCorrelation:
+and(
+  equals(body('Get_Request_Decision')?['leap_status'], 100000000),
+  not(empty(variables('varApprovalId'))),
+  equals(body('Get_Request_Decision')?['leap_approvalid'], variables('varApprovalId'))
+)
+
+Condition_ResponseEnvelope:
+and(
+  equals(length(coalesce(body('Wait_Approval')?['responses'], json('[]'))), 1),
+  not(empty(body('Wait_Approval')?['outcome']))
+)
+If responses is not an array in actual output, the action fails to recovery.
+Do not try first() until this condition's YES branch.
+
+Compose_Response (inside YES):
+first(body('Wait_Approval')?['responses'])
+
+Condition_ResponderIdPresent:
+not(empty(outputs('Compose_Response')?['responder']?['id']))
+
+Filter_ResponderById -> From:
+body('Filter_ValidApproverUsers')
+Predicate:
+equals(
+  toLower(string(item()?['azureactivedirectoryobjectid'])),
+  toLower(string(outputs('Compose_Response')?['responder']?['id']))
+)
+This compares Entra GUID to Entra GUID, never to systemuserid.
+
+Condition_ResponderIdUnique:
+equals(length(body('Filter_ResponderById')), 1)
+
+Set_DecidedBy_FromId -> Set variable varDecidedById (only unique YES):
+toLower(string(first(body('Filter_ResponderById'))?['systemuserid']))
+NO -> Set_Issue_ResponderId; a mismatching present ID must NOT fall back to email.
+
+Filter_ResponderByEmail (only when responder.id is absent) -> From:
+body('Filter_ValidApproverUsers')
+Predicate:
+and(
+  not(empty(outputs('Compose_Response')?['responder']?['email'])),
+  not(empty(item()?['internalemailaddress'])),
+  equals(
+    toLower(string(item()?['internalemailaddress'])),
+    toLower(string(outputs('Compose_Response')?['responder']?['email']))
+  )
+)
+Exact mailbox match only. No contains, display name, guessed UPN, or suffix match.
+
+Condition_ResponderEmailUnique:
+equals(length(body('Filter_ResponderByEmail')), 1)
+
+Set_DecidedBy_FromEmail -> Set variable varDecidedById (only unique YES):
+toLower(string(first(body('Filter_ResponderByEmail'))?['systemuserid']))
+NO -> Set_Issue_ResponderEmail.
+
+Condition_ResponderMembership (after Condition_ResponderIdPresent SUCCEEDED):
+and(
+  not(empty(variables('varDecidedById'))),
+  contains(outputs('Compose_SelectedApproverGuids'), variables('varDecidedById'))
+)
+NO -> Set_Issue_ResponderMembership. Never proceed with an empty lookup.
+
+Switch_Outcome -> On:
+body('Wait_Approval')?['outcome']
+Cases (literal strings, exact case): Approve; Reject.
+Default -> Set_Issue_Outcome.
+
+Update_Approved and Update_Denied
+Table: LEAP Requests. Row ID:
+variables('varRequestId')
+Request Status: 100000001 (Update_Approved); 100000002 (Update_Denied).
+If designer uses a dropdown, select Approved/Denied for custom leap_status and
+inspect code to confirm those integers, not the built-in state/status codes.
+Decided By (Users):
+concat('systemusers(', variables('varDecidedById'), ')')
+Decision Comments:
+string(coalesce(outputs('Compose_Response')?['comments'], ''))
+For Web API binding equivalents, the property is
+leap_decidedbyid@odata.bind = /systemusers(<systemuserid>).
+Do NOT enter the @odata.bind property name into a normal designer text field.
+Do not set Decided On. Omit Processing Note, Approval ID and all request fields.
+These action bodies must contain only the transition's allowed column set.
+
+Set_Terminal_Approved -> Set varTerminalStatus to literal Approved.
+Set_Terminal_Denied -> Set varTerminalStatus to literal Denied.
+Run each only after its own Update_* SUCCEEDED.
+
+Get_Request_Expiry
+Table: LEAP Requests. Row ID:
+variables('varRequestId')
+Select columns:
+leap_requestid,leap_status,leap_approvalid
+
+Condition_ExpiryPendingSameApproval:
+and(
+  equals(body('Get_Request_Expiry')?['leap_status'], 100000000),
+  not(empty(variables('varApprovalId'))),
+  equals(body('Get_Request_Expiry')?['leap_approvalid'], variables('varApprovalId'))
+)
+Update_Expired: Table LEAP Requests; Row ID varRequestId; custom Request Status
+100000003. Omit EVERY other update field, including Processing Note and decision
+fields. This action follows only the YES branch and an actually timed-out Wait.
+Set_Terminal_Expired -> Set varTerminalStatus to literal Expired.
+Compose_ExpiryNotApplied -> literal "No expiry write; review current row and saved approval ID."
+Saved-ID equality is correlation, not proof that the native service has no result.
+
+Condition_HasTerminalResult:
+not(empty(variables('varTerminalStatus')))
+
+Get_Request_Notification
+Table: LEAP Requests. Row ID:
+variables('varRequestId')
+Select columns:
+leap_requestid,leap_status,leap_approvalid
+
+Condition_NotificationCorrelation:
+and(
+  equals(body('Get_Request_Notification')?['leap_approvalid'], variables('varApprovalId')),
+  or(
+    and(equals(variables('varTerminalStatus'), 'Approved'), equals(body('Get_Request_Notification')?['leap_status'], 100000001)),
+    and(equals(variables('varTerminalStatus'), 'Denied'), equals(body('Get_Request_Notification')?['leap_status'], 100000002)),
+    and(equals(variables('varTerminalStatus'), 'Expired'), equals(body('Get_Request_Notification')?['leap_status'], 100000003))
+  )
+)
+NO -> Set_Issue_NotificationCorrelation, not a row write or a new approval.
+
+Send_Requester_Result -> Office 365 Outlook, Send an email (V2)
+To:
+body('Get_Requester')?['internalemailaddress']
+Subject:
+concat('LEAP request ', variables('varRequestId'), ': ', variables('varTerminalStatus'))
+Body (HTML field; only generic text and the approved play URL):
+concat(
+  '<p>Request ID: ', variables('varRequestId'), '</p>',
+  '<p>Status: ', variables('varTerminalStatus'), '</p>',
+  '<p>Open the authorized LEAP app: ', variables('varAppUrl'), '</p>'
+)
+No comments, title, category, leave date, hours, medical/RA or other employees.
+Choose Retry policy None if avoiding automatic duplicate email delivery is the
+workshop policy; delivery is not exactly once even with this setting.
+
+Condition_RecoveryNeeded
+Scope_Recovery runs after Scope_Notify for all statuses. Predicate:
+or(
+  not(empty(variables('varIssue'))),
+  and(
+    not(equals(actions('Scope_Process')?['status'], 'Succeeded')),
+    not(
+      and(
+        equals(actions('Update_Expired')?['status'], 'Succeeded'),
+        equals(actions('Set_Terminal_Expired')?['status'], 'Succeeded')
+      )
+    )
+  ),
+  equals(actions('Scope_Notify')?['status'], 'Failed'),
+  equals(actions('Scope_Notify')?['status'], 'TimedOut')
+)
+A handled Wait timeout followed by successful Update_Expired and
+Set_Terminal_Expired is expected; do
+not turn it into a processing failure just because a containing scope reports a
+timed-out child. Its notification failure still routes to recovery. All other
+unexpected Process failures/timeouts, including a decision write failure, alert.
+
+Get_Request_Recovery
+Table: LEAP Requests. Row ID:
+variables('varRequestId')
+Select columns:
+leap_requestid,leap_status,leap_approvalid
+
+Condition_RecoveryPending:
+equals(body('Get_Request_Recovery')?['leap_status'], 100000000)
+
+Update_ProcessingNote
+Table: LEAP Requests; Row ID varRequestId.
+Processing Note (literal single line, below the 500-character limit):
+Automation review required; consult the approved operations runbook.
+Omit Request Status and every other column. Max field length is 500, NOT memo.
+If another run finalized between the read and update, expect guard rejection.
+Send_Admin_Alert still runs; never retry the note on a terminal row.
+
+Send_Admin_Alert -> Office 365 Outlook, Send an email (V2)
+To:
+variables('varAdminMailbox')
+Subject:
+concat('LEAP operations review: ', variables('varRequestId'))
+Body:
+concat(
+  '<p>Request ID: ', variables('varRequestId'), '</p>',
+  '<p>Run ID: ', workflow()?['run']?['name'], '</p>',
+  '<p>Authorized app: ', variables('varAppUrl'), '</p>'
+)
+No serialized result(), trigger body, exception, comments, Users array, or raw
+connector outputs. The run ID lets authorized operations inspect restricted logs.
+
+Terminate_RecoveryRequired -> Control > Terminate
+Status: Failed. Code: LEAP_REVIEW_REQUIRED.
+Message (literal): "Review the saved request and approval ID in the operations runbook."
+Run after Send_Admin_Alert for all four statuses; alert delivery may also fail.
+Terminate_Completed -> Control > Terminate, Status Succeeded, default success
+run-after Scope_Recovery. The recovery branch terminates before this action.
+
+STATIC ISSUE ASSIGNMENTS
+All actions below are Variables > Set variable, Name varIssue, literal Value
+as shown. They do NOT send email or write a request field themselves.
+Set_Issue_ExistingApproval           ExistingApprovalNeedsReconciliation
+Set_Issue_Selection                  InvalidSavedApproverSelection
+Set_Issue_Approvers                  InvalidSelectedApprovers
+Set_Issue_ApprovalId                 ApprovalCreatedWithoutUsableReturnedId
+Set_Issue_Requester                  RequesterDeliveryIdentityUnavailable
+Set_Issue_ResponseEnvelope           UnexpectedResponseEnvelope
+Set_Issue_ResponderId                ResponderIdNotUniqueSelectedUser
+Set_Issue_ResponderEmail             ResponderEmailNotUniqueSelectedUser
+Set_Issue_ResponderMembership        ResponderNotInOriginalSelectedSet
+Set_Issue_Outcome                    UnexpectedNativeOutcome
+Set_Issue_DecisionCorrelation        DecisionRowOrApprovalIdChanged
+Set_Issue_NotificationCorrelation    NotificationRowOrApprovalIdChanged
+Generic codes are for restricted run inspection; administrator mail remains only
+request ID, run ID, and app link. Never copy connector messages into varIssue.
+
+NO HIDDEN EXPRESSIONS
+Scope_Process, Scope_AwaitDecision, Scope_Expire, Scope_Notify, Scope_Recovery
+are Control > Scope containers, with run-after configured by 52, not expressions.
+All unstated run-after settings are predecessor SUCCEEDED only. Do not broaden
+Wait downstream paths to skipped/failed. If an action is absent from the tree,
+do not paste an expression referencing it and assume the designer will create it.

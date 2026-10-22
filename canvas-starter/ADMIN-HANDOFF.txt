@@ -1,0 +1,212 @@
+IRS LEAP - AUTHORIZED ADMINISTRATOR HANDOFF
+=========================================
+
+READ BEFORE RUNNING
+-------------------
+WORKSHOP REVISION: guide\SOLUTIONS-FIRST.txt is now the recommended participant
+path. Version1.1.0.0 now includes the actual app,stopped approval flow,references
+and variable definitions. See guide\RELEASE-1.1.txt before the generic source
+rebuild instructions below. No customer target environment was changed.
+
+The delivery includes real managed/unmanaged Dataverse foundation exports,
+backend source and a detailed workshop guide. The administrator-role assignment
+was initially denied and then completed by an authorized administrator.
+Provisioning and development export are now complete. Do not self-elevate,
+reuse another project's credentials, or weaken the security model.
+
+Source development URL: https://YOUR-DEVELOPMENT-ORG.crm.dynamics.com
+This is commercial Contoso (default), NOT the customer's GCC sandbox.
+IRSLEAPCanvasStarter and IRSLEAP publisher/prefix leap now contain the request
+table/choices,participant/automation roles,four plugin steps,annual API,
+published native Canvas app and disabled approval cloud flow with portable
+configuration. Target connections and current values remain unconfigured.
+
+An authorized deployment administrator should:
+1. Review this source with the agency's environment/security administrator.
+2. Select and explicitly approve the deployment URL and correct cloud.
+3. Use an isolated full-Dataverse sandbox rather than production/default if
+   customer governance requires it. Confirm capacity, policies and licensing.
+4. Use an account already authorized as Dataverse System Administrator.
+5. Review the prepared plugin behavior and source before installing it.
+6. Provision, export, import into a clean rehearsal environment, and run ordinary-
+   user security/functional acceptance scenarios BEFORE the customer event.
+
+LOCAL TOOLS
+-----------
+- Windows PowerShell 7, Python 3, .NET SDK, and Microsoft Power Platform CLI PAC.
+- Python packages: azure-identity, requests, PowerPlatform-Dataverse-Client.
+- Backend project targets .NET Framework 4.6.2; install its targeting pack if
+  required by the project's existing build command.
+- Provisioning uses Python SDK for supported data/relationship operations and
+  Web API only for advanced metadata ownership/date behavior, role actions, and
+  unsupported platform actions. No direct database or anonymous HTTP interface.
+
+INSTALL PYTHON DEPENDENCIES IN AN ISOLATED ENVIRONMENT
+---------------------------------------------------
+From this directory:
+
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install azure-identity requests PowerPlatform-Dataverse-Client
+
+Use your approved package repository if public package downloads are restricted.
+Never disable TLS validation. The SDK used during preparation was 0.1.0b7;
+newer preview versions require rehearsal of signatures and behavior.
+
+CONFIGURATION AND AUTHENTICATION
+-------------------------------
+The source delivery includes scripts\auth.py, copied from the documented
+Dataverse helper and scoped to this project. It does not include the previous
+user's token cache, account record, tenant configuration, password or .env.
+
+Create a local .env in this directory (do not commit/share it) containing:
+
+DATAVERSE_URL=https://YOUR-APPROVED-ORG.crm9.dynamics.com
+TENANT_ID=YOUR-APPROVED-TENANT-GUID
+
+For a commercial sandbox, use its actual hostname instead. The example is NOT
+an instruction to change clouds or infer an organization from a guessed name.
+GCC uses public Entra identity; GCC High/DoD authentication is outside this
+source candidate and requires the agency's supported government configuration.
+
+The auth helper searches its parent directory and the current directory.
+It opens a device-code sign-in and caches tokens in the OS-protected credential
+store. Enter credentials only on Microsoft's sign-in page. Its authentication
+record .auth_record.json is not a source/distribution artifact.
+
+Verify target and account before any changes:
+
+pac auth create --name IRSLEAPWorkshop --environment https://YOUR-APPROVED-ORG.crm9.dynamics.com --cloud UsGov
+pac org who
+
+For commercial development use --cloud Public instead. Verify the output URL,
+tenant and user match the approved deployment exactly. Authentication/role
+assignment is not supplied by the starter, and no script grants an admin role.
+
+REPROVISIONING FROM SOURCE - ADMINISTRATOR ALTERNATIVE TO SOLUTION IMPORT
+----------------------------------------------------------------------
+Normally IMPORT THE INCLUDED SOLUTION. The following is for a reviewed source
+rebuild, not a required workshop participant activity. Provisioning completed in
+commercial development; new environments still require explicit authorization.
+The source candidate provision.py requires an explicit --environment value
+equal to DATAVERSE_URL and checks for a directly assigned System Administrator
+role BEFORE creating anything. Role-label localization or group-only admin
+assignments may need administrator review; do not remove checks casually.
+
+.\.venv\Scripts\python.exe provision.py --environment https://YOUR-APPROVED-ORG.crm9.dynamics.com --phase schema
+
+This creates/reuses IRSLEAP publisher (prefix leap), IRSLEAPCanvasStarter
+solution, the user-owned leap_request table with local category/status choices,
+five systemuser lookups, and IRS LEAP Participant/Automation roles.
+
+The 13 categories are metadata choices, not reference-data rows requiring a
+separate CSV import. Inspect their full labels after provisioning.
+
+Build backend\IrsLeap.Plugins.csproj following backend\REGISTRATION.txt.
+Its .keys private signing key is deliberately excluded from the source archive.
+If rebuilding, generate a key locally using backend\New-SigningKey.ps1 and
+retain it securely for future upgrades. Different keys change assembly identity;
+do not overwrite a previously installed assembly with a different key.
+
+Register using the manifest and DLL paths actually delivered/generated:
+
+.\.venv\Scripts\python.exe provision.py --environment https://YOUR-APPROVED-ORG.crm9.dynamics.com --phase backend --dll backend\artifacts\IrsLeap.Plugins.dll --manifest backend\manifest.json
+
+If those paths are not present, STOP and complete the backend build/manifest
+steps. Do not invent files or load a different assembly with the same display name.
+Review every exception. A partially completed provisioning run is not success.
+Inspect what already exists before rerunning; never delete a user-owned table
+to recover from a metadata conflict.
+
+Inspect the registered metadata in the environment:
+- leap_request table: user/team owned, DateOnly leave date, integer hours0..24.
+- Category: exact13 choices, not a multi-select field.
+- PreOperation synchronous RequestGuard: Create and Update.
+- Before preimage on Update: include all relevant columns as REGISTRATION.txt.
+- PreOperation synchronous RequestGuard: Assign blocker.
+- PostOperation synchronous transactional RequestShare: Create.
+- leap_GetAnnualTotal: unbound action, correct inputs/outputs/plugin.
+- IRS LEAP Participant and IRS LEAP Automation privilege levels.
+- Approver1 must be required in the Canvas card AND plugin; verify lookup metadata.
+
+SECURITY AND CONCURRENCY LIMITATIONS
+----------------------------------
+Participants use Basic User plus IRS LEAP Participant; native request records
+are private except explicitly shared Read access to selected approvers.
+The automation connection owner uses Basic User plus IRS LEAP Automation.
+Dataverse role privileges are cumulative: remove conflicting broad roles from
+ordinary-user rehearsal identities. App sharing does not assign data roles.
+
+Prepared code is a workshop candidate, not production authorization evidence.
+It treats a caller with the IRS LEAP Automation role (direct or team assignment)
+or System Administrator as a trusted writer of workflow fields. The workflow
+must authenticate/map the actual selected approval responder; plugin role checks
+alone cannot independently prove an approval email was clicked.
+
+An approver assigned to ANY saved request for an employee can request that
+employee's annual totals for any selected year. It does not return hidden row
+details. This access currently has no automatic expiry; approve the lifetime
+and annual-total privacy policy before using real data.
+
+The one native approval service handles first-responder ordering. The guard
+rejects stale terminal-state updates but does not establish a durable atomic
+outbox or solve every concurrent delivery/read-write race. Ambiguous duplicate
+approval dispatch and create-then-wait races require reconciliation. Do not
+present the lab as production-ready or exactly-once processing.
+
+EXPORT - FOR FUTURE REBUILDS AFTER PROVISIONING
+---------------------------------------------
+package.py exports REAL solutions from an approved environment. It does not
+manufacture solution XML. It requires an explicit environment matching the
+local .env and an authorized active PAC profile.
+
+.\.venv\Scripts\python.exe package.py --pac "C:\PATH\TO\pac.exe" --environment https://YOUR-APPROVED-ORG.crm9.dynamics.com
+
+Included development exports, also generated by future rebuilds:
+IRSLEAPCanvasStarter_1_1_0_0_unmanaged.zip
+IRSLEAPCanvasStarter_1_1_0_0_managed.zip
+IRS-LEAP-Canvas-Hackathon-Kit.zip
+
+Import the unmanaged export into a clean workshop sandbox and execute all UAT
+cases using ordinary identities. Do not distribute a package that contains only
+the empty solution container or skips the plugin/API/security components.
+
+The outer IRS-LEAP-Canvas-Hackathon-Kit.zip is a DELIVERY ARCHIVE, not a Dataverse
+solution. Extract it first; import ONLY the chosen managed/unmanaged solution ZIP.
+
+CURRENT EVIDENCE AND REMAINING GATES
+----------------------------------
+The compiled plugin source passed its local contract harness. Fifteen synthetic
+backend cases passed in commercial development: requester derivation, blank/zero,
+year derivation, immutable content, duplicate/self approvers, times/categories,
+approved overlapping-hour sum, missing-hour count, terminal state protection,
+empty-year totals and explicit Read sharing. Synthetic records were removed.
+See backend-validation.json for the evidence boundary.
+
+The app was compiled through the native authoring service,saved/published,and
+exercised in Studio for real user lookup,request save,details and annual API.
+Synthetic SDK-approved2+3withzero/blank rendered5hours,4requests,1missing; records
+were removed. This was NOT a native approval response test.
+Source standalone player was license-blocked; no trial or license changes.
+Still pending: target connection bindings,native approval/email execution,
+published licensed ordinary-user access,clean-target import and actual GCC.
+No flow was enabled and no approval/email was sent. See RELEASE-1.1.txt.
+
+Build-once flow reference is guide\CORE-LAB.txt (native Start and wait).
+Advanced split Create/persist-ID/Wait instructions are a separate alternative.
+Do not combine them. Core intentionally leaves leap_approvalid blank.
+
+RELEASE GATE
+------------
+Before participants arrive, record actual observed results for:
+1. ordinary requester creates a pending request;
+2. selected approver reads it; unrelated user cannot;
+3. native approval and requester outcome work in the target cloud;
+4. one of3 recipients finalizes the single approval;
+5. blank vs0 hours, overlapping2+3 hours, and year-of-leave totals;
+6. authorized aggregate includes hidden approved rows without revealing them;
+7. unrelated total request denied; stale decision cannot change finalized row;
+8. imported package matches the rehearsed schema, roles, plugin and API;
+9. published Canvas app runs under ordinary-user identities.
+
+Only after all gates pass should the event be described as a one-day deployment
+workshop. Otherwise use the guide for design/training only and state the blocker.

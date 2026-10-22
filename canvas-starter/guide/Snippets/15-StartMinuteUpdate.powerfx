@@ -1,0 +1,1 @@
+ddStartHour.Selected.Value * 60 + ddStartMinute.Selected.Value

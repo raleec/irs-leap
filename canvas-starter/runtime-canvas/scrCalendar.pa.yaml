@@ -1,0 +1,197 @@
+Screens:
+  scrCalendar:
+    Properties:
+      Fill: =RGBA(247, 249, 252, 1)
+      OnVisible: =Refresh('LEAP Requests')
+    Children:
+      - lblWorkshopHeading:
+          Control: Label
+          Properties:
+            Color: =RGBA(20, 44, 76, 1)
+            FocusedBorderThickness: =2
+            Font: =Font.'Segoe UI'
+            FontWeight: =FontWeight.Bold
+            Height: =52
+            Size: =28
+            TabIndex: =0
+            Text: ="IRS LEAP"
+            Width: =550
+            X: =24
+            Y: =12
+      - lblSubtitle:
+          Control: Label
+          Properties:
+            FocusedBorderThickness: =2
+            Height: =30
+            Size: =14
+            TabIndex: =0
+            Text: ="Leave and Exception Approval Portal"
+            Width: =650
+            X: =24
+            Y: =64
+      - lblSignedIn:
+          Control: Label
+          Properties:
+            FocusedBorderThickness: =2
+            Height: =32
+            TabIndex: =0
+            Text: =If(IsBlank(varMe.User), "Account unavailable. Contact your environment administrator.", "Signed in as " & varMe.'Full Name')
+            Width: =850
+            X: =24
+            Y: =100
+      - btnNew:
+          Control: Classic/Button
+          Properties:
+            DisplayMode: =If(IsBlank(varMe.User), DisplayMode.Disabled, DisplayMode.Edit)
+            Height: =44
+            OnSelect: =Set(varNewRequest, true); Navigate(scrNew)
+            Text: ="New request"
+            Width: =155
+            X: =1010
+            Y: =24
+      - btnRefresh:
+          Control: Classic/Button
+          Properties:
+            Height: =44
+            OnSelect: =Refresh('LEAP Requests'); Notify("Requests refreshed. Reload annual totals separately.", NotificationType.Information)
+            Text: ="Refresh"
+            Width: =150
+            X: =1180
+            Y: =24
+      - btnPrevious:
+          Control: Classic/Button
+          Properties:
+            OnSelect: =Set(varMonth, DateAdd(varMonth, -1, TimeUnit.Months)); Set(varSelectedDate, varMonth); Set(varGridStart, DateAdd(varMonth, 1 - Weekday(varMonth, StartOfWeek.Monday), TimeUnit.Days))
+            Text: ="Previous"
+            Width: =120
+            X: =24
+            Y: =152
+      - lblMonth:
+          Control: Label
+          Properties:
+            Align: =Align.Center
+            FocusedBorderThickness: =2
+            FontWeight: =FontWeight.Semibold
+            Size: =19
+            TabIndex: =0
+            Text: =Text(varMonth, "[$-en-US]mmmm yyyy")
+            Width: =326
+            X: =150
+            Y: =152
+      - btnNext:
+          Control: Classic/Button
+          Properties:
+            OnSelect: =Set(varMonth, DateAdd(varMonth, 1, TimeUnit.Months)); Set(varSelectedDate, varMonth); Set(varGridStart, DateAdd(varMonth, 1 - Weekday(varMonth, StartOfWeek.Monday), TimeUnit.Days))
+            Text: ="Next"
+            Width: =120
+            X: =484
+            Y: =152
+      - lblWeek:
+          Control: Label
+          Properties:
+            FocusedBorderThickness: =2
+            Height: =32
+            TabIndex: =0
+            Text: ="Mon          Tue          Wed          Thu          Fri          Sat          Sun"
+            Width: =580
+            X: =32
+            Y: =204
+      - galMonth:
+          Control: Gallery
+          Variant: Vertical
+          Properties:
+            AccessibleLabel: ="Month calendar. Select a day to view authorized requests."
+            Height: =360
+            Items: =AddColumns(Sequence(42), CellDate, DateAdd(varGridStart, Value - 1, TimeUnit.Days))
+            TabIndex: =0
+            TemplatePadding: =3
+            TemplateSize: =56
+            Width: =588
+            WrapCount: =7
+            X: =24
+            Y: =244
+          Children:
+            - btnDay:
+                Control: Classic/Button
+                Properties:
+                  Color: =If(ThisItem.CellDate = varSelectedDate, Color.White, If(Month(ThisItem.CellDate) = Month(varMonth), RGBA(20, 44, 76, 1), Color.Gray))
+                  Fill: =If(ThisItem.CellDate = varSelectedDate, RGBA(20, 75, 125, 1), RGBA(232, 238, 247, 1))
+                  Height: =50
+                  OnSelect: =Set(varSelectedDate, ThisItem.CellDate)
+                  Text: =Text(ThisItem.CellDate, "d")
+                  Tooltip: =Text(ThisItem.CellDate, "dddd, mmmm d, yyyy")
+                  Width: =74
+      - lblCalendarPrivacy:
+          Control: Label
+          Properties:
+            FocusedBorderThickness: =2
+            Height: =56
+            Size: =12
+            TabIndex: =0
+            Text: ="Only requests you are authorized to read appear. An empty day does not mean nobody else has leave."
+            Width: =590
+            X: =24
+            Y: =612
+      - btnMyTotals:
+          Control: Classic/Button
+          Properties:
+            DisplayMode: =If(IsBlank(varMe.User), DisplayMode.Disabled, DisplayMode.Edit)
+            Height: =44
+            OnSelect: =Set(varTotalsRequester, varMe); Set(varAnnualTotal, Blank()); Set(varTotalError, ""); Set(varReloadTotals, true); Navigate(scrTotals)
+            Text: ="My annual totals"
+            Width: =250
+            X: =24
+            Y: =686
+      - lblSelectedDate:
+          Control: Label
+          Properties:
+            FocusedBorderThickness: =2
+            FontWeight: =FontWeight.Semibold
+            Size: =18
+            TabIndex: =0
+            Text: =Text(varSelectedDate, "dddd, mmmm d, yyyy")
+            Width: =680
+            X: =650
+            Y: =152
+      - ddRequestView:
+          Control: Classic/DropDown
+          Properties:
+            AccessibleLabel: ="Filter authorized day requests"
+            Default: ="Authorized day"
+            Items: =["Authorized day", "My requests", "My approvals"]
+            Items.Value: =Value
+            Width: =330
+            X: =650
+            Y: =204
+      - galRequests:
+          Control: Gallery
+          Variant: Vertical
+          Properties:
+            AccessibleLabel: ="Authorized requests on the selected calendar date"
+            Height: =470
+            Items: =Switch(ddRequestView.Selected.Value, "My requests", Sort(Filter('LEAP Requests', 'Leave Date' = varSelectedDate, Requester.User = varMe.User), 'Start Minute', SortOrder.Ascending), "My approvals", Sort(Filter('LEAP Requests', 'Leave Date' = varSelectedDate, 'Approver 1'.User = varMe.User || 'Approver 2'.User = varMe.User || 'Approver 3'.User = varMe.User), 'Start Minute', SortOrder.Ascending), Sort(Filter('LEAP Requests', 'Leave Date' = varSelectedDate), 'Start Minute', SortOrder.Ascending))
+            OnSelect: =Set(varSelectedRequest, ThisItem); Navigate(scrDetails)
+            TabIndex: =0
+            TemplatePadding: =6
+            TemplateSize: =106
+            Width: =680
+            X: =650
+            Y: =256
+          Children:
+            - lblRequestRow:
+                Control: Label
+                Properties:
+                  Fill: =Color.White
+                  FocusedBorderThickness: =2
+                  Height: =92
+                  OnSelect: =Select(Parent)
+                  PaddingLeft: =12
+                  Size: =14
+                  TabIndex: =0
+                  Text: |-
+                    =ThisItem.Title & " | " & Text(ThisItem.'Request Status') & Char(10) &
+                    ThisItem.Requester.'Full Name' & " | " &
+                    Text(Int(ThisItem.'Start Minute' / 60), "00") & ":" & Text(Mod(ThisItem.'Start Minute', 60), "00") &
+                    " - " & Text(Int(ThisItem.'End Minute' / 60), "00") & ":" & Text(Mod(ThisItem.'End Minute', 60), "00") &
+                    " | " & If(IsBlank(ThisItem.'Leave Hours'), "Hours not entered", Text(ThisItem.'Leave Hours') & " hours")
+                  Width: =650

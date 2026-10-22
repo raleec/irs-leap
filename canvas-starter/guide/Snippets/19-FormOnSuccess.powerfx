@@ -1,0 +1,9 @@
+Set(varSubmitting, false);
+Set(varSelectedRequest, frmRequest.LastSubmit);
+Set(varSelectedDate, frmRequest.LastSubmit.'Leave Date');
+Set(varMonth, Date(Year(varSelectedDate), Month(varSelectedDate), 1));
+Set(varGridStart, DateAdd(varMonth, 1 - Weekday(varMonth, StartOfWeek.Monday), TimeUnit.Days));
+Refresh('LEAP Requests');
+Notify("Request submitted. Approval is processed separately.", NotificationType.Success);
+ResetForm(frmRequest);
+Navigate(scrCalendar, ScreenTransition.None)
